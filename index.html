@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cours de Physique L1 du Dr Papa Touty Traoré, Université Souleymane Niang de Matam : supports de cours, diaporamas et TD corrigés.">
 <title>Cours de Physique L1</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1B2A41">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Physique L1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Fira+Mono:wght@400;500&display=swap">
@@ -95,6 +101,23 @@ summary{font-family:var(--f-head);font-size:.86rem;font-weight:500;color:var(--a
 .td-card{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:20px;background:var(--tint);border:1px solid var(--line);border-radius:12px;padding:18px}
 .td-card h3{font-family:var(--f-head);font-size:1.15rem;margin:2px 0 4px}
 .td-card p{margin:0;color:var(--muted);font-size:.95rem}
+.off{display:grid;grid-template-columns:1fr;gap:12px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-top:22px}
+.off h2{font-family:var(--f-head);font-size:1.05rem;margin:2px 0 4px}
+.off p{margin:0;color:var(--muted);font-size:.93rem;max-width:75ch}
+.off-act{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.obtn{font-family:var(--f-head);font-size:.88rem;font-weight:500;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer}
+.obtn:hover:not(:disabled){border-color:var(--accent)}
+.obtn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.obtn:disabled{opacity:.55;cursor:default}
+.obtn small{font-family:var(--f-mono);font-size:.74rem;opacity:.8;margin-left:4px}
+.olink{font-family:var(--f-head);font-size:.82rem;color:var(--muted);background:none;border:0;text-decoration:underline;cursor:pointer;padding:4px}
+.meter{grid-column:1/-1;height:6px;background:var(--tint);border-radius:3px;overflow:hidden}
+.meter span{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+.net{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-head);font-size:.8rem;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--tint);color:var(--accent)}
+.net.down{background:var(--tint2);color:var(--warm)}
+.net::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.btn.saved .n::before{content:"✓ ";font-weight:600}
+@media (max-width:820px){.off{grid-template-columns:1fr}.off-act{justify-content:flex-start}}
 .empty{color:var(--muted);font-family:var(--f-head);padding:20px 0}
 footer{border-top:1px solid var(--line);color:var(--muted);font-family:var(--f-head);font-size:.82rem}
 footer .wrap{padding-block:18px}
@@ -145,6 +168,22 @@ footer .wrap{padding-block:18px}
   </div>
 </nav>
 
+<div class="wrap" id="offWrap" hidden>
+  <section class="off" aria-labelledby="offTitle">
+    <div>
+      <div class="eyebrow">Consultation hors connexion <span class="net" id="net">en ligne</span></div>
+      <h2 id="offTitle">Emportez vos cours sur votre téléphone</h2>
+      <p id="offMsg">Les pages, les quiz et les simulations fonctionnent déjà sans connexion. Enregistrez aussi les documents pour les lire partout, sans internet.</p>
+    </div>
+    <div class="off-act">
+      <button type="button" class="obtn primary" id="dlDocs">Enregistrer les cours et TD<small>3,4 Mo</small></button>
+      <button type="button" class="obtn" id="dlSlides">Enregistrer les diaporamas<small>28 Mo</small></button>
+      <button type="button" class="obtn" id="install" hidden>Installer l'application</button>
+      <button type="button" class="olink" id="offClear">Supprimer les documents enregistrés</button>
+    </div>
+    <div class="meter" hidden id="meter"><span id="meterBar"></span></div>
+  </section>
+</div>
 <main><div class="wrap" id="content"></div></main>
 
 <footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré. Les documents s'ouvrent dans la liseuse ; le bouton « Nouvel onglet » permet de les enregistrer.</div></footer>
@@ -253,6 +292,7 @@ function render(){
     h+=`<p class="empty">Aucun chapitre de ce cours ne contient « ${esc($("#q").value)} ».${other.length?` Essayez l'onglet ${other.map(o=>esc(o.tab)).join(", ")}.`:""}</p>`;
   }
   $("#content").innerHTML=h;
+  markCached();
 }
 
 $("#tabs").innerHTML=COURSES.map(c=>`<button type="button" class="tab" role="tab" data-id="${c.id}">${esc(c.tab)}</button>`).join("");
@@ -280,7 +320,9 @@ async function openPdf(file,title){
     if(my!==token)return;
     $("#rPages").textContent=doc.numPages+" pages";
     layout();
-  }catch(err){wrap.innerHTML=`<div class="r-msg">Le document n'a pas pu s'afficher. <a href="${url}" target="_blank" rel="noopener">Ouvrir le PDF dans un nouvel onglet</a>.</div>`}
+  }catch(err){wrap.innerHTML=navigator.onLine===false
+    ?`<div class="r-msg">Vous êtes hors connexion et ce document n'est pas encore enregistré sur cet appareil. Reconnectez-vous pour l'ouvrir : il restera ensuite disponible hors connexion.</div>`
+    :`<div class="r-msg">Le document n'a pas pu s'afficher. <a href="${url}" target="_blank" rel="noopener">Ouvrir le PDF dans un nouvel onglet</a>.</div>`}
 }
 async function layout(){
   if(obs)obs.disconnect();
@@ -303,12 +345,45 @@ async function drawPage(div){
   div.appendChild(cv);
   await page.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise;
 }
-function closeReader(){reader.hidden=true;document.body.style.overflow="";token++;if(obs)obs.disconnect();wrap.innerHTML="";if(doc){doc.destroy();doc=null}}
+function closeReader(){setTimeout(markCached,300);reader.hidden=true;document.body.style.overflow="";token++;if(obs)obs.disconnect();wrap.innerHTML="";if(doc){doc.destroy();doc=null}}
 $("#rClose").addEventListener("click",closeReader);
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!reader.hidden)closeReader()});
 $("#zIn").addEventListener("click",()=>{if(!doc)return;zoom=Math.min(2.5,zoom*1.25);layout()});
 $("#zOut").addEventListener("click",()=>{if(!doc)return;zoom=Math.max(.5,zoom/1.25);layout()});
 document.addEventListener("click",e=>{const b=e.target.closest("[data-pdf]");if(b)openPdf(b.dataset.pdf,b.dataset.title)});
+
+
+/* ---------- hors connexion ---------- */
+var PDF_CACHE="pdf-v1";
+var pdfPath=f=>(f.includes("/")?f:"docs/"+f)+".pdf";
+var absPath=u=>new URL(u,location.href).pathname;
+function allDocs(){const d=[],s=[];COURSES.forEach(c=>{c.chapters.forEach(ch=>{d.push(pdfPath(ch.key));if(ch.td){d.push(pdfPath(ch.td.e),pdfPath(ch.td.c))}if(ch.slides)s.push(pdfPath("slides/"+ch.key+"_diapo"))});(c.series||[]).forEach(x=>d.push(pdfPath(x.e),pdfPath(x.c)))});return{d,s}}
+async function savedPaths(){try{if(!("caches" in window))return new Set();const c=await caches.open(PDF_CACHE);return new Set((await c.keys()).map(r=>new URL(r.url).pathname))}catch(e){return new Set()}}
+async function markCached(){const set=await savedPaths();document.querySelectorAll(".btn[data-pdf]").forEach(b=>b.classList.toggle("saved",set.has(absPath(pdfPath(b.dataset.pdf)))));
+  const {d,s}=allDocs(),nd=d.filter(u=>set.has(absPath(u))).length,ns=s.filter(u=>set.has(absPath(u))).length;
+  const b1=$("#dlDocs"),b2=$("#dlSlides");if(!b1)return;
+  if(!busy){b1.disabled=nd===d.length;b1.firstChild.textContent=nd===d.length?"Cours et TD enregistrés ✓":"Enregistrer les cours et TD";
+  b2.disabled=ns===s.length;b2.firstChild.textContent=ns===s.length?"Diaporamas enregistrés ✓":"Enregistrer les diaporamas"}}
+var busy=false;
+async function download(list,btn){if(busy)return;busy=true;const c=await caches.open(PDF_CACHE),set=await savedPaths(),todo=list.filter(u=>!set.has(absPath(u)));
+  const m=$("#meter"),bar=$("#meterBar");m.hidden=false;let ok=0,fail=0;
+  for(let i=0;i<todo.length;i++){btn.firstChild.textContent=`Enregistrement… ${i+1}/${todo.length}`;bar.style.width=(i/todo.length*100)+"%";
+    try{const r=await fetch(todo[i],{cache:"no-cache"});if(!r.ok)throw 0;await c.put(absPath(todo[i]),r);ok++}catch(e){fail++}}
+  bar.style.width="100%";busy=false;setTimeout(()=>{m.hidden=true;bar.style.width="0"},800);
+  $("#offMsg").textContent=fail?`${ok} document(s) enregistré(s), ${fail} en échec : vérifiez la connexion puis réessayez.`:"C'est fait : ces documents s'ouvrent maintenant sans connexion, même après fermeture du navigateur.";
+  markCached()}
+function netState(){const on=navigator.onLine!==false,n=$("#net");n.textContent=on?"en ligne":"hors connexion";n.classList.toggle("down",!on);
+  if(!on)$("#offMsg").textContent="Vous êtes hors connexion. Les documents marqués ✓ s'ouvrent normalement ; les autres seront disponibles au retour de la connexion."}
+if("serviceWorker" in navigator&&"caches" in window){
+  $("#offWrap").hidden=false;
+  $("#dlDocs").addEventListener("click",e=>download(allDocs().d,e.currentTarget));
+  $("#dlSlides").addEventListener("click",e=>download(allDocs().s,e.currentTarget));
+  $("#offClear").addEventListener("click",async()=>{try{await caches.delete(PDF_CACHE)}catch(e){}$("#offMsg").textContent="Les documents enregistrés ont été supprimés de cet appareil.";markCached()});
+  addEventListener("online",netState);addEventListener("offline",netState);netState();
+  let deferred=null;addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e;$("#install").hidden=false});
+  $("#install").addEventListener("click",async()=>{if(!deferred)return;deferred.prompt();await deferred.userChoice.catch(()=>{});deferred=null;$("#install").hidden=true});
+  markCached();
+}
 
 /* ---------- motif de champ du bandeau (comme les couvertures) ---------- */
 (function(){
@@ -331,6 +406,9 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-pdf]");if(
   }
   draw();addEventListener("resize",draw);
 })();
+</script>
+<script>
+if("serviceWorker" in navigator){addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
 </script>
 </body>
 </html>

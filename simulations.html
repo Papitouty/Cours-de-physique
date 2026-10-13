@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Simulations de Physique L1</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1B2A41">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Physique L1">
 <meta name="description" content="Simulations interactives pour les cours de Physique L1 du Dr P. T. Traoré (USNM) : champ électrostatique, théorème de Gauss, base de Frenet, énergie potentielle.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Fira+Mono:wght@400;500&display=swap">
@@ -493,6 +499,9 @@ if(matchMedia)matchMedia("(prefers-color-scheme: dark)").addEventListener?.("cha
 
 addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(SIMS.some(s=>s[0]===h)&&h!==cur)go(h)});
 tabs();go(cur);
+</script>
+<script>
+if("serviceWorker" in navigator){addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
 </script>
 </body>
 </html>

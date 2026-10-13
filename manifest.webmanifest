@@ -1,0 +1,16 @@
+{
+  "name": "Cours de Physique L1 — Dr P. T. Traoré",
+  "short_name": "Physique L1",
+  "description": "Supports de cours, diaporamas, TD corrigés, quiz et simulations de Physique L1 (Université Souleymane Niang de Matam).",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1B2A41",
+  "theme_color": "#1B2A41",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
