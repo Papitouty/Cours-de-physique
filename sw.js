@@ -2,7 +2,7 @@
    - pages et ressources du site : réseau d'abord, copie locale si pas de connexion
    - documents PDF : copie locale d'abord (un document ouvert une fois reste disponible)
    - bibliothèques et polices externes : copie locale, rafraîchie en arrière-plan */
-const VERSION = "v4";
+const VERSION = "v5";
 const SHELL = "shell-" + VERSION;
 const PDFS = "pdf-v1";          // nom stable : les documents enregistrés survivent aux mises à jour du site
 const EXT = "ext-" + VERSION;
@@ -99,7 +99,8 @@ self.addEventListener("fetch", e => {
   if (url.origin === location.origin) {
     e.respondWith((async () => {
       const c = await caches.open(SHELL);
-      const netP = fetch(req).then(res => { if (res.ok) c.put(req, res.clone()); return res; });
+      // "no-cache" : on redemande toujours la dernière version au serveur (sinon le navigateur peut garder une copie de 10 min)
+      const netP = fetch(req, { cache: "no-cache" }).then(res => { if (res.ok) c.put(req, res.clone()); return res; });
       try {
         return await withTimeout(netP, 5000);           // réseau lent ou absent : on passe à la copie locale
       } catch (err) {
