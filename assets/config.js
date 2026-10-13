@@ -10,5 +10,5 @@ window.SITE_CONFIG = {
   whatsapp: "",
   /* Adresse de l'application Web Google (Apps Script) qui reçoit et corrige les comptes rendus de TP.
      Laisser "" tant qu'elle n'est pas installée. */
-  crEndpoint: ""
+  crEndpoint: "https://script.google.com/macros/s/AKfycbyRQ9FqyqxnfkQg99lsZ3Y9BII1lJqUF0Mhcd4DMzugR_BI0UsyMDSUeRjM_LIkiGpFBQ/exec"
 };
