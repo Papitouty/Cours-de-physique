@@ -118,6 +118,13 @@ summary{font-family:var(--f-head);font-size:.86rem;font-weight:500;color:var(--a
 .net::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
 .btn.saved .n::before{content:"✓ ";font-weight:600}
 @media (max-width:820px){.off{grid-template-columns:1fr}.off-act{justify-content:flex-start}}
+.annb{display:flex;align-items:center;gap:12px;margin-top:18px;background:var(--tint2);border:1px solid var(--line);border-radius:10px;padding:10px 12px 10px 14px}
+.annb-tag{flex:none;font-family:var(--f-head);font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--warm)}
+.annb-txt{flex:1;min-width:0;color:var(--fg);text-decoration:none;font-size:.95rem}
+.annb-txt b{font-family:var(--f-head);font-weight:600}
+.annb-txt span{color:var(--muted)}
+.annb-txt:hover b{text-decoration:underline}
+.annb-x{flex:none;border:0;background:none;color:var(--muted);font-size:1.3rem;line-height:1;cursor:pointer;padding:2px 6px}
 .empty{color:var(--muted);font-family:var(--f-head);padding:20px 0}
 footer{border-top:1px solid var(--line);color:var(--muted);font-family:var(--f-head);font-size:.82rem}
 footer .wrap{padding-block:18px}
@@ -161,6 +168,9 @@ footer .wrap{padding-block:18px}
     <div class="tabs" role="tablist" id="tabs"></div>
     <a class="navlink" href="quiz.html">Quiz</a>
     <a class="navlink" href="simulations.html">Simulations</a>
+    <a class="navlink" href="entrainement.html">Entraînement</a>
+    <a class="navlink" href="calendrier.html">Annonces</a>
+    <a class="navlink" href="questions.html">Questions</a>
     <label class="search" for="q">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="q" type="search" placeholder="Rechercher une notion : Gauss, Frenet, travail…" autocomplete="off">
@@ -168,6 +178,13 @@ footer .wrap{padding-block:18px}
   </div>
 </nav>
 
+<div class="wrap" id="annWrap" hidden>
+  <div class="annb" role="status">
+    <span class="annb-tag" id="annTag">Annonce</span>
+    <a class="annb-txt" id="annLink" href="calendrier.html"><b id="annTitle"></b> <span id="annText"></span></a>
+    <button type="button" class="annb-x" id="annClose" aria-label="Masquer l'annonce">×</button>
+  </div>
+</div>
 <div class="wrap" id="offWrap" hidden>
   <section class="off" aria-labelledby="offTitle">
     <div>
@@ -200,6 +217,7 @@ footer .wrap{padding-block:18px}
   <div class="r-scroll" id="rScroll"><div class="r-pages-wrap" id="rWrap"></div></div>
 </div>
 
+<script src="assets/annonces.js"></script>
 <script src="vendor/pdfjs/pdf.js"></script>
 <script>
 const COURSES=[
@@ -243,7 +261,7 @@ if(location.hash&&COURSES.some(c=>c.id===location.hash.slice(1)))current=locatio
 (function(){
   let ch=0,pg=0,sl=0,td=0;
   COURSES.forEach(c=>{c.chapters.forEach(x=>{ch++;pg+=x.pages;if(x.slides)sl+=x.slides;if(x.td)td++});(c.series||[]).forEach(()=>td++)});
-  $("#stats").innerHTML=`<span><b>${COURSES.length}</b>cours</span><span><b>${ch}</b>chapitres</span><span><b>${pg}</b>pages de cours</span><span><b>${sl}</b>diapositives</span><span><b>${td}</b>séries de TD corrigées</span><span><b>60</b>questions de quiz</span><span><b>5</b>simulations</span>`;
+  $("#stats").innerHTML=`<span><b>${COURSES.length}</b>cours</span><span><b>${ch}</b>chapitres</span><span><b>${pg}</b>pages de cours</span><span><b>${sl}</b>diapositives</span><span><b>${td}</b>séries de TD corrigées</span><span><b>60</b>questions de quiz</span><span><b>5</b>simulations</span><span><b>19</b>exercices d'entraînement</span>`;
 })();
 
 function pdfBtn(file,label,n,kind,primary){
@@ -276,6 +294,7 @@ function render(){
         ${pdfBtn(ch.key,"Support de cours",ch.pages,"pdf",true).replace('data-title="Support de cours"',`data-title="${esc("Chapitre "+ch.n+" — "+ch.title)}"`)}
         ${ch.slides?pptBtn(ch.key,ch.slides,"Diaporama — chapitre "+ch.n+" : "+ch.title):""}
         ${ch.td?pdfBtn(ch.td.e,"TD "+ch.n+" — énoncés",ch.td.ep,"pdf")+pdfBtn(ch.td.c,"TD "+ch.n+" — corrigé détaillé",ch.td.cp,"cor"):""}
+        <a class="btn" href="entrainement.html#${c.id}${ch.n}"><span class="k k-quiz">EXOS</span><span class="lbl">Exercices d'entraînement</span></a>
         <a class="btn" href="quiz.html#${c.id}${ch.n}"><span class="k k-quiz">QUIZ</span><span class="lbl">Quiz d'auto-évaluation</span><span class="n">10 q.</span></a>
         ${(SIMS[c.id+ch.n]||[]).map(([id,t])=>`<a class="btn" href="simulations.html#${id}"><span class="k k-sim">SIMU</span><span class="lbl">${esc(t)}</span></a>`).join("")}
       </div></article>`;
@@ -361,6 +380,23 @@ $("#zIn").addEventListener("click",()=>{if(!doc)return;zoom=Math.min(2.5,zoom*1.
 $("#zOut").addEventListener("click",()=>{if(!doc)return;zoom=Math.max(.5,zoom/1.25);layout()});
 document.addEventListener("click",e=>{const b=e.target.closest("[data-pdf]");if(b)openPdf(b.dataset.pdf,b.dataset.title)});
 
+
+
+/* ---------- bandeau d'annonce ---------- */
+(function(){
+  const A=(window.ANNONCES||[]).slice().sort((a,b)=>b.date.localeCompare(a.date)),C=(window.CALENDRIER||[]);
+  const t0=new Date();t0.setHours(0,0,0,0);
+  const toD=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+  const next=C.filter(e=>{const d=toD(e.date);return d>=t0&&(d-t0)/864e5<=7}).sort((a,b)=>a.date.localeCompare(b.date))[0];
+  let item=null;
+  if(next){const d=toD(next.date),n=Math.round((d-t0)/864e5);item={id:"cal-"+next.date+next.titre,tag:n===0?"Aujourd'hui":n===1?"Demain":"Dans "+n+" jours",titre:next.titre,texte:(next.heure?next.heure+" ":"")+(next.lieu||""),lien:"calendrier.html"}}
+  else{const a=A.find(x=>x.important);if(a)item={id:"ann-"+a.date+a.titre,tag:"Nouveau",titre:a.titre,texte:a.texte||"",lien:a.lien||"calendrier.html"}}
+  if(!item)return;
+  let hidden=null;try{hidden=localStorage.getItem("annHidden")}catch(e){}
+  if(hidden===item.id)return;
+  $("#annTag").textContent=item.tag;$("#annTitle").textContent=item.titre;$("#annText").textContent=item.texte;$("#annLink").href=item.lien;$("#annWrap").hidden=false;
+  $("#annClose").addEventListener("click",()=>{$("#annWrap").hidden=true;try{localStorage.setItem("annHidden",item.id)}catch(e){}});
+})();
 
 /* ---------- hors connexion ---------- */
 var PDF_CACHE="pdf-v1";

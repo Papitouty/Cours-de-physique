@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Entraînement de Physique L1</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1B2A41">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="description" content="Exercices d'entraînement à valeurs aléatoires, corrigés pas à pas, pour les cours de Physique L1 du Dr P. T. Traoré (USNM).">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Fira+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+main .wrap{padding-block:24px 10px;display:grid;gap:20px}
+.picker{display:grid;gap:12px}
+.grp{display:grid;gap:6px}
+.grp-t{font-family:var(--f-head);font-size:.8rem;font-weight:600;color:var(--muted)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:18px;align-items:start}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:22px;display:grid;gap:16px;min-width:0}
+.head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.head h2{font-family:var(--f-head);font-size:1.15rem;margin:0}
+.exnav{display:flex;gap:6px;flex-wrap:wrap}
+.exnav button{font-family:var(--f-mono);font-size:.8rem;border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:6px;padding:4px 9px;cursor:pointer}
+.exnav button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.enonce{font-size:1.07rem;line-height:1.6;overflow-x:auto}
+.answers{display:grid;gap:10px}
+.ans{display:grid;grid-template-columns:minmax(80px,auto) minmax(0,220px) auto auto;gap:10px;align-items:center}
+.ans .nm{font-size:1.02rem;text-align:right}
+.ans input{font-family:var(--f-mono);font-size:1rem;padding:9px 11px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);width:100%;min-width:0}
+.ans input:focus{border-color:var(--accent);outline:none}
+.ans input.good{border-color:var(--ok);background:var(--ok-bg)}
+.ans input.bad{border-color:var(--ko);background:var(--ko-bg)}
+.ans .u{font-family:var(--f-head);font-size:.9rem;color:var(--muted)}
+.ans .st{font-family:var(--f-head);font-size:.85rem;font-weight:600}
+.ans .st.good{color:var(--ok)} .ans .st.bad{color:var(--ko)}
+.tip{font-family:var(--f-head);font-size:.82rem;color:var(--muted);margin:0}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.sol{border-top:1px solid var(--line);padding-top:14px;display:grid;gap:8px}
+.sol ol{margin:0;padding-left:22px;display:grid;gap:8px}
+.sol li{overflow-x:auto}
+.side{display:grid;gap:14px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:8px;font-size:.95rem}
+.panel h3{font-family:var(--f-head);font-size:.95rem;margin:0}
+.panel ul{margin:0;padding-left:18px;display:grid;gap:4px}
+.score{font-family:var(--f-mono);font-size:1.8rem;color:var(--accent);font-variant-numeric:tabular-nums}
+.score small{font-size:.9rem;color:var(--muted)}
+@media (max-width:860px){.layout{grid-template-columns:1fr}}
+@media (max-width:520px){.ans{grid-template-columns:auto minmax(0,1fr) auto}.ans .st{grid-column:1/-1;text-align:right}}
+</style>
+</head>
+<body>
+<header class="band"><div class="wrap">
+  <a class="back" href="./">← Retour aux cours</a>
+  <div class="uni">UNIVERSITÉ SOULEYMANE NIANG DE MATAM • PHYSIQUE L1</div>
+  <h1>Entraînement</h1>
+  <p>Des exercices dont les données changent à chaque essai. Calcule, saisis ta réponse : le site la vérifie et te montre la correction pas à pas.</p>
+</div></header>
+<main><div class="wrap">
+  <section class="picker" id="picker" aria-label="Choix du chapitre"></section>
+  <div class="layout">
+    <section class="card" id="card" aria-live="polite"></section>
+    <aside class="side">
+      <div class="panel"><h3>Cette séance</h3><div class="score" id="score">0<small> / 0 réussis</small></div><div class="tip" style="margin:0">Un exercice est réussi quand toutes ses réponses sont justes du premier coup ou après correction de tes calculs, sans avoir affiché la solution.</div></div>
+      <div class="panel"><h3>Saisir une réponse</h3><ul>
+        <li>Virgule ou point : <code>3,6</code> ou <code>3.6</code></li>
+        <li>Puissances de 10 : <code>3,6e4</code> ou <code>3,6x10^4</code></li>
+        <li>Garde au moins 3 chiffres significatifs ; une erreur de 2 % est tolérée.</li>
+        <li>Respecte l'unité indiquée à droite de la case.</li>
+      </ul></div>
+    </aside>
+  </div>
+</div></main>
+<footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré</div></footer>
+
+<script src="assets/exos.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>
+const EX=window.EXOS,TT=window.EXO_TITRES,KEYS=Object.keys(EX);
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function math(el){if(window.renderMathInElement)renderMathInElement(el,{delimiters:[{left:"$",right:"$",display:false}],macros:{"\\dd":"\\mathrm{d}"},throwOnError:false});}
+function tex(s){try{return window.katex?katex.renderToString(s,{throwOnError:false,macros:{"\\dd":"\\mathrm{d}"}}):esc(s)}catch(e){return esc(s)}}
+let key=KEYS.includes(location.hash.slice(1))?location.hash.slice(1):KEYS[0],idx=0,cur=null,shown=false,done=false;
+let tried=0,won=0;
+
+function picker(){
+  const groups={"Mécanique":KEYS.filter(k=>k.startsWith("meca")),"Électricité":KEYS.filter(k=>k.startsWith("elec"))};
+  $("#picker").innerHTML=Object.entries(groups).map(([g,ks])=>`<div class="grp"><div class="grp-t">${g}</div><div class="pill-row">${ks.map(k=>`<button type="button" class="pill" data-k="${k}" aria-pressed="${k===key}">${esc(TT[k])}</button>`).join("")}</div></div>`).join("");
+}
+$("#picker").addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(!b)return;key=b.dataset.k;idx=0;history.replaceState(null,"","#"+key);picker();gen()});
+
+function parse(s){
+  s=String(s).trim().replace(/\s/g,"").replace(/,/g,".").replace(/−/g,"-").replace(/[×x*]10\^?\(?(-?\d+)\)?/i,"e$1").replace(/·10\^?(-?\d+)/,"e$1");
+  if(s===""||!/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s))return NaN;return Number(s)}
+function fmtVal(x){if(x===0)return"0";const a=Math.abs(x);if(a>=1e-2&&a<1e4)return(+x.toPrecision(3)).toString().replace(".",",");const ex=Math.floor(Math.log10(a));return(+(x/10**ex).toPrecision(3)).toString().replace(".",",")+" × 10^"+ex}
+
+function gen(){
+  const list=EX[key];cur=list[idx]();shown=false;done=false;tried++;updScore();
+  $("#card").innerHTML=`<div class="head"><h2>${esc(cur.titre)}</h2><div class="exnav">${list.map((_,i)=>`<button type="button" data-i="${i}" aria-pressed="${i===idx}" title="Exercice ${i+1}">Ex. ${i+1}</button>`).join("")}</div></div>
+   <div class="enonce">${cur.enonce}</div>
+   <form class="answers" id="ansForm" autocomplete="off">${cur.reponses.map((r,i)=>`<div class="ans"><span class="nm">${tex(r.nom)} =</span><input id="a${i}" inputmode="decimal" aria-label="Réponse ${i+1}"><span class="u">${esc(r.unite||"")}</span><span class="st" id="s${i}"></span></div>`).join("")}
+   <div class="actions"><button type="submit" class="btn primary">Vérifier</button><button type="button" class="btn" id="showSol">Voir la correction</button><button type="button" class="btn" id="newEx">Nouvelles valeurs</button></div></form>
+   <div class="sol" id="sol" hidden><div class="eyebrow">Correction</div><ol>${cur.correction.map(c=>`<li>${c}</li>`).join("")}</ol></div>`;
+  math($("#card"));
+}
+function check(){
+  let all=true;
+  cur.reponses.forEach((r,i)=>{const inp=$("#a"+i),st=$("#s"+i),x=parse(inp.value);
+    const tol=Math.max(r.abs||0,(r.tol||0.02)*Math.abs(r.val));
+    const ok=isFinite(x)&&Math.abs(x-r.val)<=tol+1e-12;
+    inp.classList.toggle("good",ok);inp.classList.toggle("bad",!ok);
+    st.className="st "+(ok?"good":"bad");st.textContent=ok?"✓ juste":(isFinite(x)?"✗ à revoir":"✗ nombre attendu");
+    if(!ok)all=false});
+  if(all&&!shown&&!done){done=true;won++;updScore()}
+  if(all){$("#sol").hidden=false}
+}
+function reveal(){shown=true;$("#sol").hidden=false;cur.reponses.forEach((r,i)=>{const st=$("#s"+i);if(!st.classList.contains("good")){st.className="st bad";st.textContent="attendu : "+fmtVal(r.val)}})}
+function updScore(){$("#score").innerHTML=`${won}<small> / ${tried} réussi${won>1?"s":""}</small>`}
+$("#card").addEventListener("submit",e=>{e.preventDefault();check()});
+$("#card").addEventListener("click",e=>{
+  if(e.target.id==="showSol")reveal();
+  if(e.target.id==="newEx")gen();
+  const b=e.target.closest("[data-i]");if(b){idx=+b.dataset.i;gen()}
+});
+addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(KEYS.includes(h)&&h!==key){key=h;idx=0;picker();gen()}});
+picker();gen();
+</script>
+<script>
+if("serviceWorker" in navigator){addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+</script>
+</body>
+</html>

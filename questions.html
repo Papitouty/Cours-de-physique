@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Questions — Physique L1</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1B2A41">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="description" content="Poser une question sur le cours ou signaler une erreur — Physique L1, Dr P. T. Traoré (USNM).">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Fira+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+main .wrap{padding-block:24px 10px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start}
+h2{font-family:var(--f-head);font-size:1.25rem;margin:0 0 6px}
+.lead{margin:0 0 14px;color:var(--muted);font-size:.97rem}
+form{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:20px;display:grid;gap:14px}
+.f{display:grid;gap:5px}
+.f label{font-family:var(--f-head);font-size:.88rem;font-weight:500}
+.f label small{font-weight:400;color:var(--muted)}
+input,select,textarea{font:inherit;font-size:1rem;padding:9px 11px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);outline:none}
+textarea{min-height:140px;resize:vertical}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.acts{display:flex;flex-wrap:wrap;gap:8px}
+.msg{font-family:var(--f-head);font-size:.9rem;border-radius:8px;padding:10px 12px;background:var(--tint)}
+.msg.warn{background:var(--tint2)}
+details{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+details+details{margin-top:8px}
+summary{font-family:var(--f-head);font-weight:500;cursor:pointer}
+details p,details ol{margin:10px 0 0;font-size:.97rem}
+details ol{padding-left:20px;display:grid;gap:4px}
+@media (max-width:820px){main .wrap{grid-template-columns:1fr}.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="band"><div class="wrap">
+  <a class="back" href="./">← Retour aux cours</a>
+  <div class="uni">UNIVERSITÉ SOULEYMANE NIANG DE MATAM • PHYSIQUE L1</div>
+  <h1>Questions</h1>
+  <p>Une question sur le cours, un exercice qui bloque, une erreur repérée dans un document : écris-la ici.</p>
+</div></header>
+<main><div class="wrap">
+  <section aria-labelledby="hQ">
+    <h2 id="hQ">Poser une question</h2>
+    <p class="lead">Précise le chapitre, l'exercice et ce que tu as déjà essayé : la réponse sera plus rapide et plus utile.</p>
+    <form id="qForm" novalidate>
+      <div class="two">
+        <div class="f"><label for="nom">Nom et prénom</label><input id="nom" autocomplete="name" required></div>
+        <div class="f"><label for="grp">Groupe de TD <small>(facultatif)</small></label><input id="grp"></div>
+      </div>
+      <div class="two">
+        <div class="f"><label for="type">Objet</label><select id="type">
+          <option>Question sur le cours</option><option>Question sur un exercice de TD</option><option>Question sur un quiz ou un exercice d'entraînement</option><option>Signaler une erreur dans un document</option><option>Problème avec le site</option><option>Autre</option></select></div>
+        <div class="f"><label for="chap">Chapitre</label><select id="chap">
+          <option>Mécanique — Ch. 1 Calcul vectoriel</option><option>Mécanique — Ch. 2 Cinématique</option><option>Mécanique — Ch. 3 Dynamique</option><option>Mécanique — Ch. 4 Travail et énergie</option><option>Électricité — Ch. 1 Charge et loi de Coulomb</option><option>Électricité — Ch. 2 Champ et potentiel</option><option>Électricité — Série de TD n°1</option><option>Autre / général</option></select></div>
+      </div>
+      <div class="f"><label for="ref">Référence <small>(page, exercice, question — facultatif)</small></label><input id="ref" placeholder="Ex. : TD 3, exercice 4, question 2"></div>
+      <div class="f"><label for="txt">Ta question</label><textarea id="txt" required placeholder="Explique ce que tu ne comprends pas et ce que tu as déjà essayé."></textarea></div>
+      <div class="acts" id="acts"></div>
+      <div class="msg" id="out" hidden></div>
+    </form>
+  </section>
+  <section aria-labelledby="hF">
+    <h2 id="hF">Questions fréquentes</h2>
+    <p class="lead">La réponse est peut-être déjà ici.</p>
+    <details><summary>Par où commencer pour réviser un chapitre ?</summary><ol>
+      <li>Relis le support de cours, en refaisant toi-même les démonstrations.</li>
+      <li>Fais le quiz du chapitre et reprends les sections indiquées pour chaque erreur.</li>
+      <li>Entraîne-toi avec les exercices à valeurs aléatoires jusqu'à les réussir sans la correction.</li>
+      <li>Cherche les exercices de TD seul, avant de regarder le corrigé.</li></ol></details>
+    <details><summary>Comment bien utiliser un corrigé de TD ?</summary><p>Cherche d'abord l'exercice au moins vingt minutes. Ensuite, ne lis que l'étape suivante du corrigé, ferme-le et continue seul. Refais l'exercice entier quelques jours plus tard, sans le corrigé : c'est ce qui prépare réellement à l'examen.</p></details>
+    <details><summary>Comment utiliser le site sans connexion ?</summary><p>Ouvre le site une première fois avec internet : les cours, les TD, les quiz, les simulations et les exercices sont alors enregistrés sur ton téléphone. Les diaporamas, plus lourds, s'enregistrent avec le bouton « Enregistrer les diaporamas » de la page d'accueil. Un document enregistré porte une coche ✓.</p></details>
+    <details><summary>Comment installer le site comme une application ?</summary><p>Sur Android (Chrome) : bouton « Installer l'application » sur la page d'accueil, ou menu ⋮ puis « Installer l'application ». Sur iPhone (Safari) : bouton Partager puis « Sur l'écran d'accueil ».</p></details>
+    <details><summary>Je ne vois pas les dernières nouveautés.</summary><p>Ferme complètement le navigateur, puis rouvre le site avec internet. La nouvelle version s'installe automatiquement.</p></details>
+    <details><summary>Comment saisir une réponse dans l'entraînement ?</summary><p>Écris un nombre avec une virgule ou un point (3,6 ou 3.6). Pour les puissances de 10 : 3,6e4 ou 3,6x10^4. Respecte l'unité indiquée à côté de la case. Une erreur de 2 % est tolérée.</p></details>
+    <details><summary>L'enseignant voit-il mes scores aux quiz ?</summary><p>Non. Les scores restent uniquement sur ton téléphone ; ils servent à te situer, pas à te noter.</p></details>
+    <details><summary>Un document ne s'ouvre pas.</summary><p>Vérifie la connexion, puis réessaie. Si la liseuse intégrée ne démarre pas, un bouton propose d'ouvrir le document avec le lecteur PDF du téléphone. Si le problème continue, signale-le avec le formulaire (objet « Problème avec le site »).</p></details>
+  </section>
+</div></main>
+<footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré</div></footer>
+<script src="assets/config.js"></script>
+<script>
+const $=s=>document.querySelector(s),CFG=window.SITE_CONFIG||{};
+const acts=[];
+if(CFG.email)acts.push('<button type="submit" class="btn primary" data-via="mail">Envoyer par e-mail</button>');
+if(CFG.whatsapp)acts.push(`<button type="submit" class="btn${CFG.email?"":" primary"}" data-via="wa">Envoyer par WhatsApp</button>`);
+acts.push(`<button type="submit" class="btn${acts.length?"":" primary"}" data-via="copy">Copier le message</button>`);
+$("#acts").innerHTML=acts.join("");
+if(!CFG.email&&!CFG.whatsapp){const o=$("#out");o.hidden=false;o.className="msg warn";o.textContent="L'envoi direct n'est pas encore activé : copie ton message et pose ta question en séance ou dans le groupe de la classe.";}
+let via="copy";
+$("#acts").addEventListener("click",e=>{const b=e.target.closest("[data-via]");if(b)via=b.dataset.via});
+function compose(){
+  const v=id=>$("#"+id).value.trim();
+  const subject=`[Physique L1] ${v("type")} — ${v("chap")}`;
+  const body=`Nom : ${v("nom")}${v("grp")?"\nGroupe : "+v("grp"):""}\nObjet : ${v("type")}\nChapitre : ${v("chap")}${v("ref")?"\nRéférence : "+v("ref"):""}\n\n${v("txt")}`;
+  return {subject,body};
+}
+$("#qForm").addEventListener("submit",async e=>{
+  e.preventDefault();const out=$("#out");
+  if(!$("#nom").value.trim()||!$("#txt").value.trim()){out.hidden=false;out.className="msg warn";out.textContent="Indique ton nom et ta question avant d'envoyer.";(!$("#nom").value.trim()?$("#nom"):$("#txt")).focus();return}
+  const {subject,body}=compose();
+  if(via==="mail"){location.href=`mailto:${CFG.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;out.hidden=false;out.className="msg";out.textContent=`Ton application de messagerie s'ouvre avec le message prêt : il reste à appuyer sur Envoyer. Si rien ne s'ouvre, écris à ${CFG.email}.`;return}
+  if(via==="wa"){window.open(`https://wa.me/${CFG.whatsapp}?text=${encodeURIComponent(subject+"\n\n"+body)}`,"_blank","noopener");out.hidden=false;out.className="msg";out.textContent="WhatsApp s'ouvre avec le message prêt : il reste à appuyer sur Envoyer.";return}
+  const txt=subject+"\n\n"+body;
+  try{await navigator.clipboard.writeText(txt);out.hidden=false;out.className="msg";out.textContent="Message copié : colle-le dans un e-mail ou dans le groupe WhatsApp de la classe.";}
+  catch(err){$("#txt").value=txt;$("#txt").select();out.hidden=false;out.className="msg warn";out.textContent="La copie automatique a échoué : le message complet est sélectionné dans la case, copie-le manuellement.";}
+});
+</script>
+<script>
+if("serviceWorker" in navigator){addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+</script>
+</body>
+</html>
