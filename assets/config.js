@@ -7,5 +7,8 @@
    ===================================================================== */
 window.SITE_CONFIG = {
   email: "papatouty.traore@ucad.edu.sn",
-  whatsapp: ""
+  whatsapp: "",
+  /* Adresse de l'application Web Google (Apps Script) qui reçoit et corrige les comptes rendus de TP.
+     Laisser "" tant qu'elle n'est pas installée. */
+  crEndpoint: ""
 };

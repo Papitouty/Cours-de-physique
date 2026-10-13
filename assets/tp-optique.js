@@ -73,7 +73,7 @@
       $("#rfI").addEventListener("input", e => { i = +e.target.value; update(); T.draw(); });
       $("#rfRec").onclick = () => { if (lec.r == null) { T.msg("Réflexion totale : il n'y a pas de rayon réfracté à mesurer.", "bad"); return; } T.add(mode, { i: lec.i, r: lec.r }); T.msg(`Mesure enregistrée (partie ${mode}).`, "ok"); };
       $("#rfLim").onclick = () => { const { lim } = read(); if (mode !== "B") { T.msg("L'angle limite s'observe dans le sens plexiglas → air.", "bad"); return; } if (i < lim) { T.msg("Le rayon réfracté est encore visible : augmente doucement l'angle.", "bad"); return; } if (i > lim + 1.5) { T.msg("Tu as dépassé l'angle limite de trop : reviens en arrière et approche-le lentement.", "bad"); return; } T.add("C", { l: round05(i + gauss() * 0.2) }); T.msg("Angle limite noté.", "ok"); };
-      $("#rfNew").onclick = () => { newBlock(); ["A", "B", "C"].forEach(k => T.rows[k] = []); T.renderAll(); update(); T.draw(); T.msg("Nouveau demi-cylindre : refais les mesures."); };
+      $("#rfNew").onclick = () => { if (T.locked()) { T.msg("Compte rendu déjà soumis : le matériel ne peut plus être changé.", "bad"); return; } newBlock(); T.clearRows(); update(); T.draw(); T.msg("Nouveau demi-cylindre : refais les mesures."); };
       T.draw = () => {
         const { c, w, h } = fit($("#refraction-cv"), innerWidth < 600 ? 0.95 : 0.62); c.fillStyle = css("--plot-bg"); c.fillRect(0, 0, w, h);
         const fg = css("--fg"), mu = css("--muted"), cx = w / 2, cy = h / 2, R = Math.min(w, h) * 0.42;
@@ -221,7 +221,7 @@
       };
       $("#lnP1").onclick = () => { if (!sharp()) { T.msg("L'image n'est pas nette : cherche la position donnant une image nette.", "bad"); return; } pend = { D, x1: Math.round(xl * 10) / 10 }; T.msg(`Position 1 notée : ${fr(pend.x1, 1)} cm. Cherche maintenant la seconde position nette.`, "ok"); };
       $("#lnP2").onclick = () => { if (!pend) { T.msg("Note d'abord la position 1.", "bad"); return; } if (!sharp()) { T.msg("L'image n'est pas nette.", "bad"); return; } const x2 = Math.round(xl * 10) / 10; if (Math.abs(x2 - pend.x1) < 1) { T.msg("C'est la même position : cherche l'autre position nette, plus loin de l'objet.", "bad"); return; } T.add("C", { D: pend.D, x1: Math.min(pend.x1, x2), x2: Math.max(pend.x1, x2) }); pend = null; T.msg("Couple de positions enregistré.", "ok"); };
-      $("#lnNew").onclick = () => { newL(); ["A", "B", "C"].forEach(k => T.rows[k] = []); T.renderAll(); ui(); T.msg("Nouvelle lentille : refais les mesures."); };
+      $("#lnNew").onclick = () => { if (T.locked()) { T.msg("Compte rendu déjà soumis : le matériel ne peut plus être changé.", "bad"); return; } newL(); T.clearRows(); ui(); T.msg("Nouvelle lentille : refais les mesures."); };
       T.draw = () => {
         const s = state(), { c, w, h } = fit($("#lentilles-cv"), innerWidth < 600 ? 1.0 : 0.6); c.fillStyle = css("--plot-bg"); c.fillRect(0, 0, w, h);
         const fg = css("--fg"), mu = css("--muted"), by = h * 0.36, X = x => 16 + x / 150 * (w - 32);
@@ -309,7 +309,7 @@
         else { const e = (xk - s.x1) - P.f2; if (Math.abs(e) >= 0.15) { T.msg("L'image finale n'est pas à l'infini : règle l'oculaire.", "bad"); return; }
           const a = AB / 1000 * s.g1 / (P.f2 / 100) * (1 + gauss() * 0.02); T.add("B", { g1: Math.round(s.g1 * (1 + gauss() * 0.015) * 100) / 100, a }); T.msg("Mesure enregistrée (partie B).", "ok"); }
       };
-      $("#mcNew").onclick = () => { newL(); ["A", "B"].forEach(k => T.rows[k] = []); T.renderAll(); ui(); T.msg("Nouvelles lentilles : refais les mesures."); };
+      $("#mcNew").onclick = () => { if (T.locked()) { T.msg("Compte rendu déjà soumis : le matériel ne peut plus être changé.", "bad"); return; } newL(); T.clearRows(); ui(); T.msg("Nouvelles lentilles : refais les mesures."); };
       T.draw = () => {
         const s = st(), { c, w, h } = fit($("#microscope-cv"), innerWidth < 600 ? 1.0 : 0.6); c.fillStyle = css("--plot-bg"); c.fillRect(0, 0, w, h);
         const fg = css("--fg"), mu = css("--muted"), by = h * 0.36, X = x => 16 + x / 150 * (w - 32);

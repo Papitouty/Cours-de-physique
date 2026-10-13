@@ -93,7 +93,7 @@
         if (part === "A" && mont !== "aval") T.msg("Conseil : pour la partie A, utilise le montage aval.", "");
         T.add(part, { U: meas.V, I: meas.I, mont, nom: label(sel), k: sel }); if (part !== "A" || mont === "aval") T.msg(`Mesure enregistrée dans la partie ${part}.`, "ok");
       };
-      $("#ohNew").onclick = () => { newSet(); ["A", "B", "C"].forEach(k => T.rows[k] = []); T.renderAll(); measure(); T.draw(); T.msg("Nouveaux résistors : refais les mesures."); };
+      $("#ohNew").onclick = () => { if (T.locked()) { T.msg("Compte rendu déjà soumis : le matériel ne peut plus être changé.", "bad"); return; } newSet(); T.clearRows(); measure(); T.draw(); T.msg("Nouveaux résistors : refais les mesures."); };
       T.draw = () => {
         const { c, w, h } = fit($("#ohm-cv"), innerWidth < 600 ? 0.9 : 0.55); c.fillStyle = css("--plot-bg"); c.fillRect(0, 0, w, h);
         const fg = css("--fg"), mu = css("--muted"), L = w * 0.1, Rr = w * 0.62, Tp = h * 0.28, B = h * 0.84;

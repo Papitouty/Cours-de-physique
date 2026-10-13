@@ -173,7 +173,7 @@
       $("#rsSt").onclick = () => { run = false; x = 0; v = 0; set(); T.draw(); };
       $("#rsRecA").onclick = () => { if (run) { T.msg("Immobilise la masse avant de lire la règle.", "bad"); return; } T.add("A", { m: Math.round(m * 1000), l: lread, l0: P.l0read }); T.msg("Mesure statique enregistrée.", "ok"); };
       $("#rsRecB").onclick = () => { const { t, n } = ch.S.reading(); if (ch.S.on || ch.S.armed) { T.msg("Arrête d'abord le chronomètre.", "bad"); return; } if (t < 0.3) { T.msg("Chronomètre d'abord les oscillations.", "bad"); return; } T.add("B", { m: Math.round(m * 1000), X: X * 100, n, t }); T.msg(`Période enregistrée : T₀ = ${fr(t / n, 3)} s.`, "ok"); };
-      $("#rsNew").onclick = () => { newSpring(); T.rows.A = []; T.rows.B = []; T.renderAll(); set(); T.draw(); T.msg("Nouveau ressort : refais les mesures."); };
+      $("#rsNew").onclick = () => { if (T.locked()) { T.msg("Compte rendu déjà soumis : le matériel ne peut plus être changé.", "bad"); return; } newSpring(); T.clearRows(); set(); T.draw(); T.msg("Nouveau ressort : refais les mesures."); };
       T.tick = dt => {
         let extreme = false;
         if (run) { const meff = m + P.mr / 3, k = 20, h = dt / k; for (let i = 0; i < k; i++) { v += -(P.k / meff) * x * h; x += v * h; } if (prev > 0 && v <= 0) extreme = true; prev = v; }
@@ -269,7 +269,7 @@
       $("#toGo").onclick = () => { set(); th = A * Math.PI / 180; om = 0; prev = 0; run = true; T.msg("Barre lâchée : chronomètre au moins 5 oscillations."); };
       $("#toSt").onclick = () => { run = false; th = 0; om = 0; T.draw(); };
       $("#toRec").onclick = () => { const { t, n } = ch.S.reading(); if (ch.S.on || ch.S.armed) { T.msg("Arrête d'abord le chronomètre.", "bad"); return; } if (t < 1) { T.msg("Chronomètre d'abord les oscillations.", "bad"); return; } const p = $("#to-part").value; T.add(p, { L, d: d * 100, n, t }); T.msg(`Mesure enregistrée (partie ${p}) : T = ${fr(t / n, 3)} s.`, "ok"); };
-      $("#toNew").onclick = () => { newWire(); T.rows.A = []; T.rows.B = []; T.renderAll(); T.msg("Nouveau fil : refais les mesures."); };
+      $("#toNew").onclick = () => { if (T.locked()) { T.msg("Compte rendu déjà soumis : le matériel ne peut plus être changé.", "bad"); return; } newWire(); T.clearRows(); T.msg("Nouveau fil : refais les mesures."); };
       T.tick = dt => { let extreme = false; if (run) { const k = 10, h = dt / k, w2 = C() / J(); for (let i = 0; i < k; i++) { om += -w2 * th * h; th += om * h; } if (prev > 0 && om <= 0) extreme = true; prev = om; } ch.S.step(dt, extreme); T.draw(); };
       T.draw = () => {
         const { c, w, h } = fit($("#torsion-cv"), innerWidth < 600 ? 1.0 : 0.58); c.fillStyle = css("--plot-bg"); c.fillRect(0, 0, w, h);

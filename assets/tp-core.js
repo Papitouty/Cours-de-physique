@@ -89,9 +89,13 @@
   const TPS = [];
   function register(T) { TPS.push(T); }
 
+  const ROUND = (row, spec) => { const o = Object.assign({}, row); Object.keys(spec || {}).forEach(k => { if (typeof o[k] !== "number") return; o[k] = spec[k] === "s4" ? +o[k].toPrecision(4) : +o[k].toFixed(spec[k]); }); return o; };
+  const parseNum = v => { const s = String(v ?? "").trim().replace(/\s/g, "").replace(",", ".").replace(/[×x*]10\^?\(?(-?\d+)\)?/i, "e$1"); return s === "" ? NaN : Number(s); };
+
   function mount(T) {
+    const CR = window.TPCR[T.id], L = "ABCDEFG", keys = Object.keys(CR.parts);
     const host = document.createElement("section"); host.className = "tp"; host.id = T.id; host.hidden = true;
-    const L = "ABCDEFG";
+    const idField = (f, label, opt) => `<label>${label}${opt ? ' <span class="opt">(facultatif)</span>' : ""}<input id="${T.id}-${f}" data-id="${f}" autocomplete="off"></label>`;
     host.innerHTML = `
     <article class="card fiche">
       <div class="eyebrow">${esc(T.disc)} • TP n°${T.num}</div>
@@ -107,91 +111,117 @@
       <div class="bench"><canvas id="${T.id}-cv" aria-label="Montage simulé"></canvas><p class="hint">${T.hint}</p></div>
       <div class="panel">${T.controls}<p class="msg" id="${T.id}-msg" role="status"></p></div>
     </div>
-    ${T.parts.map((p, i) => `<section class="part" id="${T.id}-p-${p.key}">
-      <h3>Partie ${L[i]} — ${esc(p.titre)}</h3>
-      <div class="data${p.point ? "" : " solo"}">
-        <div class="tblwrap"><table><thead><tr>${p.cols.map(c => `<th>${c}</th>`).join("")}<th class="noprint"></th></tr></thead><tbody id="${T.id}-tb-${p.key}"></tbody></table></div>
-        ${p.point ? `<div class="graph"><canvas id="${T.id}-gr-${p.key}" aria-label="Graphe ${esc(p.titre)}"></canvas><div class="fit" id="${T.id}-fit-${p.key}">—</div></div>` : `<div class="fit" id="${T.id}-fit-${p.key}">—</div>`}
-      </div></section>`).join("")}
-    <section class="card report" aria-labelledby="${T.id}-crh">
+    <section class="card report" id="${T.id}-cr" aria-labelledby="${T.id}-crh">
       <h3 id="${T.id}-crh">Compte rendu — TP n°${T.num}</h3>
-      <div class="id">
-        <label>Nom et prénom<input id="${T.id}-nom" autocomplete="name"></label>
-        <label>Binôme<input id="${T.id}-bin"></label>
-        <label>Groupe<input id="${T.id}-grp"></label>
-        <label>Date<input id="${T.id}-date" type="date"></label>
+      <div class="note-box" id="${T.id}-noteBox" hidden></div>
+      <div class="id">${idField("nom", "Nom")}${idField("prenom", "Prénom")}${idField("carte", "N° carte étudiant")}${idField("groupe", "Groupe")}${idField("sousgroupe", "Sous-groupe")}${idField("binome", "Binôme", true)}</div>
+      <p class="hint">Les mesures relevées sur la paillasse s'ajoutent automatiquement aux tableaux. À toi de calculer et de remplir les colonnes colorées, puis les résultats et le QCM. Tout est enregistré sur cet appareil jusqu'à la soumission.</p>
+      ${keys.map((k, i) => { const p = CR.parts[k]; return `<div class="crpart">
+        <h4>Partie ${L[i]} — ${esc(p.titre)} <span class="minm" id="${T.id}-min-${k}"></span></h4>
+        <div class="data${p.plot ? "" : " solo"}">
+          <div class="tblwrap"><table><thead><tr>${p.cols.map(c => `<th>${c}</th>`).join("")}${p.fill.map(f => `<th class="fillh">${f.h}</th>`).join("")}<th class="noprint"></th></tr></thead><tbody id="${T.id}-tb-${k}"></tbody></table></div>
+          ${p.plot ? `<div class="graph"><canvas id="${T.id}-gr-${k}" aria-label="Graphe de la partie ${L[i]}"></canvas><p class="hint">Graphe tracé avec <b>tes</b> valeurs. Trace la droite moyenne et calcule sa pente toi-même.</p></div>` : ""}
+        </div></div>`; }).join("")}
+      <div class="crblock"><h4>Résultats et calculs</h4><div class="calcs">
+        ${CR.calc.map(c => `<div class="calc"><label for="${T.id}-c-${c.k}">${c.h}</label><div class="cin"><input id="${T.id}-c-${c.k}" data-calc="${c.k}" inputmode="decimal"><span>${esc(c.u)}</span></div></div>`).join("")}
+      </div></div>
+      <div class="crblock"><h4>Questions (QCM)</h4>
+        ${CR.qcm.map((q, i) => `<fieldset class="qcm"><legend><b>${i + 1}.</b> ${q.q}</legend>${q.o.map((o, j) => `<label><input type="radio" name="${T.id}-q${i}" value="${j}"> ${o}</label>`).join("")}</fieldset>`).join("")}
       </div>
-      <div class="res"><div class="eyebrow">Résultats des mesures (remplis automatiquement)</div>${T.parts.map((p, i) => `<div class="fit" id="${T.id}-sum-${p.key}"></div>`).join("")}</div>
-      <div class="eyebrow">Questions</div>
-      ${T.questions.map((q, i) => `<div class="q"><label for="${T.id}-q${i}"><b>${i + 1}.</b> ${q}</label><textarea id="${T.id}-q${i}"></textarea></div>`).join("")}
-      <div class="q"><label for="${T.id}-concl"><b>Conclusion.</b> Résume les résultats obtenus, leur précision et ce que tu retiens du TP.</label><textarea id="${T.id}-concl"></textarea></div>
-      <div class="row noprint">
-        <button type="button" class="btn primary" id="${T.id}-dl">Télécharger le compte rendu</button>
-        <button type="button" class="btn" id="${T.id}-pr">Imprimer / PDF</button>
-        <button type="button" class="btn" id="${T.id}-cp">Copier le texte</button>
-        <button type="button" class="btn" id="${T.id}-clr">Effacer toutes les mesures</button>
-        <span class="saved" id="${T.id}-saved">Les réponses sont enregistrées automatiquement sur cet appareil.</span>
+      <div class="crblock"><h4>Remarques <span class="opt">(facultatif, non noté)</span></h4><textarea id="${T.id}-rem" data-id="rem"></textarea></div>
+      <div class="submit noprint" id="${T.id}-sub">
+        <label class="chk"><input type="checkbox" id="${T.id}-ok"> <span>Je certifie que ce compte rendu est mon travail. J'ai compris qu'<b>une seule soumission</b> est possible pour ce TP et que la note est définitive.</span></label>
+        <div class="row"><button type="button" class="btn primary" id="${T.id}-send">Soumettre le compte rendu</button><button type="button" class="btn" id="${T.id}-dl">Télécharger une copie</button><button type="button" class="btn" id="${T.id}-clr">Effacer toutes les mesures</button></div>
+        <p class="msg" id="${T.id}-smsg" role="status"></p>
       </div>
     </section>`;
     $("#tpHost").appendChild(host);
 
-    T.rows = {}; T.parts.forEach(p => T.rows[p.key] = store.get(T.id + "_" + p.key, []));
-    T.fits = {};
+    const S = store.get(T.id + "_crv2", { fill: {}, calc: {}, qcm: {}, id: {} });
+    T.rows = {}; keys.forEach(k => { T.rows[k] = store.get(T.id + "_v2_" + k, []); S.fill[k] = S.fill[k] || []; while (S.fill[k].length < T.rows[k].length) S.fill[k].push({}); });
+    const save = () => { store.set(T.id + "_crv2", S); keys.forEach(k => store.set(T.id + "_v2_" + k, T.rows[k])); };
+    let SUB = store.get(T.id + "_submitted", null);
     T.msg = (s, kind) => { const e = $("#" + T.id + "-msg"); e.textContent = s || ""; e.className = "msg" + (kind ? " " + kind : ""); };
-    T.renderPart = key => {
-      const p = T.parts.find(q => q.key === key), rows = T.rows[key], tb = $("#" + T.id + "-tb-" + key);
-      tb.innerHTML = rows.length ? rows.map((r, i) => `<tr>${p.cells(r, i).map(v => `<td>${v}</td>`).join("")}<td class="x noprint"><button type="button" data-del="${key}:${i}" aria-label="Supprimer la mesure ${i + 1}">×</button></td></tr>`).join("")
-        : `<tr class="empty"><td colspan="${p.cols.length + 1}">Aucune mesure pour l'instant.</td></tr>`;
-      let R = null;
-      if (p.point) { const P = rows.map(p.point).filter(Boolean); R = scatter($("#" + T.id + "-gr-" + key), P, p.axes || {}); }
-      T.fits[key] = R;
-      const s = p.fit(R, rows);
-      $("#" + T.id + "-fit-" + key).innerHTML = s; $("#" + T.id + "-sum-" + key).innerHTML = `<b>Partie ${L[T.parts.indexOf(p)]}.</b> ` + s;
-      store.set(T.id + "_" + key, rows);
+    const plotPart = k => {
+      const p = CR.parts[k]; if (!p.plot) return;
+      const P = T.rows[k].map((r, i) => { const f = {}; p.fill.forEach(c => f[c.k] = parseNum((S.fill[k][i] || {})[c.k])); return [p.plot.x(r, f), p.plot.y(r, f)]; }).filter(q => isFinite(q[0]) && isFinite(q[1]));
+      scatter($("#" + T.id + "-gr-" + k), P, { xl: p.plot.xl, yl: p.plot.yl, noFit: true });
     };
-    T.renderAll = () => T.parts.forEach(p => T.renderPart(p.key));
-    T.add = (key, row) => { T.rows[key].push(row); T.renderPart(key); };
-    host.addEventListener("click", e => { const b = e.target.closest("[data-del]"); if (!b) return; const [k, i] = b.dataset.del.split(":"); T.rows[k].splice(+i, 1); T.renderPart(k); });
-    $("#" + T.id + "-clr").onclick = () => { T.parts.forEach(p => T.rows[p.key] = []); T.renderAll(); T.msg("Toutes les mesures ont été effacées."); };
-
-    // compte rendu : sauvegarde locale
-    const fields = ["nom", "bin", "grp", "date", "concl"].concat(T.questions.map((_, i) => "q" + i));
-    const saved = store.get(T.id + "_cr", {});
-    fields.forEach(f => { const e = $("#" + T.id + "-" + f); if (saved[f] != null) e.value = saved[f]; e.addEventListener("input", () => { const o = {}; fields.forEach(g => o[g] = $("#" + T.id + "-" + g).value); store.set(T.id + "_cr", o); }); });
-    if (!$("#" + T.id + "-date").value) $("#" + T.id + "-date").value = new Date().toISOString().slice(0, 10);
-
-    const val = f => $("#" + T.id + "-" + f).value;
-    const plain = h => String(h).replace(/<sup>(.*?)<\/sup>/g, "^$1").replace(/<sub>(.*?)<\/sub>/g, "_$1").replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
-    const textReport = () => {
-      const out = [`COMPTE RENDU — TP n°${T.num} : ${T.titre}`, "Université Souleymane Niang de Matam — Physique L1", `Nom : ${val("nom")}`, `Binôme : ${val("bin")}`, `Groupe : ${val("grp")}`, `Date : ${val("date")}`, ""];
-      T.parts.forEach((p, i) => { out.push(`PARTIE ${L[i]} — ${p.titre}`, p.cols.map(plain).join(" | ")); T.rows[p.key].forEach((r, j) => out.push(p.cells(r, j).map(plain).join(" | "))); out.push("Exploitation : " + plain(p.fit(T.fits[p.key], T.rows[p.key])), ""); });
-      out.push("QUESTIONS"); T.questions.forEach((q, i) => out.push(`${i + 1}. ${plain(q)}`, "   " + (val("q" + i) || "(sans réponse)"), ""));
-      out.push("CONCLUSION", val("concl") || "(sans réponse)"); return out.join("\n");
+    T.renderPart = k => {
+      const p = CR.parts[k], rows = T.rows[k], tb = $("#" + T.id + "-tb-" + k), lock = !!SUB;
+      while (S.fill[k].length < rows.length) S.fill[k].push({}); S.fill[k].length = rows.length;
+      tb.innerHTML = rows.length ? rows.map((r, i) => `<tr>${p.cells(r, i).map(v => `<td>${v}</td>`).join("")}${p.fill.map(c => `<td class="fillc"><input data-f="${k}:${i}:${c.k}" value="${esc((S.fill[k][i] || {})[c.k] ?? "")}" inputmode="decimal" aria-label="${esc(c.h)}, ligne ${i + 1}"${lock ? " disabled" : ""}></td>`).join("")}<td class="x noprint">${lock ? "" : `<button type="button" data-del="${k}:${i}" aria-label="Supprimer la mesure ${i + 1}">×</button>`}</td></tr>`).join("")
+        : `<tr class="empty"><td colspan="${p.cols.length + p.fill.length + 1}">Aucune mesure : fais les mesures sur la paillasse ci-dessus.</td></tr>`;
+      const m = $("#" + T.id + "-min-" + k); m.textContent = `${rows.length} mesure${rows.length > 1 ? "s" : ""} / ${p.min} minimum`; m.className = "minm" + (rows.length >= p.min ? " ok" : "");
+      plotPart(k); save();
     };
-    const htmlReport = () => {
-      const tables = T.parts.map((p, i) => {
-        const cv = p.point ? $("#" + T.id + "-gr-" + p.key) : null, img = cv && T.rows[p.key].length ? `<img src="${cv.toDataURL("image/png")}" alt="Graphe" style="max-width:100%;border:1px solid #ccc">` : "";
-        return `<h2>Partie ${L[i]} — ${esc(p.titre)}</h2><table><tr>${p.cols.map(c => `<th>${c}</th>`).join("")}</tr>${T.rows[p.key].map((r, j) => `<tr>${p.cells(r, j).map(v => `<td>${v}</td>`).join("")}</tr>`).join("") || `<tr><td colspan="${p.cols.length}">Aucune mesure</td></tr>`}</table>${img}<p class="fit">${p.fit(T.fits[p.key], T.rows[p.key])}</p>`;
-      }).join("");
-      const qs = T.questions.map((q, i) => `<p><b>${i + 1}. ${q}</b><br>${esc(val("q" + i) || "(sans réponse)").replace(/\n/g, "<br>")}</p>`).join("");
-      return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Compte rendu TP ${T.num} — ${esc(val("nom"))}</title><style>body{font-family:Georgia,serif;max-width:800px;margin:24px auto;padding:0 16px;color:#111}h1{font-family:Arial,sans-serif;font-size:20px;border-bottom:3px solid #D98E04;padding-bottom:6px}h2{font-family:Arial,sans-serif;font-size:16px;color:#1F7A8C;margin-top:22px}table{border-collapse:collapse;margin:8px 0;font-family:monospace;font-size:13px}th,td{border:1px solid #999;padding:4px 8px;text-align:right}th{background:#EEF4F6}.fit{background:#EEF4F6;padding:8px;font-family:monospace;font-size:13px}.id td{text-align:left;border:0;padding:2px 12px 2px 0}</style></head><body>
-        <div style="font-family:Arial;font-size:12px;color:#B87503;font-weight:bold">UNIVERSITÉ SOULEYMANE NIANG DE MATAM • PHYSIQUE L1</div>
-        <h1>Compte rendu — TP n°${T.num} : ${esc(T.titre)}</h1>
-        <table class="id"><tr><td><b>Nom</b></td><td>${esc(val("nom"))}</td><td><b>Binôme</b></td><td>${esc(val("bin"))}</td></tr><tr><td><b>Groupe</b></td><td>${esc(val("grp"))}</td><td><b>Date</b></td><td>${esc(val("date"))}</td></tr></table>
-        ${tables}<h2>Questions</h2>${qs}<h2>Conclusion</h2><p>${esc(val("concl") || "(sans réponse)").replace(/\n/g, "<br>")}</p></body></html>`;
+    T.renderAll = () => keys.forEach(T.renderPart);
+    T.locked = () => !!SUB;
+    T.clearRows = () => { keys.forEach(k => { T.rows[k] = []; S.fill[k] = []; }); T.renderAll(); };
+    T.add = (k, row) => { if (SUB) { T.msg("Ce compte rendu a déjà été soumis : les nouvelles mesures ne sont plus enregistrées.", "bad"); return; } T.rows[k].push(ROUND(row, CR.parts[k].r)); S.fill[k].push({}); T.renderPart(k); };
+    const cr = $("#" + T.id + "-cr");
+    cr.addEventListener("click", e => { const b = e.target.closest("[data-del]"); if (!b || SUB) return; const [k, i] = b.dataset.del.split(":"); T.rows[k].splice(+i, 1); S.fill[k].splice(+i, 1); T.renderPart(k); });
+    cr.addEventListener("input", e => {
+      const t = e.target;
+      if (t.dataset.f) { const [k, i, c] = t.dataset.f.split(":"); S.fill[k][+i] = S.fill[k][+i] || {}; S.fill[k][+i][c] = t.value; plotPart(k); save(); }
+      else if (t.dataset.calc) { S.calc[t.dataset.calc] = t.value; save(); }
+      else if (t.dataset.id) { S.id[t.dataset.id] = t.value; save(); }
+    });
+    cr.addEventListener("change", e => { if (e.target.type === "radio") { S.qcm["q" + e.target.name.split("-q").pop()] = e.target.value; save(); } });
+    Object.keys(S.id).forEach(f => { const e = $("#" + T.id + "-" + f); if (e) e.value = S.id[f]; });
+    Object.keys(S.calc).forEach(c => { const e = $("#" + T.id + "-c-" + c); if (e) e.value = S.calc[c]; });
+    Object.keys(S.qcm).forEach(q => { const e = host.querySelector(`input[name="${T.id}-${q}"][value="${S.qcm[q]}"]`); if (e) e.checked = true; });
+    $("#" + T.id + "-clr").onclick = () => { if (SUB) return; keys.forEach(k => { T.rows[k] = []; S.fill[k] = []; }); T.renderAll(); T.msg("Toutes les mesures ont été effacées."); };
+
+    const showNote = R => {
+      const nb = $("#" + T.id + "-noteBox"); nb.hidden = false;
+      nb.innerHTML = isFinite(R.note) ? `<div class="nb-main"><span>Compte rendu soumis le ${esc(new Date(R.date).toLocaleString("fr-FR"))}</span><b>${String(R.note).replace(".", ",")} / 20</b></div>
+        <div class="nb-detail"><span>Mesures <b>${fr(R.mesures, 2)}</b> / 2</span><span>Tableaux <b>${fr(R.tableau, 2)}</b> / 6</span><span>Calculs <b>${fr(R.calculs, 2)}</b> / 6</span><span>QCM <b>${fr(R.qcm, 2)}</b> / 6</span></div>
+        <p class="hint">Ta copie a été transmise à ton enseignant. Elle ne peut plus être modifiée.</p>`
+        : `<div class="nb-main"><span>Un compte rendu a déjà été soumis pour ce TP avec ce numéro de carte.</span><b>Soumis</b></div>`;
+      cr.querySelectorAll("input, textarea").forEach(e => e.disabled = true);
+      $("#" + T.id + "-sub").querySelector(".chk").hidden = true; $("#" + T.id + "-send").hidden = true; $("#" + T.id + "-clr").hidden = true;
+      cr.querySelectorAll("[data-del]").forEach(b => b.remove());
+    };
+    const smsg = (s, kind) => { const e = $("#" + T.id + "-smsg"); e.textContent = s; e.className = "msg" + (kind ? " " + kind : ""); };
+    $("#" + T.id + "-send").onclick = async () => {
+      if (SUB) return;
+      const id = {}; ["nom", "prenom", "carte", "groupe", "sousgroupe", "binome"].forEach(f => id[f] = ($("#" + T.id + "-" + f).value || "").trim());
+      const miss = ["nom", "prenom", "carte", "groupe", "sousgroupe"].filter(f => !id[f]);
+      if (miss.length) { smsg("Complète d'abord l'identification : nom, prénom, n° de carte étudiant, groupe et sous-groupe.", "bad"); $("#" + T.id + "-" + miss[0]).focus(); return; }
+      if (!$("#" + T.id + "-ok").checked) { smsg("Coche la case de certification avant de soumettre.", "bad"); return; }
+      const URL_ = (window.SITE_CONFIG || {}).crEndpoint;
+      if (!URL_) { smsg("La soumission en ligne n'est pas encore activée par l'enseignant. Utilise « Télécharger une copie » en attendant.", "bad"); return; }
+      const fillOut = {}; keys.forEach(k => fillOut[k] = T.rows[k].map((_, i) => { const o = {}; CR.parts[k].fill.forEach(c => o[c.k] = (S.fill[k][i] || {})[c.k] ?? ""); return o; }));
+      const pk = (window.TPCR_PARAMS || {})[T.id];
+      const payload = { tp: T.id, num: T.num, id, raw: T.rows, fill: fillOut, calc: S.calc, qcm: S.qcm, rem: ($("#" + T.id + "-rem").value || "").slice(0, 2000), params: pk ? store.get(pk, null) : null, client: new Date().toISOString() };
+      const btn = $("#" + T.id + "-send"); btn.disabled = true; smsg("Envoi et correction en cours…");
+      try {
+        const res = await fetch(URL_, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
+        const R = await res.json();
+        if (R.ok) { SUB = Object.assign({ date: new Date().toISOString() }, R); store.set(T.id + "_submitted", SUB); smsg("Compte rendu soumis et corrigé.", "ok"); showNote(SUB); }
+        else if (R.duplicate) { SUB = { date: new Date().toISOString(), note: NaN }; store.set(T.id + "_submitted", SUB); smsg(R.error, "bad"); showNote(SUB); }
+        else { btn.disabled = false; smsg(R.error || "La soumission a échoué.", "bad"); }
+      } catch (err) { btn.disabled = false; smsg("Envoi impossible : vérifie ta connexion internet puis réessaie. Tes réponses sont conservées sur cet appareil.", "bad"); }
     };
     $("#" + T.id + "-dl").onclick = () => {
-      const b = new Blob([htmlReport()], { type: "text/html;charset=utf-8" }), a = document.createElement("a");
-      a.href = URL.createObjectURL(b); a.download = `CR_TP${T.num}_${(val("nom") || "etudiant").trim().replace(/\s+/g, "_")}.html`; document.body.appendChild(a); a.click(); a.remove();
-      $("#" + T.id + "-saved").textContent = "Fichier téléchargé : ouvre-le puis imprime-le ou envoie-le à ton enseignant.";
+      const val = f => ($("#" + T.id + "-" + f) || {}).value || "";
+      const tables = keys.map((k, i) => { const p = CR.parts[k]; const cv = p.plot ? $("#" + T.id + "-gr-" + k) : null;
+        return `<h2>Partie ${L[i]} — ${esc(p.titre)}</h2><table><tr>${p.cols.concat(p.fill.map(f => f.h)).map(c => `<th>${c}</th>`).join("")}</tr>${T.rows[k].map((r, j) => `<tr>${p.cells(r, j).concat(p.fill.map(c => esc((S.fill[k][j] || {})[c.k] ?? ""))).map(v => `<td>${v}</td>`).join("")}</tr>`).join("") || `<tr><td colspan="9">Aucune mesure</td></tr>`}</table>${cv && T.rows[k].length ? `<img src="${cv.toDataURL("image/png")}" alt="Graphe" style="max-width:100%;border:1px solid #ccc">` : ""}`; }).join("");
+      const calcs = CR.calc.map(c => `<tr><td style="text-align:left">${c.h}</td><td>${esc(S.calc[c.k] || "")} ${esc(c.u)}</td></tr>`).join("");
+      const qcm = CR.qcm.map((q, i) => `<p><b>${i + 1}. ${q.q}</b><br>${S.qcm["q" + i] != null ? esc(q.o[+S.qcm["q" + i]]) : "(sans réponse)"}</p>`).join("");
+      const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Compte rendu TP ${T.num} — ${esc(val("nom"))}</title><style>body{font-family:Georgia,serif;max-width:820px;margin:24px auto;padding:0 16px;color:#111}h1{font-family:Arial,sans-serif;font-size:20px;border-bottom:3px solid #D98E04;padding-bottom:6px}h2{font-family:Arial,sans-serif;font-size:16px;color:#1F7A8C;margin-top:22px}table{border-collapse:collapse;margin:8px 0;font-family:monospace;font-size:13px}th,td{border:1px solid #999;padding:4px 8px;text-align:right}th{background:#EEF4F6}</style></head><body>
+        <div style="font-family:Arial;font-size:12px;color:#B87503;font-weight:bold">UNIVERSITÉ SOULEYMANE NIANG DE MATAM • PHYSIQUE L1</div><h1>Compte rendu — TP n°${T.num} : ${esc(T.titre)}</h1>
+        <p><b>${esc(val("nom"))} ${esc(val("prenom"))}</b> — carte n° ${esc(val("carte"))} — groupe ${esc(val("groupe"))}, sous-groupe ${esc(val("sousgroupe"))}${val("binome") ? " — binôme : " + esc(val("binome")) : ""}</p>
+        ${SUB && isFinite(SUB.note) ? `<p><b>Note obtenue : ${String(SUB.note).replace(".", ",")} / 20</b></p>` : ""}${tables}<h2>Résultats et calculs</h2><table>${calcs}</table><h2>QCM</h2>${qcm}</body></html>`;
+      const b = new Blob([html], { type: "text/html;charset=utf-8" }), a = document.createElement("a");
+      a.href = URL.createObjectURL(b); a.download = `CR_TP${T.num}_${(val("nom") || "etudiant").replace(/\s+/g, "_")}.html`; document.body.appendChild(a); a.click(); a.remove();
     };
-    $("#" + T.id + "-pr").onclick = () => window.print();
-    $("#" + T.id + "-cp").onclick = async () => { try { await navigator.clipboard.writeText(textReport()); $("#" + T.id + "-saved").textContent = "Texte du compte rendu copié."; } catch (e) { $("#" + T.id + "-saved").textContent = "Copie impossible : utilise « Télécharger »."; } };
 
     T.init(T);
     T.renderAll();
+    if (SUB) showNote(SUB);
   }
-
   let cur = null;
   function go(id) {
     cur = id;
