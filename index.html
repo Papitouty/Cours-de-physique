@@ -173,7 +173,7 @@ footer .wrap{padding-block:18px}
     <div>
       <div class="eyebrow">Consultation hors connexion <span class="net" id="net">en ligne</span></div>
       <h2 id="offTitle">Emportez vos cours sur votre téléphone</h2>
-      <p id="offMsg">Les pages, les quiz et les simulations fonctionnent déjà sans connexion. Enregistrez aussi les documents pour les lire partout, sans internet.</p>
+      <p id="offMsg">Après une première visite avec internet, les pages, les quiz, les simulations, les supports de cours et les TD fonctionnent sans connexion. Les diaporamas, plus lourds, s'enregistrent sur demande.</p>
     </div>
     <div class="off-act">
       <button type="button" class="obtn primary" id="dlDocs">Enregistrer les cours et TD<small>3,4 Mo</small></button>
@@ -200,8 +200,7 @@ footer .wrap{padding-block:18px}
   <div class="r-scroll" id="rScroll"><div class="r-pages-wrap" id="rWrap"></div></div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<script src="vendor/pdfjs/pdf.js"></script>
 <script>
 const COURSES=[
  {id:"meca",tab:"Mécanique",eyebrow:"Physique I",title:"Mécanique du point matériel",
@@ -302,27 +301,37 @@ render();
 
 /* ---------- liseuse PDF ---------- */
 const lib=window.pdfjsLib;
-if(lib){lib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";}
+if(lib){lib.GlobalWorkerOptions.workerSrc="vendor/pdfjs/pdf.worker.js";}
 let doc=null,zoom=1,obs=null,token=0;
 const reader=$("#reader"),wrap=$("#rWrap");
 function baseWidth(){return Math.min(900,$("#rScroll").clientWidth-32)*zoom}
+let blobUrl=null;
+function deviceLink(name){return blobUrl?`<p><a class="obtn primary" href="${blobUrl}" download="${name}" target="_blank" rel="noopener">Ouvrir avec le lecteur PDF de l'appareil</a></p>`:""}
 async function openPdf(file,title){
-  const url=(file.includes("/")?file:"docs/"+file)+".pdf";
+  const url=(file.includes("/")?file:"docs/"+file)+".pdf",name=url.split("/").pop();
   $("#rTitle").textContent=title;$("#rOpen").href=url;$("#rPages").textContent="";
   wrap.innerHTML='<div class="r-msg">Chargement du document…</div>';
   reader.hidden=false;document.body.style.overflow="hidden";$("#rClose").focus();
   zoom=1;const my=++token;
-  if(!lib){wrap.innerHTML=`<div class="r-msg">La liseuse n'a pas pu se charger. <a href="${url}" target="_blank" rel="noopener">Ouvrir le PDF dans un nouvel onglet</a>.</div>`;return}
+  if(blobUrl){URL.revokeObjectURL(blobUrl);blobUrl=null}
+  let data;
   try{
-    const data=await (await fetch(url)).arrayBuffer();
+    const res=await fetch(url);if(!res.ok)throw new Error("http "+res.status);
+    const blob=await res.blob();data=await blob.arrayBuffer();blobUrl=URL.createObjectURL(new Blob([data],{type:"application/pdf"}));
+  }catch(err){
     if(my!==token)return;
-    doc=await lib.getDocument({data}).promise;
+    wrap.innerHTML=navigator.onLine===false
+      ?`<div class="r-msg">Vous êtes hors connexion et ce document n'est pas encore enregistré sur cet appareil.<br>Reconnectez-vous une fois pour l'ouvrir : il restera ensuite disponible hors connexion.</div>`
+      :`<div class="r-msg">Le document n'a pas pu être chargé. Vérifiez la connexion puis réessayez.</div>`;
+    return}
+  if(my!==token)return;
+  if(!lib){wrap.innerHTML=`<div class="r-msg">La liseuse intégrée n'a pas pu démarrer sur ce navigateur.${deviceLink(name)}</div>`;return}
+  try{
+    doc=await lib.getDocument({data:new Uint8Array(data.slice(0))}).promise;
     if(my!==token)return;
     $("#rPages").textContent=doc.numPages+" pages";
     layout();
-  }catch(err){wrap.innerHTML=navigator.onLine===false
-    ?`<div class="r-msg">Vous êtes hors connexion et ce document n'est pas encore enregistré sur cet appareil. Reconnectez-vous pour l'ouvrir : il restera ensuite disponible hors connexion.</div>`
-    :`<div class="r-msg">Le document n'a pas pu s'afficher. <a href="${url}" target="_blank" rel="noopener">Ouvrir le PDF dans un nouvel onglet</a>.</div>`}
+  }catch(err){wrap.innerHTML=`<div class="r-msg">La liseuse intégrée n'a pas pu afficher ce document.${deviceLink(name)}</div>`}
 }
 async function layout(){
   if(obs)obs.disconnect();
