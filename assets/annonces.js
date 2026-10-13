@@ -16,8 +16,8 @@
    ===================================================================== */
 window.ANNONCES = [
   { date: "2026-10-13", important: true,
-    titre: "Travaux pratiques virtuels",
-    texte: "Trois TP simulés pour préparer les séances : loi d'Ohm, lentille convergente et pendule simple, avec tableau de mesures, graphe et compte rendu.",
+    titre: "Travaux pratiques : 7 TP simulés",
+    texte: "Pendule simple, oscillateur harmonique, pendule de torsion, mesures de résistances, réfraction, lentilles et microscope : protocole détaillé, mesures simulées et compte rendu à remplir en ligne.",
     lien: "tp.html" },
   { date: "2026-10-13",
     titre: "Exercices d'entraînement en ligne",

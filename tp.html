@@ -3,334 +3,111 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Travaux pratiques virtuels — Physique L1</title>
+<title>Travaux pratiques — Physique L1</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#1B2A41">
 <link rel="icon" type="image/png" href="icons/favicon.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<meta name="description" content="Laboratoire virtuel : travaux pratiques simulés d'électricité, d'optique et de mécanique (Physique L1, Dr P. T. Traoré, USNM).">
+<meta name="description" content="Travaux pratiques virtuels de mécanique, d'électricité et d'optique : protocoles détaillés, simulations et comptes rendus en ligne (Physique L1, Dr P. T. Traoré, USNM).">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Fira+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="assets/site.css">
 <style>
 main .wrap{padding-block:22px 10px;display:grid;gap:18px}
+.grp{display:grid;gap:6px}
 .grp-t{font-family:var(--f-head);font-size:.8rem;font-weight:600;color:var(--muted)}
-.tabs-wrap{display:grid;gap:6px}
+.tabs-wrap{display:grid;gap:10px}
 .tp{display:grid;gap:18px}
-.fiche{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;display:grid;gap:10px}
-.fiche h2{font-family:var(--f-head);font-size:1.3rem;margin:0}
-.fiche h3{font-family:var(--f-head);font-size:.98rem;margin:6px 0 0}
-.fiche p,.fiche li{font-size:.98rem}
-.fiche p{margin:0}
-.fiche ol,.fiche ul{margin:0;padding-left:22px;display:grid;gap:4px}
-.fiche details summary{font-family:var(--f-head);font-weight:500;cursor:pointer;color:var(--accent)}
-.formula{font-family:var(--f-mono);font-size:.92rem;background:var(--tint);border-radius:8px;padding:8px 12px;overflow-x:auto}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;display:grid;gap:10px;min-width:0}
+.fiche h2{font-family:var(--f-head);font-size:1.35rem;margin:0;text-wrap:balance}
+.fiche .obj{font-size:1rem;margin:0}
+.fiche details{border-top:1px solid var(--line);padding-top:10px}
+.fiche summary{font-family:var(--f-head);font-weight:600;cursor:pointer;color:var(--fg)}
+.fiche summary::marker{color:var(--accent)}
+.fiche .sec{display:grid;gap:8px;margin-top:10px;font-size:.98rem}
+.fiche .sec p{margin:0}
+.fiche .sec h4{font-family:var(--f-head);font-size:.92rem;margin:6px 0 0;color:var(--accent)}
+.fiche ol,.fiche ul{margin:0;padding-left:22px;display:grid;gap:5px}
+.fiche .mat{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+.mat li{font-family:var(--f-head);font-size:.82rem;background:var(--tint);color:var(--fg);border-radius:6px;padding:3px 9px}
+.formula{font-family:var(--f-mono);font-size:.9rem;background:var(--tint);border-radius:8px;padding:8px 12px;overflow-x:auto;white-space:pre}
+.warn{background:var(--tint2);border-radius:8px;padding:8px 12px;font-size:.95rem}
 .lab{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
-.bench{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:10px;display:grid;gap:10px;min-width:0}
+.bench{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:10px;display:grid;gap:8px;min-width:0}
 .bench canvas{display:block;width:100%;border-radius:8px;background:var(--plot-bg);touch-action:none}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:10px;min-width:0}
-.panel h3{font-family:var(--f-head);font-size:.95rem;margin:0}
+.panel h3{font-family:var(--f-head);font-size:.92rem;margin:4px 0 0}
+.panel h3:first-child{margin-top:0}
 .ctl{display:grid;gap:4px}
 .ctl label{display:flex;justify-content:space-between;gap:8px;font-family:var(--f-head);font-size:.86rem;color:var(--muted)}
-.ctl label b{font-family:var(--f-mono);font-weight:500;color:var(--fg);font-variant-numeric:tabular-nums}
+.ctl label b{font-family:var(--f-mono);font-weight:500;color:var(--fg);font-variant-numeric:tabular-nums;white-space:nowrap}
 input[type=range]{width:100%;accent-color:var(--accent)}
+.panel select,.panel input[type=number]{font:inherit;font-family:var(--f-head);font-size:.9rem;padding:6px 8px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);width:100%}
 .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .btn.sm{font-size:.84rem;padding:7px 11px}
-.lcd{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-family:var(--f-head);font-size:.88rem;align-items:center}
+.lcd{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-family:var(--f-head);font-size:.86rem;align-items:center;margin:0}
 .lcd dt{color:var(--muted)}
-.lcd dd{margin:0;font-family:var(--f-mono);font-size:1.05rem;text-align:right;font-variant-numeric:tabular-nums}
+.lcd dd{margin:0;font-family:var(--f-mono);font-size:1.02rem;text-align:right;font-variant-numeric:tabular-nums}
 .hint{font-family:var(--f-head);font-size:.82rem;color:var(--muted);margin:0}
-.data{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
-.tblwrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
-table{border-collapse:collapse;width:100%;font-family:var(--f-mono);font-size:.85rem;font-variant-numeric:tabular-nums}
-th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-th{font-family:var(--f-head);font-weight:600;font-size:.8rem;color:var(--muted);background:var(--bg);position:sticky;top:0}
+.msg{font-family:var(--f-head);font-size:.86rem;margin:0;min-height:1.2em}
+.msg.bad{color:var(--ko)} .msg.ok{color:var(--ok)}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{flex:1;font-family:var(--f-head);font-size:.82rem;border:0;background:var(--bg);color:var(--fg);padding:7px 6px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg)}
+.part{display:grid;gap:10px}
+.part h3{font-family:var(--f-head);font-size:1.05rem;margin:0}
+.data{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+.data.solo{grid-template-columns:1fr}
+.tblwrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;max-height:380px}
+table{border-collapse:collapse;width:100%;font-family:var(--f-mono);font-size:.84rem;font-variant-numeric:tabular-nums}
+th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{font-family:var(--f-head);font-weight:600;font-size:.78rem;color:var(--muted);background:var(--bg);position:sticky;top:0}
 td.x{text-align:center}
 td.x button{border:0;background:none;color:var(--muted);cursor:pointer;font-size:1rem}
-.empty td{text-align:center;color:var(--muted);font-family:var(--f-head);white-space:normal}
-.graph{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;display:grid;gap:8px}
+tr.empty td{text-align:center;color:var(--muted);font-family:var(--f-head);white-space:normal}
+.graph{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;display:grid;gap:8px;min-width:0}
 .graph canvas{width:100%;display:block}
-.fit{font-family:var(--f-mono);font-size:.86rem;background:var(--tint);border-radius:8px;padding:8px 10px;overflow-x:auto}
-.report{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;display:grid;gap:12px}
-.report h3{font-family:var(--f-head);font-size:1.05rem;margin:0}
-.q{display:grid;gap:5px}
-.q label{font-size:.97rem}
-.q textarea,.id input{font:inherit;font-size:.97rem;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);width:100%}
-.q textarea{min-height:64px;resize:vertical}
-.id{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.id label{font-family:var(--f-head);font-size:.85rem;display:grid;gap:4px}
-.msg{font-family:var(--f-head);font-size:.88rem;color:var(--ok)}
-.res-bands{display:flex;gap:6px;align-items:center;font-family:var(--f-head);font-size:.84rem;color:var(--muted)}
-@media (max-width:900px){.lab,.data{grid-template-columns:1fr}}
-@media (max-width:520px){.id{grid-template-columns:1fr}}
+.fit{font-family:var(--f-mono);font-size:.84rem;background:var(--tint);border-radius:8px;padding:8px 10px;overflow-x:auto}
+.report h3{font-family:var(--f-head);font-size:1.1rem;margin:0}
+.report .id{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.report label{font-family:var(--f-head);font-size:.85rem;display:grid;gap:4px}
+.report input,.report textarea{font:inherit;font-size:.96rem;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);width:100%}
+.report textarea{min-height:66px;resize:vertical}
+.report .q{display:grid;gap:5px}
+.report .q label{display:block;font-family:var(--f-body);font-size:.97rem}
+.res{display:grid;gap:6px}
+.res .fit{font-size:.82rem}
+.saved{font-family:var(--f-head);font-size:.8rem;color:var(--muted)}
+@media (max-width:900px){.lab,.data{grid-template-columns:1fr}.report .id{grid-template-columns:1fr 1fr}}
+@media print{
+  .band,.tabs-wrap,footer,.lab,.noprint,.btn{display:none!important}
+  body{background:#fff;color:#000}
+  .card,.tblwrap,.graph{border:1px solid #999;box-shadow:none}
+  .tp[hidden]{display:none!important}
+  details{display:block}
+  .tblwrap{max-height:none}
+}
 </style>
 </head>
 <body>
 <header class="band"><div class="wrap">
   <a class="back" href="./">← Retour aux cours</a>
   <div class="uni">UNIVERSITÉ SOULEYMANE NIANG DE MATAM • PHYSIQUE L1</div>
-  <h1>Travaux pratiques virtuels</h1>
-  <p>Un laboratoire simulé pour préparer ou refaire les TP : règle le montage, relève tes mesures, trace le graphe et rédige ton compte rendu.</p>
+  <h1>Travaux pratiques</h1>
+  <p>Pour chaque TP : le protocole détaillé, un montage simulé pour faire les mesures, les tableaux et graphes, et le compte rendu à remplir en ligne.</p>
 </div></header>
 
 <main><div class="wrap">
-  <nav class="tabs-wrap" aria-label="Choix du TP">
-    <div class="pill-row" id="tabs"></div>
-  </nav>
+  <nav class="tabs-wrap" aria-label="Choix du TP" id="tabs"></nav>
   <div id="tpHost"></div>
 </div></main>
-<footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré • Les mesures sont simulées avec une petite incertitude, comme en salle de TP.</div></footer>
+<footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré • Les mesures sont simulées avec une incertitude réaliste : deux étudiants n'obtiennent pas exactement les mêmes valeurs.</div></footer>
 
-<script>
-"use strict";
-const $=s=>document.querySelector(s);
-const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const fr=(x,d=2)=>isFinite(x)?x.toFixed(d).replace(".",","):"—";
-const gauss=()=>{let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
-const store={get(k,d){try{const v=localStorage.getItem("tp_"+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem("tp_"+k,JSON.stringify(v))}catch(e){}}};
-function fit(cv,ratio){const w=cv.clientWidth||600,h=Math.round(w*ratio),d=Math.min(devicePixelRatio||1,2);
-  if(cv.width!==Math.round(w*d)||cv.height!==Math.round(h*d)){cv.width=Math.round(w*d);cv.height=Math.round(h*d);cv.style.height=h+"px"}
-  const c=cv.getContext("2d");c.setTransform(d,0,0,d,0,0);return{c,w,h}}
-function txt(c,s,x,y,col,al="left",bl="alphabetic",font="12px 'Fira Sans',Arial,sans-serif"){c.font=font;c.fillStyle=col;c.textAlign=al;c.textBaseline=bl;c.fillText(s,x,y)}
-function linreg(P){const n=P.length;if(n<2)return null;let sx=0,sy=0,sxx=0,sxy=0,syy=0;P.forEach(([x,y])=>{sx+=x;sy+=y;sxx+=x*x;sxy+=x*y;syy+=y*y});
-  const d=n*sxx-sx*sx;if(Math.abs(d)<1e-15)return null;const a=(n*sxy-sx*sy)/d,b=(sy-a*sx)/n;
-  const r=(n*sxy-sx*sy)/Math.sqrt(d*(n*syy-sy*sy)||1);return{a,b,r}}
-/* graphe nuage de points + droite */
-function scatter(cv,P,o){
-  const {c,w,h}=fit(cv,0.68);c.fillStyle=css("--plot-bg");c.fillRect(0,0,w,h);
-  const m={l:52,r:14,t:16,b:38},W=w-m.l-m.r,H=h-m.t-m.b;
-  if(!P.length){txt(c,"Le graphe se trace dès la première mesure.",w/2,h/2,css("--muted"),"center","middle","13px 'Fira Sans',Arial");return null}
-  const xs=P.map(p=>p[0]),ys=P.map(p=>p[1]);
-  let x0=Math.min(0,...xs),x1=Math.max(...xs),y0=Math.min(0,...ys),y1=Math.max(...ys);
-  if(o.xmin!=null)x0=o.xmin;if(o.ymin!=null)y0=o.ymin;
-  const px=(x1-x0)||1,py=(y1-y0)||1;x1+=px*0.08;y1+=py*0.1;if(x0<0)x0-=px*0.08;if(y0<0)y0-=py*0.1;
-  const X=x=>m.l+(x-x0)/(x1-x0)*W,Y=y=>m.t+H-(y-y0)/(y1-y0)*H;
-  const ticks=(a,b)=>{const s=Math.pow(10,Math.floor(Math.log10((b-a)/4)));const st=[1,2,5,10].map(k=>k*s).find(k=>(b-a)/k<=6);const out=[];for(let t=Math.ceil(a/st)*st;t<=b+1e-9;t+=st)out.push(+t.toPrecision(10));return out};
-  c.strokeStyle=css("--grid");c.lineWidth=1;
-  ticks(x0,x1).forEach(t=>{c.beginPath();c.moveTo(X(t),m.t);c.lineTo(X(t),m.t+H);c.stroke();txt(c,String(t).replace(".",","),X(t),m.t+H+14,css("--muted"),"center")});
-  ticks(y0,y1).forEach(t=>{c.beginPath();c.moveTo(m.l,Y(t));c.lineTo(m.l+W,Y(t));c.stroke();txt(c,String(t).replace(".",","),m.l-6,Y(t),css("--muted"),"right","middle")});
-  c.strokeStyle=css("--muted");c.lineWidth=1.2;c.beginPath();c.moveTo(m.l,m.t);c.lineTo(m.l,m.t+H);c.lineTo(m.l+W,m.t+H);c.stroke();
-  txt(c,o.xl,m.l+W,m.t+H+30,css("--muted"),"right");txt(c,o.yl,m.l+4,m.t+10,css("--muted"));
-  const R=linreg(P);
-  if(R){c.strokeStyle=css("--saff");c.lineWidth=2;c.beginPath();c.moveTo(X(x0),Y(R.a*x0+R.b));c.lineTo(X(x1),Y(R.a*x1+R.b));c.save();c.beginPath();c.rect(m.l,m.t,W,H);c.clip();c.beginPath();c.moveTo(X(x0),Y(R.a*x0+R.b));c.lineTo(X(x1),Y(R.a*x1+R.b));c.stroke();c.restore()}
-  c.fillStyle=css("--accent");P.forEach(([x,y])=>{c.beginPath();c.arc(X(x),Y(y),4.5,0,7);c.fill()});
-  return R}
-
-/* ---------- structure commune d'un TP ---------- */
-const TPS=[];
-function mountTP(T){
-  const host=document.createElement("section");host.className="tp";host.id=T.id;host.hidden=true;
-  host.innerHTML=`<article class="fiche"><div class="eyebrow">${esc(T.disc)}</div><h2>${esc(T.titre)}</h2>${T.fiche}</article>
-   <div class="lab"><div class="bench"><canvas id="${T.id}-cv" aria-label="Montage"></canvas><p class="hint">${T.hint}</p></div><div class="panel" id="${T.id}-ctl">${T.controls}</div></div>
-   <div class="data"><div class="tblwrap"><table><thead><tr>${T.cols.map(c=>`<th>${c}</th>`).join("")}<th></th></tr></thead><tbody id="${T.id}-tb"></tbody></table></div>
-     <div class="graph"><canvas id="${T.id}-gr" aria-label="Graphe des mesures"></canvas><div class="fit" id="${T.id}-fit">—</div></div></div>
-   <section class="report"><h3>Compte rendu</h3>
-     <div class="id"><label>Nom et prénom<input id="${T.id}-nom"></label><label>Groupe<input id="${T.id}-grp"></label></div>
-     ${T.questions.map((q,i)=>`<div class="q"><label for="${T.id}-q${i}"><b>${i+1}.</b> ${q}</label><textarea id="${T.id}-q${i}"></textarea></div>`).join("")}
-     <div class="row"><button type="button" class="btn primary" id="${T.id}-dl">Télécharger le compte rendu</button><button type="button" class="btn" id="${T.id}-cp">Copier</button><button type="button" class="btn" id="${T.id}-clr">Effacer les mesures</button><span class="msg" id="${T.id}-msg"></span></div>
-   </section>`;
-  $("#tpHost").appendChild(host);
-  T.rows=store.get(T.id+"_rows",[]);
-  const saveTxt=()=>{const o={nom:$("#"+T.id+"-nom").value,grp:$("#"+T.id+"-grp").value,q:T.questions.map((_,i)=>$("#"+T.id+"-q"+i).value)};store.set(T.id+"_txt",o)};
-  const st=store.get(T.id+"_txt",null);if(st){$("#"+T.id+"-nom").value=st.nom||"";$("#"+T.id+"-grp").value=st.grp||"";(st.q||[]).forEach((v,i)=>{const e=$("#"+T.id+"-q"+i);if(e)e.value=v})}
-  host.querySelectorAll(".report input,.report textarea").forEach(e=>e.addEventListener("input",saveTxt));
-  T.renderData=()=>{const tb=$("#"+T.id+"-tb");
-    tb.innerHTML=T.rows.length?T.rows.map((r,i)=>`<tr>${T.rowCells(r).map(v=>`<td>${v}</td>`).join("")}<td class="x"><button type="button" data-del="${i}" aria-label="Supprimer la mesure ${i+1}">×</button></td></tr>`).join(""):`<tr class="empty"><td colspan="${T.cols.length+1}">Aucune mesure : utilise le bouton « Enregistrer la mesure ».</td></tr>`;
-    const R=scatter($("#"+T.id+"-gr"),T.rows.map(T.point),T.axes);$("#"+T.id+"-fit").innerHTML=T.fitText(R,T.rows.length);T.lastFit=R;store.set(T.id+"_rows",T.rows)};
-  $("#"+T.id+"-tb").addEventListener("click",e=>{const b=e.target.closest("[data-del]");if(b){T.rows.splice(+b.dataset.del,1);T.renderData()}});
-  $("#"+T.id+"-clr").addEventListener("click",()=>{T.rows=[];T.renderData()});
-  const report=()=>{const L=[];L.push("COMPTE RENDU DE TP — "+T.titre,"Université Souleymane Niang de Matam — Physique L1","Nom : "+$("#"+T.id+"-nom").value,"Groupe : "+$("#"+T.id+"-grp").value,"Date : "+new Date().toLocaleDateString("fr-FR"),"","MESURES");
-    L.push(T.cols.join(" | "));T.rows.forEach(r=>L.push(T.rowCells(r).join(" | ")));L.push("","EXPLOITATION",$("#"+T.id+"-fit").textContent,"","RÉPONSES AUX QUESTIONS");
-    T.questions.forEach((q,i)=>{L.push((i+1)+". "+q.replace(/<[^>]+>/g,""),"   "+($("#"+T.id+"-q"+i).value||"(sans réponse)"),"")});return L.join("\n")};
-  $("#"+T.id+"-dl").addEventListener("click",()=>{const b=new Blob([report()],{type:"text/plain;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="CR_"+T.id+"_"+($("#"+T.id+"-nom").value||"etudiant").replace(/\s+/g,"_")+".txt";document.body.appendChild(a);a.click();a.remove();$("#"+T.id+"-msg").textContent="Fichier téléchargé."});
-  $("#"+T.id+"-cp").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(report());$("#"+T.id+"-msg").textContent="Compte rendu copié."}catch(e){$("#"+T.id+"-msg").textContent="Copie impossible : utilise le téléchargement."}});
-  TPS.push(T);T.init();T.renderData();
-}
-
-/* =================== TP 1 : LOI D'OHM =================== */
-mountTP({
-  id:"ohm",disc:"Électricité • TP n°1",titre:"Loi d'Ohm : caractéristique d'un conducteur ohmique",
-  fiche:`<p><b>Objectif.</b> Tracer la caractéristique U = f(I) d'un résistor, vérifier la loi d'Ohm et mesurer sa résistance ; comparer avec la valeur indiquée par le code des couleurs.</p>
-   <details><summary>Rappels et protocole</summary>
-   <h3>Rappels</h3><p>Pour un conducteur ohmique, la tension à ses bornes est proportionnelle à l'intensité qui le traverse :</p><div class="formula">U = R · I    (U en V, I en A, R en Ω)</div>
-   <p>Le code des couleurs donne la valeur nominale : 1<sup>er</sup> chiffre, 2<sup>e</sup> chiffre, multiplicateur, tolérance (or = ±5 %).</p>
-   <h3>Protocole</h3><ol><li>L'ampèremètre est branché en série, le voltmètre en dérivation aux bornes du résistor.</li><li>Fais varier la tension du générateur de 0 à 12 V par pas d'environ 1,5 V.</li><li>Pour chaque réglage, lis U et I sur les appareils puis clique sur « Enregistrer la mesure » (au moins 6 mesures).</li><li>Exploite le graphe U = f(I) : la pente de la droite est la résistance R.</li></ol></details>`,
-  hint:"Couleurs : 0 noir, 1 marron, 2 rouge, 3 orange, 4 jaune, 5 vert, 6 bleu, 7 violet, 8 gris, 9 blanc.",
-  controls:`<h3>Générateur</h3><div class="ctl"><label for="ohmU">Tension de consigne <b id="ohmUv"></b></label><input id="ohmU" type="range" min="0" max="12" step="0.1" value="3"></div>
-   <h3>Appareils de mesure</h3><dl class="lcd"><dt>Voltmètre</dt><dd id="ohmV">—</dd><dt>Ampèremètre</dt><dd id="ohmI">—</dd></dl>
-   <div class="row"><button type="button" class="btn primary sm" id="ohmRec">Enregistrer la mesure</button><button type="button" class="btn sm" id="ohmNew">Changer de résistor</button></div>
-   <p class="hint">Chaque étudiant reçoit un résistor différent : la valeur exacte est inconnue, à toi de la mesurer.</p>`,
-  cols:["n°","U (V)","I (mA)","U/I (Ω)"],
-  rowCells:r=>[r.n,fr(r.U,2),fr(r.I,2),r.I>0?fr(r.U/r.I*1000,0):"—"],
-  point:r=>[r.I,r.U],axes:{xl:"I (mA)",yl:"U (V)",xmin:0,ymin:0},
-  fitText:(R,n)=>n<2?"Au moins 2 mesures sont nécessaires pour tracer la droite.":`Droite de régression : U = ${fr(R.a*1000,1)} · I + ${fr(R.b,3)}  (I en A)   →   R = pente ≈ ${fr(R.a*1000,1)} Ω   (r = ${fr(R.r,4)})`,
-  questions:["Lis le code des couleurs du résistor et donne sa valeur nominale et sa tolérance.","Le graphe U = f(I) est-il une droite passant par l'origine ? Que peux-tu en conclure ?","Donne la valeur de R déduite de la pente.","Calcule l'écart relatif entre R mesurée et R nominale. Est-il compatible avec la tolérance ?"],
-  init(){const T=this;const E12=[[100,"marron","noir","marron"],[150,"marron","vert","marron"],[220,"rouge","rouge","marron"],[330,"orange","orange","marron"],[470,"jaune","violet","marron"],[680,"bleu","gris","marron"]];
-    const COL={noir:"#111",marron:"#7a4a1f",rouge:"#c62828",orange:"#ef7d00",jaune:"#f2c200",vert:"#2e7d32",bleu:"#1565c0",violet:"#6a1b9a",gris:"#8a8a8a",blanc:"#f5f5f5",or:"#c9a227"};
-    let res=store.get("ohm_res",null);
-    const newRes=()=>{const e=E12[Math.floor(Math.random()*E12.length)];res={nom:e[0],bands:[e[1],e[2],e[3],"or"],R:e[0]*(1+(Math.random()*2-1)*0.045)};store.set("ohm_res",res)};
-    if(!res)newRes();
-    const cv=$("#ohm-cv");let U=+$("#ohmU").value,meas={V:0,I:0};
-    const measure=()=>{const I=U/res.R;meas={V:Math.max(0,U*(1+gauss()*0.002)+gauss()*0.005),I:Math.max(0,I*1000*(1+gauss()*0.003)+gauss()*0.01)};$("#ohmV").textContent=fr(meas.V,2)+" V";$("#ohmI").textContent=fr(meas.I,2)+" mA";$("#ohmUv").textContent=fr(U,1)+" V"};
-    const lcd=(c,x,y,label,val,unit)=>{c.fillStyle=css("--surface");c.strokeStyle=css("--fg");c.lineWidth=2;c.beginPath();c.arc(x,y,24,0,7);c.fill();c.stroke();txt(c,label,x,y+1,css("--fg"),"center","middle","700 16px 'Fira Sans',Arial");
-      c.fillStyle="#1d2a1f";c.fillRect(x-42,y-58,84,26);txt(c,val+" "+unit,x,y-44,"#9cf29c","center","middle","13px 'Fira Mono',monospace")};
-    T.draw=()=>{const {c,w,h}=fit(cv,innerWidth<600?0.85:0.55);c.fillStyle=css("--plot-bg");c.fillRect(0,0,w,h);
-      const L=w*0.14,Rr=w*0.78,Tp=h*0.3,B=h*0.82,fg=css("--fg");c.strokeStyle=fg;c.lineWidth=2;
-      c.beginPath();c.moveTo(L,Tp);c.lineTo(Rr,Tp);c.lineTo(Rr,B);c.lineTo(L,B);c.closePath();c.stroke();
-      // générateur
-      c.fillStyle=css("--plot-bg");c.fillRect(L-30,(Tp+B)/2-30,60,60);c.strokeRect(L-30,(Tp+B)/2-30,60,60);txt(c,"G",L,(Tp+B)/2-8,fg,"center","middle","700 16px 'Fira Sans',Arial");txt(c,fr(U,1)+" V",L,(Tp+B)/2+12,css("--muted"),"center","middle","12px 'Fira Mono'");
-      txt(c,"+",L+12,Tp-8,css("--rouge"),"left","alphabetic","700 14px 'Fira Sans'");
-      // ampèremètre
-      const ax=(L+Rr)/2;c.fillStyle=css("--plot-bg");c.fillRect(ax-26,Tp-3,52,6);lcd(c,ax,Tp,"A",fr(meas.I,2),"mA");
-      // résistor
-      const ry=(Tp+B)/2,rw=26,rh=80;c.fillStyle="#e8d3a9";c.fillRect(Rr-rw/2,ry-rh/2,rw,rh);c.strokeRect(Rr-rw/2,ry-rh/2,rw,rh);
-      res.bands.forEach((b,i)=>{c.fillStyle=COL[b];c.fillRect(Rr-rw/2,ry-rh/2+10+i*(i===3?17:14),rw,8)});
-      txt(c,"R = ?",Rr+22,ry+4,fg,"left","middle","600 13px 'Fira Sans'");
-      // voltmètre en dérivation
-      const vx=Rr+w*0.12;c.beginPath();c.moveTo(Rr,Tp+20);c.lineTo(vx,Tp+20);c.lineTo(vx,B-20);c.lineTo(Rr,B-20);c.stroke();
-      c.fillStyle=fg;[[Rr,Tp+20],[Rr,B-20]].forEach(([x,y])=>{c.beginPath();c.arc(x,y,3.5,0,7);c.fill()});
-      lcd(c,vx,ry+10,"V",fr(meas.V,2),"V");
-      // flèche courant
-      c.fillStyle=css("--accent");const fx=L+w*0.12;c.beginPath();c.moveTo(fx+10,Tp);c.lineTo(fx,Tp-6);c.lineTo(fx,Tp+6);c.closePath();c.fill();txt(c,"I",fx+2,Tp-12,css("--accent"),"center","alphabetic","italic 600 14px 'Source Serif 4',serif");
-    };
-    $("#ohmU").addEventListener("input",e=>{U=+e.target.value;measure();T.draw()});
-    $("#ohmRec").addEventListener("click",()=>{T.rows.push({n:T.rows.length+1,U:meas.V,I:meas.I});T.rows.forEach((r,i)=>r.n=i+1);T.renderData()});
-    $("#ohmNew").addEventListener("click",()=>{newRes();T.rows=[];measure();T.draw();T.renderData()});
-    measure();T.draw();}
-});
-
-/* =================== TP 2 : LENTILLE CONVERGENTE =================== */
-mountTP({
-  id:"lentille",disc:"Optique • TP n°2",titre:"Lentille mince convergente : relation de conjugaison et distance focale",
-  fiche:`<p><b>Objectif.</b> Former l'image nette d'un objet sur un écran, vérifier la relation de conjugaison et déterminer la distance focale f′ de la lentille.</p>
-   <details><summary>Rappels et protocole</summary>
-   <h3>Rappels</h3><p>Avec des distances algébriques comptées à partir du centre optique O (sens de la lumière positif) :</p>
-   <div class="formula">1/OA′ − 1/OA = 1/f′        grandissement  γ = OA′/OA</div>
-   <p>Le graphe de 1/OA′ en fonction de 1/OA est une droite de pente 1 dont l'ordonnée à l'origine vaut 1/f′ (la vergence V, en dioptries δ si les distances sont en mètres).</p>
-   <h3>Protocole</h3><ol><li>L'objet lumineux (lettre F) est fixé à la graduation 5 cm du banc.</li><li>Place la lentille, puis déplace l'écran jusqu'à obtenir l'image la plus nette.</li><li>Clique sur « Enregistrer la mesure » : les positions lues sur le banc sont notées.</li><li>Recommence pour au moins 6 positions différentes de la lentille.</li></ol></details>`,
-  hint:"Déplace la lentille et l'écran avec les curseurs. L'image n'est nette que pour une seule position de l'écran.",
-  controls:`<h3>Banc d'optique</h3>
-   <div class="ctl"><label for="lenL">Position de la lentille <b id="lenLv"></b></label><input id="lenL" type="range" min="20" max="70" step="0.5" value="30"></div>
-   <div class="ctl"><label for="lenE">Position de l'écran <b id="lenEv"></b></label><input id="lenE" type="range" min="30" max="150" step="0.2" value="80"></div>
-   <div class="ctl"><label for="lenEf">Réglage fin de l'écran <b>± 2 cm</b></label><input id="lenEf" type="range" min="-2" max="2" step="0.05" value="0"></div>
-   <dl class="lcd"><dt>Objet</dt><dd>5,0 cm</dd><dt>Lentille</dt><dd id="lenLr"></dd><dt>Écran</dt><dd id="lenEr"></dd></dl>
-   <div class="row"><button type="button" class="btn primary sm" id="lenRec">Enregistrer la mesure</button><button type="button" class="btn sm" id="lenNew">Changer de lentille</button></div>`,
-  cols:["n°","OA (cm)","OA′ (cm)","1/OA (δ)","1/OA′ (δ)","γ mesuré"],
-  rowCells:r=>[r.n,fr(r.OA,1),fr(r.OAp,1),fr(100/r.OA,2),fr(100/r.OAp,2),r.g!=null?fr(r.g,2):"—"],
-  point:r=>[100/r.OA,100/r.OAp],axes:{xl:"1/OA (δ)",yl:"1/OA′ (δ)",ymin:0},
-  fitText:(R,n)=>n<2?"Au moins 2 mesures sont nécessaires pour tracer la droite.":`Droite de régression : 1/OA′ = ${fr(R.a,3)} · (1/OA) + ${fr(R.b,2)}   →   V = 1/f′ ≈ ${fr(R.b,2)} δ,  f′ ≈ ${fr(100/R.b,1)} cm   (pente attendue : 1 ; r = ${fr(R.r,4)})`,
-  questions:["Pourquoi n'obtient-on aucune image sur l'écran quand la lentille est trop près de l'objet ?","La pente de la droite est-elle proche de 1 ? Conclure sur la relation de conjugaison.","Déduis-en la vergence V et la distance focale f′ de la lentille.","Pour une de tes mesures, compare le grandissement mesuré à OA′/OA."],
-  init(){const T=this;let f=store.get("len_f",null);const newF=()=>{f=[10,12.5,15,20][Math.floor(Math.random()*4)]*(1+(Math.random()*2-1)*0.03);store.set("len_f",f)};if(!f)newF();
-    const cv=$("#lentille-cv"),XO=5,h0=2.0,D=4;let xL=+$("#lenL").value,xE=+$("#lenE").value,fine=0;
-    const state=()=>{const OA=-(xL-XO),inv=1/f+1/OA,OAp=inv>0?1/inv:Infinity,d=(xE+fine)-xL,real=inv>0&&isFinite(OAp);
-      const blur=real?D*Math.abs(d-OAp)/OAp:99,g=real?OAp/OA:null;return{OA,OAp,d,real,blur,g,img:real?h0*d/(-OA)*-1:0}};
-    T.draw=()=>{const s=state(),{c,w,h}=fit(cv,innerWidth<600?0.95:0.6);c.fillStyle=css("--plot-bg");c.fillRect(0,0,w,h);
-      const fg=css("--fg"),mu=css("--muted"),by=h*0.42,X=x=>16+x/150*(w-32);
-      // rail
-      c.fillStyle=css("--line");c.fillRect(X(0),by+34,X(150)-X(0),10);
-      for(let x=0;x<=150;x+=5){c.strokeStyle=mu;c.lineWidth=1;c.beginPath();c.moveTo(X(x),by+34);c.lineTo(X(x),by+(x%10?40:46));c.stroke();if(x%20===0)txt(c,String(x),X(x),by+60,mu,"center")}
-      txt(c,"cm",X(150),by+74,mu,"right");
-      // axe optique
-      c.setLineDash([4,4]);c.strokeStyle=mu;c.beginPath();c.moveTo(X(0),by);c.lineTo(X(150),by);c.stroke();c.setLineDash([]);
-      // objet
-      c.fillStyle=css("--saff");c.fillRect(X(XO)-6,by-30,12,30);txt(c,"F",X(XO),by-38,css("--saff"),"center","alphabetic","700 14px 'Fira Sans'");txt(c,"objet",X(XO),by+24,mu,"center");
-      // lentille
-      const lx=X(xL);c.strokeStyle=css("--accent");c.lineWidth=3;c.beginPath();c.moveTo(lx,by-42);c.lineTo(lx,by+28);c.stroke();
-      c.fillStyle=css("--accent");[[-42,1],[28,-1]].forEach(([dy,sg])=>{c.beginPath();c.moveTo(lx,by+dy-sg*2);c.lineTo(lx-7,by+dy+sg*8);c.lineTo(lx+7,by+dy+sg*8);c.closePath();c.fill()});
-      txt(c,"lentille",lx,by-50,css("--accent"),"center");
-      // écran
-      const ex=X(xE+fine);c.fillStyle=fg;c.fillRect(ex-3,by-50,6,80);txt(c,"écran",ex,by-56,fg,"center");
-      // deux rayons particuliers (objet de hauteur h0 = 2 cm, échelle verticale 12 px/cm)
-      if(s.real){const k=12,yA=by-h0*k,ix=X(xL+s.OAp),iy=by-s.g*h0*k,end=Math.min(X(150),Math.max(ex,ix)+20);
-        c.strokeStyle=css("--saff");c.globalAlpha=.55;c.lineWidth=1.3;
-        c.beginPath();c.moveTo(X(XO),yA);c.lineTo(lx,yA);c.lineTo(end,yA+(iy-yA)*(end-lx)/(ix-lx||1));c.stroke();
-        c.beginPath();c.moveTo(X(XO),yA);c.lineTo(end,yA+(by-yA)*(end-X(XO))/(lx-X(XO)||1));c.stroke();c.globalAlpha=1}
-      // vue de l'écran
-      const vx=w-150,vy=h*0.66,vw=134,vh=h*0.32;c.fillStyle="#f4f1e8";c.fillRect(vx,vy,vw,vh);c.strokeStyle=mu;c.strokeRect(vx,vy,vw,vh);txt(c,"ce que tu vois sur l'écran",vx+vw/2,vy-6,mu,"center");
-      c.save();c.beginPath();c.rect(vx,vy,vw,vh);c.clip();
-      if(s.real&&s.blur<6){const gs=Math.abs(s.g*(s.d/s.OAp)),size=Math.max(6,Math.min(vh*1.6,gs*h0*(vh/4))),bl=Math.min(30,s.blur*12);const n=bl<0.8?1:20;
-        c.fillStyle="#d98e04";c.globalAlpha=n===1?1:0.12;
-        for(let k=0;k<n;k++){const a=k/n*6.283,r=n===1?0:bl*(0.35+0.65*((k*7)%n)/n);c.save();c.translate(vx+vw/2+Math.cos(a)*r,vy+vh/2+Math.sin(a)*r);c.rotate(Math.PI);c.font=`700 ${size}px 'Fira Sans',Arial`;c.textAlign="center";c.textBaseline="middle";c.fillText("F",0,0);c.restore()}
-        c.globalAlpha=1;txt(c,n===1?"image nette (renversée)":"image floue",vx+vw/2,vy+vh-6,"#7a6a4a","center")}else{c.fillStyle="rgba(217,142,4,.18)";c.beginPath();c.arc(vx+vw/2,vy+vh/2,vh*0.42,0,7);c.fill();txt(c,"tache floue",vx+vw/2,vy+vh-6,"#7a6a4a","center")}
-      c.restore();
-      $("#lenLv").textContent=fr(xL,1)+" cm";$("#lenEv").textContent=fr(xE,1)+" cm";$("#lenLr").textContent=fr(xL,1)+" cm";$("#lenEr").textContent=fr(xE+fine,1)+" cm";
-    };
-    const upd=()=>{xL=+$("#lenL").value;xE=Math.max(+$("#lenE").value,xL+2);fine=+$("#lenEf").value;T.draw()};
-    ["#lenL","#lenE","#lenEf"].forEach(id=>$(id).addEventListener("input",upd));
-    $("#lenRec").addEventListener("click",()=>{const s=state();const msg=$("#lentille-msg");
-      if(!s.real||s.blur>0.2){msg.style.color=css("--ko");msg.textContent="L'image n'est pas nette : ajuste l'écran avant d'enregistrer.";return}
-      msg.textContent="";const OA=-(xL-XO),OAp=(xE+fine)-xL;const hp=s.g*h0*(1+gauss()*0.02);
-      T.rows.push({n:0,OA:+OA.toFixed(1),OAp:+OAp.toFixed(1),g:hp/h0});T.rows.forEach((r,i)=>r.n=i+1);T.renderData()});
-    $("#lenNew").addEventListener("click",()=>{newF();T.rows=[];T.draw();T.renderData()});
-    upd();}
-});
-
-/* =================== TP 3 : PENDULE SIMPLE =================== */
-mountTP({
-  id:"pendule",disc:"Mécanique • TP n°3",titre:"Pendule simple : période et mesure de l'intensité de la pesanteur",
-  fiche:`<p><b>Objectif.</b> Étudier la période T d'un pendule simple en fonction de sa longueur L, vérifier l'isochronisme des petites oscillations et mesurer g.</p>
-   <details><summary>Rappels et protocole</summary>
-   <h3>Rappels</h3><p>Pour de petites oscillations, la période d'un pendule simple ne dépend ni de la masse ni de l'amplitude :</p>
-   <div class="formula">T = 2π √(L/g)     soit     T² = (4π²/g) · L</div>
-   <p>Le graphe T² = f(L) est donc une droite passant par l'origine, de pente 4π²/g.</p>
-   <h3>Protocole</h3><ol><li>Règle la longueur L et l'amplitude (moins de 15° pour les petites oscillations), puis lâche le pendule.</li><li>Déclenche le chronomètre au passage par une position extrême, et arrête-le après 10 oscillations complètes (le compteur t'aide).</li><li>Enregistre la mesure : T = t/10. Mesurer 10 périodes réduit l'erreur due à ton temps de réaction.</li><li>Recommence pour au moins 6 longueurs entre 20 cm et 1,5 m. Puis, à L fixée, compare des amplitudes de 10° et 40°.</li></ol></details>`,
-  hint:"Le pendule oscille en temps réel : chronomètre-le toi-même, comme en salle de TP.",
-  controls:`<h3>Pendule</h3>
-   <div class="ctl"><label for="penL">Longueur L <b id="penLv"></b></label><input id="penL" type="range" min="20" max="150" step="1" value="60"></div>
-   <div class="ctl"><label for="penA">Amplitude θ₀ <b id="penAv"></b></label><input id="penA" type="range" min="5" max="45" step="1" value="10"></div>
-   <div class="row"><button type="button" class="btn primary sm" id="penGo">Lâcher le pendule</button><button type="button" class="btn sm" id="penStop">Arrêter</button></div>
-   <h3>Chronomètre</h3><dl class="lcd"><dt>Temps</dt><dd id="penT">0,00 s</dd><dt>Oscillations</dt><dd id="penN">0</dd></dl>
-   <div class="row"><button type="button" class="btn sm" id="penChr">Démarrer</button><button type="button" class="btn sm" id="penRz">Remise à zéro</button></div>
-   <div class="ctl"><label for="penNb">Nombre d'oscillations chronométrées</label><input id="penNb" type="number" min="1" max="50" value="10" style="font:inherit;padding:6px 8px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)"></div>
-   <button type="button" class="btn primary sm" id="penRec">Enregistrer la mesure</button>`,
-  cols:["n°","L (m)","θ₀ (°)","n","t (s)","T (s)","T² (s²)"],
-  rowCells:r=>[r.n,fr(r.L,2),r.A,r.k,fr(r.t,2),fr(r.t/r.k,3),fr((r.t/r.k)**2,3)],
-  point:r=>[r.L,(r.t/r.k)**2],axes:{xl:"L (m)",yl:"T² (s²)",xmin:0,ymin:0},
-  fitText:(R,n)=>n<2?"Au moins 2 mesures sont nécessaires pour tracer la droite.":`Droite de régression : T² = ${fr(R.a,3)} · L + ${fr(R.b,3)}   →   g = 4π²/pente ≈ ${fr(4*Math.PI**2/R.a,2)} m/s²   (r = ${fr(R.r,4)})`,
-  questions:["Le graphe T² = f(L) est-il une droite passant par l'origine ? Conclure.","Déduis de la pente la valeur de g. Compare à la valeur attendue au Sénégal (g ≈ 9,78 m/s²).","À longueur fixée, la période change-t-elle entre 10° et 40° d'amplitude ? Que signifie « isochronisme des petites oscillations » ?","Pourquoi chronomètre-t-on 10 oscillations plutôt qu'une seule ?"],
-  init(){const T=this;const g=9.78,cv=$("#pendule-cv");let L=+$("#penL").value/100,A=+$("#penA").value,th=0,om=0,running=false,chrono=false,tc=0,last=null,osc=0,prevOm=0;
-    const reset=()=>{th=A*Math.PI/180;om=0;osc=0;prevOm=0;$("#penN").textContent="0"};
-    $("#penL").addEventListener("input",e=>{L=+e.target.value/100;$("#penLv").textContent=fr(L*100,0)+" cm";if(!running)reset();T.draw()});
-    $("#penA").addEventListener("input",e=>{A=+e.target.value;$("#penAv").textContent=A+"°";if(!running)reset();T.draw()});
-    $("#penGo").addEventListener("click",()=>{reset();running=true});
-    $("#penStop").addEventListener("click",()=>{running=false;reset();T.draw()});
-    $("#penChr").addEventListener("click",()=>{chrono=!chrono;$("#penChr").textContent=chrono?"Arrêter":"Démarrer";if(chrono)osc=0});
-    $("#penRz").addEventListener("click",()=>{chrono=false;tc=0;osc=0;$("#penChr").textContent="Démarrer";$("#penT").textContent="0,00 s";$("#penN").textContent="0"});
-    $("#penRec").addEventListener("click",()=>{const k=Math.max(1,Math.round(+$("#penNb").value||10)),msg=$("#pendule-msg");
-      if(tc<0.5){msg.style.color=css("--ko");msg.textContent="Chronomètre d'abord les oscillations.";return}msg.textContent="";
-      T.rows.push({n:0,L:L,A:A,k:k,t:tc});T.rows.forEach((r,i)=>r.n=i+1);T.renderData()});
-    T.draw=()=>{const {c,w,h}=fit(cv,innerWidth<600?0.95:0.6);c.fillStyle=css("--plot-bg");c.fillRect(0,0,w,h);
-      const fg=css("--fg"),mu=css("--muted"),px=w*0.42,py=26,sc=(h-80)/1.55;
-      c.fillStyle=mu;c.fillRect(px-70,py-12,140,8);for(let i=-70;i<70;i+=8){c.strokeStyle=mu;c.beginPath();c.moveTo(px+i,py-12);c.lineTo(px+i-6,py-20);c.stroke()}
-      c.setLineDash([3,4]);c.strokeStyle=css("--grid");c.beginPath();c.moveTo(px,py);c.lineTo(px,py+L*sc+20);c.stroke();
-      [1,-1].forEach(s=>{c.beginPath();c.moveTo(px,py);c.lineTo(px+Math.sin(s*A*Math.PI/180)*L*sc,py+Math.cos(A*Math.PI/180)*L*sc);c.stroke()});c.setLineDash([]);
-      const bx=px+Math.sin(th)*L*sc,byy=py+Math.cos(th)*L*sc;c.strokeStyle=fg;c.lineWidth=1.5;c.beginPath();c.moveTo(px,py);c.lineTo(bx,byy);c.stroke();
-      const grd=c.createRadialGradient(bx-4,byy-4,2,bx,byy,13);grd.addColorStop(0,"#ffd27a");grd.addColorStop(1,"#b87503");c.fillStyle=grd;c.beginPath();c.arc(bx,byy,12,0,7);c.fill();
-      txt(c,"L = "+fr(L*100,0)+" cm",px+10,py+L*sc/2,mu);txt(c,"θ₀ = "+A+"°",px+Math.sin(A*Math.PI/180)*L*sc+8,py+Math.cos(A*Math.PI/180)*L*sc+4,mu);
-      // grand affichage chrono
-      const cx=w*0.82,cy=h*0.3;c.fillStyle="#1d2a1f";c.fillRect(cx-70,cy-26,140,52);txt(c,fr(tc,2)+" s",cx,cy,"#9cf29c","center","middle","600 24px 'Fira Mono',monospace");
-      txt(c,chrono?"chronomètre en marche":"chronomètre arrêté",cx,cy+42,chrono?css("--ok"):mu,"center");
-      txt(c,"oscillations : "+osc,cx,cy+62,mu,"center");
-    };
-    const loop=ts=>{if(last!=null){const dt=Math.min(0.05,(ts-last)/1000);
-        if(running){const n=20,hh=dt/n;for(let i=0;i<n;i++){om+=-(g/L)*Math.sin(th)*hh;th+=om*hh}
-          if(prevOm>0&&om<=0&&chrono){osc++;$("#penN").textContent=osc}prevOm=om}
-        if(chrono){tc+=dt;$("#penT").textContent=fr(tc,2)+" s"}
-        if(!$("#pendule").hidden)T.draw()}
-      last=ts;requestAnimationFrame(loop)};
-    $("#penLv").textContent=fr(L*100,0)+" cm";$("#penAv").textContent=A+"°";reset();T.draw();requestAnimationFrame(loop);}
-});
-
-/* ---------- onglets ---------- */
-let cur=TPS.some(t=>t.id===location.hash.slice(1))?location.hash.slice(1):TPS[0].id;
-function go(id){cur=id;$("#tabs").innerHTML=TPS.map(t=>`<button type="button" class="pill" data-t="${t.id}" aria-selected="${t.id===cur}">${esc(t.disc.split(" •")[0])} : ${esc(t.titre.split(" :")[0])}</button>`).join("");
-  TPS.forEach(t=>{$("#"+t.id).hidden=t.id!==id});history.replaceState(null,"","#"+id);const T=TPS.find(t=>t.id===id);T.draw();T.renderData()}
-$("#tabs").addEventListener("click",e=>{const b=e.target.closest("[data-t]");if(b)go(b.dataset.t)});
-addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(TPS.some(t=>t.id===h)&&h!==cur)go(h)});
-addEventListener("resize",()=>{const T=TPS.find(t=>t.id===cur);T.draw();T.renderData()});
-go(cur);
-</script>
+<script src="assets/tp-core.js"></script>
+<script src="assets/tp-meca.js"></script>
+<script src="assets/tp-elec.js"></script>
+<script src="assets/tp-optique.js"></script>
+<script>TPCORE.start();</script>
 <script>
 if("serviceWorker" in navigator){addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
 </script>
