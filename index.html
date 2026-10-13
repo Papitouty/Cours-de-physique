@@ -53,6 +53,10 @@ a{color:var(--accent)}
 .tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px}
 .tab{font-family:var(--f-head);font-size:.92rem;font-weight:500;border:0;background:transparent;color:var(--muted);padding:7px 14px;border-radius:999px;cursor:pointer}
 .tab[aria-selected="true"]{background:var(--accent);color:var(--accent-fg)}
+.navlink{font-family:var(--f-head);font-size:.92rem;font-weight:500;color:var(--accent);text-decoration:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px}
+.navlink:hover{border-color:var(--accent)}
+.k-quiz{background:var(--tint);color:var(--accent)}
+.k-sim{background:var(--tint2);color:var(--warm)}
 .search{flex:1 1 220px;min-width:0;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:0 12px}
 .search input{flex:1;min-width:0;border:0;background:transparent;color:var(--fg);font:inherit;font-family:var(--f-head);font-size:.95rem;padding:9px 0;outline:none}
 .search svg{flex:none;stroke:var(--muted)}
@@ -132,6 +136,8 @@ footer .wrap{padding-block:18px}
 <nav class="bar" aria-label="Choix du cours">
   <div class="wrap">
     <div class="tabs" role="tablist" id="tabs"></div>
+    <a class="navlink" href="quiz.html">Quiz</a>
+    <a class="navlink" href="simulations.html">Simulations</a>
     <label class="search" for="q">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="q" type="search" placeholder="Rechercher une notion : Gauss, Frenet, travail…" autocomplete="off">
@@ -199,13 +205,14 @@ if(location.hash&&COURSES.some(c=>c.id===location.hash.slice(1)))current=locatio
 (function(){
   let ch=0,pg=0,sl=0,td=0;
   COURSES.forEach(c=>{c.chapters.forEach(x=>{ch++;pg+=x.pages;if(x.slides)sl+=x.slides;if(x.td)td++});(c.series||[]).forEach(()=>td++)});
-  $("#stats").innerHTML=`<span><b>${COURSES.length}</b>cours</span><span><b>${ch}</b>chapitres</span><span><b>${pg}</b>pages de cours</span><span><b>${sl}</b>diapositives</span><span><b>${td}</b>séries de TD corrigées</span>`;
+  $("#stats").innerHTML=`<span><b>${COURSES.length}</b>cours</span><span><b>${ch}</b>chapitres</span><span><b>${pg}</b>pages de cours</span><span><b>${sl}</b>diapositives</span><span><b>${td}</b>séries de TD corrigées</span><span><b>60</b>questions de quiz</span><span><b>5</b>simulations</span>`;
 })();
 
 function pdfBtn(file,label,n,kind,primary){
   const k=kind==="cor"?'<span class="k k-cor">CORRIGÉ</span>':'<span class="k k-pdf">PDF</span>';
   return `<button type="button" class="btn${primary?" primary":""}" data-pdf="${file}" data-title="${esc(label)}">${k}<span class="lbl">${esc(label)}</span><span class="n">${n} p.</span></button>`;
 }
+const SIMS={meca2:[["frenet","Simulation : base de Frenet"]],meca4:[["energie","Simulation : énergie potentielle"]],elec1:[["champ","Simulation : lignes de champ"]],elec2:[["champ","Simulation : champ et potentiel"],["anneau","Simulation : anneau chargé"],["boule","Simulation : théorème de Gauss"]]};
 function pptBtn(key,n,t){
   return `<button type="button" class="btn" data-pdf="slides/${key}_diapo" data-title="${esc(t)}"><span class="k k-ppt">DIAPO</span><span class="lbl">Diaporama</span><span class="n">${n} diap.</span></button>`;
 }
@@ -231,6 +238,8 @@ function render(){
         ${pdfBtn(ch.key,"Support de cours",ch.pages,"pdf",true).replace('data-title="Support de cours"',`data-title="${esc("Chapitre "+ch.n+" — "+ch.title)}"`)}
         ${ch.slides?pptBtn(ch.key,ch.slides,"Diaporama — chapitre "+ch.n+" : "+ch.title):""}
         ${ch.td?pdfBtn(ch.td.e,"TD "+ch.n+" — énoncés",ch.td.ep,"pdf")+pdfBtn(ch.td.c,"TD "+ch.n+" — corrigé détaillé",ch.td.cp,"cor"):""}
+        <a class="btn" href="quiz.html#${c.id}${ch.n}"><span class="k k-quiz">QUIZ</span><span class="lbl">Quiz d'auto-évaluation</span><span class="n">10 q.</span></a>
+        ${(SIMS[c.id+ch.n]||[]).map(([id,t])=>`<a class="btn" href="simulations.html#${id}"><span class="k k-sim">SIMU</span><span class="lbl">${esc(t)}</span></a>`).join("")}
       </div></article>`;
   });
   h+="</div>";
