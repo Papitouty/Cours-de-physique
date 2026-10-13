@@ -389,7 +389,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-pdf]");if(
   const toD=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
   const next=C.filter(e=>{const d=toD(e.date);return d>=t0&&(d-t0)/864e5<=7}).sort((a,b)=>a.date.localeCompare(b.date))[0];
   let item=null;
-  if(next){const d=toD(next.date),n=Math.round((d-t0)/864e5);item={id:"cal-"+next.date+next.titre,tag:n===0?"Aujourd'hui":n===1?"Demain":"Dans "+n+" jours",titre:next.titre,texte:(next.heure?next.heure+" ":"")+(next.lieu||""),lien:"calendrier.html"}}
+  if(next){const d=toD(next.date),n=Math.round((d-t0)/864e5);item={id:"cal-"+next.date+next.titre,tag:n===0?"Aujourd'hui":n===1?"Demain":"Dans "+n+" jours",titre:next.titre,texte:(next.heure?next.heure+" ":"")+(next.lieu||"")+(next.provisoire?" (date à confirmer)":""),lien:"calendrier.html"}}
   else{const a=A.find(x=>x.important);if(a)item={id:"ann-"+a.date+a.titre,tag:"Nouveau",titre:a.titre,texte:a.texte||"",lien:a.lien||"calendrier.html"}}
   if(!item)return;
   let hidden=null;try{hidden=localStorage.getItem("annHidden")}catch(e){}

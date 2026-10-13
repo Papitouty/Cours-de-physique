@@ -32,6 +32,8 @@ h2{font-family:var(--f-head);font-size:1.25rem;margin:0 0 12px}
 .ev p{margin:4px 0 0;font-size:.94rem}
 .tag{display:inline-block;font-family:var(--f-head);font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px;background:var(--tint);color:var(--accent);margin-right:6px}
 .tag.controle,.tag.examen{background:var(--tint2);color:var(--warm)}
+.prov{display:inline-block;font-family:var(--f-head);font-size:.7rem;font-weight:600;padding:2px 7px;border-radius:4px;border:1px dashed var(--warm);color:var(--warm);margin-right:6px}
+.notice{font-family:var(--f-head);font-size:.86rem;background:var(--tint2);border-radius:10px;padding:10px 14px;margin-bottom:12px}
 .soon{font-family:var(--f-head);font-size:.78rem;font-weight:600;color:var(--warm)}
 .empty{background:var(--surface);border:1px dashed var(--line);border-radius:12px;padding:20px;color:var(--muted);font-family:var(--f-head);font-size:.92rem}
 .sub{font-family:var(--f-head);font-size:.8rem;font-weight:600;color:var(--muted);margin:16px 0 8px}
@@ -65,10 +67,11 @@ const today=new Date();today.setHours(0,0,0,0);
 const C=(window.CALENDRIER||[]).slice().sort((a,b)=>(a.date+(a.heure||"")).localeCompare(b.date+(b.heure||"")));
 const ev=e=>{const d=dt(e.date),past=d<today,days=Math.round((d-today)/864e5);
   const soon=!past&&days<=7?`<span class="soon">${days===0?"aujourd'hui":days===1?"demain":"dans "+days+" jours"}</span>`:"";
-  return `<article class="ev${past?" past":""}"><div class="day"><b>${d.getDate()}</b><span>${MOIS[d.getMonth()]}</span></div><div><div><span class="tag ${esc(e.type)}">${esc(TYPES[e.type]||"Info")}</span>${soon}</div><h3>${esc(e.titre)}</h3><div class="meta">${esc(longDate(e.date))}${e.heure?" • "+esc(e.heure):""}${e.lieu?" • "+esc(e.lieu):""}</div>${e.detail?`<p>${esc(e.detail)}</p>`:""}</div></article>`};
+  return `<article class="ev${past?" past":""}"><div class="day"><b>${d.getDate()}</b><span>${MOIS[d.getMonth()]}</span></div><div><div><span class="tag ${esc(e.type)}">${esc(TYPES[e.type]||"Info")}</span>${e.provisoire?'<span class="prov">date à confirmer</span>':""}${soon}</div><h3>${esc(e.titre)}</h3><div class="meta">${esc(longDate(e.date))}${e.heure?" • "+esc(e.heure):""}${e.lieu?" • "+esc(e.lieu):""}</div>${e.detail?`<p>${esc(e.detail)}</p>`:""}</div></article>`};
 const up=C.filter(e=>dt(e.date)>=today),past=C.filter(e=>dt(e.date)<today).reverse();
+const prov=C.some(e=>e.provisoire)?`<div class="notice">Planning provisoire : ces dates sont indicatives et seront confirmées en séance.</div>`:"";
 $("#cal").innerHTML=C.length
-  ?`<div class="list">${up.length?up.map(ev).join(""):`<div class="empty">Aucune séance à venir n'est encore programmée.</div>`}</div>${past.length?`<div class="sub">Passé</div><div class="list">${past.map(ev).join("")}</div>`:""}`
+  ?prov+`<div class="list">${up.length?up.map(ev).join(""):`<div class="empty">Aucune séance à venir n'est encore programmée.</div>`}</div>${past.length?`<div class="sub">Passé</div><div class="list">${past.map(ev).join("")}</div>`:""}`
   :`<div class="empty">Les dates des séances de TD, des contrôles et des examens seront publiées ici dès qu'elles seront fixées.</div>`;
 </script>
 <script>
