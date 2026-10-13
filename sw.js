@@ -2,13 +2,13 @@
    - pages et ressources du site : réseau d'abord, copie locale si pas de connexion
    - documents PDF : copie locale d'abord (un document ouvert une fois reste disponible)
    - bibliothèques et polices externes : copie locale, rafraîchie en arrière-plan */
-const VERSION = "v5";
+const VERSION = "v6";
 const SHELL = "shell-" + VERSION;
 const PDFS = "pdf-v1";          // nom stable : les documents enregistrés survivent aux mises à jour du site
 const EXT = "ext-" + VERSION;
 
 const SHELL_FILES = [
-  "./", "index.html", "quiz.html", "simulations.html", "entrainement.html", "calendrier.html", "questions.html", "videos.html",
+  "./", "index.html", "quiz.html", "simulations.html", "entrainement.html", "calendrier.html", "questions.html", "videos.html", "tp.html",
   "assets/site.css", "assets/quiz-data.js", "assets/exos.js", "assets/annonces.js", "assets/config.js", "assets/videos.js", "manifest.webmanifest",
   "vendor/pdfjs/pdf.js", "vendor/pdfjs/pdf.worker.js",
   "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png",
