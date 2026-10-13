@@ -63,6 +63,7 @@ a{color:var(--accent)}
 .navlink:hover{border-color:var(--accent)}
 .k-quiz{background:var(--tint);color:var(--accent)}
 .k-sim{background:var(--tint2);color:var(--warm)}
+.k-vid{background:var(--tint2);color:var(--rouge)}
 .search{flex:1 1 220px;min-width:0;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:0 12px}
 .search input{flex:1;min-width:0;border:0;background:transparent;color:var(--fg);font:inherit;font-family:var(--f-head);font-size:.95rem;padding:9px 0;outline:none}
 .search svg{flex:none;stroke:var(--muted)}
@@ -170,6 +171,7 @@ footer .wrap{padding-block:18px}
     <a class="navlink" href="simulations.html">Simulations</a>
     <a class="navlink" href="entrainement.html">Entraînement</a>
     <a class="navlink" href="calendrier.html">Annonces</a>
+    <a class="navlink" href="videos.html" id="navVid" hidden>Vidéos</a>
     <a class="navlink" href="questions.html">Questions</a>
     <label class="search" for="q">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -218,6 +220,7 @@ footer .wrap{padding-block:18px}
 </div>
 
 <script src="assets/annonces.js"></script>
+<script src="assets/videos.js"></script>
 <script src="vendor/pdfjs/pdf.js"></script>
 <script>
 const COURSES=[
@@ -296,6 +299,7 @@ function render(){
         ${ch.td?pdfBtn(ch.td.e,"TD "+ch.n+" — énoncés",ch.td.ep,"pdf")+pdfBtn(ch.td.c,"TD "+ch.n+" — corrigé détaillé",ch.td.cp,"cor"):""}
         <a class="btn" href="entrainement.html#${c.id}${ch.n}"><span class="k k-quiz">EXOS</span><span class="lbl">Exercices d'entraînement</span></a>
         <a class="btn" href="quiz.html#${c.id}${ch.n}"><span class="k k-quiz">QUIZ</span><span class="lbl">Quiz d'auto-évaluation</span><span class="n">10 q.</span></a>
+        ${((window.VIDEOS||{})[c.id+ch.n]||[]).map(v=>`<a class="btn" href="${esc(v.url)}" target="_blank" rel="noopener"><span class="k k-vid">VIDÉO</span><span class="lbl">${esc(v.titre)}</span>${v.duree?`<span class="n">${esc(v.duree)}</span>`:""}</a>`).join("")}
         ${(SIMS[c.id+ch.n]||[]).map(([id,t])=>`<a class="btn" href="simulations.html#${id}"><span class="k k-sim">SIMU</span><span class="lbl">${esc(t)}</span></a>`).join("")}
       </div></article>`;
   });
@@ -316,6 +320,7 @@ function render(){
 $("#tabs").innerHTML=COURSES.map(c=>`<button type="button" class="tab" role="tab" data-id="${c.id}">${esc(c.tab)}</button>`).join("");
 $("#tabs").addEventListener("click",e=>{const b=e.target.closest(".tab");if(!b)return;current=b.dataset.id;try{localStorage.setItem("tab",current)}catch(_){}render()});
 $("#q").addEventListener("input",render);
+if(Object.values(window.VIDEOS||{}).some(l=>l&&l.length))document.getElementById("navVid").hidden=false;
 render();
 
 /* ---------- liseuse PDF ---------- */

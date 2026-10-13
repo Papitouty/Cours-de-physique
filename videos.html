@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vidéos — Physique L1</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1B2A41">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="description" content="Vidéos YouTube associées aux cours de Physique L1 du Dr P. T. Traoré (USNM).">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Fira+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+main .wrap{padding-block:24px 10px;display:grid;gap:26px}
+h2{font-family:var(--f-head);font-size:1.15rem;margin:0 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.vid{display:grid;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;text-decoration:none;color:var(--fg)}
+.vid:hover{border-color:var(--accent)}
+.th{position:relative;aspect-ratio:16/9;background:var(--ink);max-width:100%}
+.th img{width:100%;height:100%;object-fit:cover;display:block}
+.th .play{position:absolute;inset:0;display:grid;place-items:center}
+.th .play span{width:54px;height:38px;border-radius:10px;background:rgba(0,0,0,.65);display:grid;place-items:center}
+.th .play span::after{content:"";border-style:solid;border-width:9px 0 9px 15px;border-color:transparent transparent transparent #fff;margin-left:3px}
+.th .dur{position:absolute;right:8px;bottom:8px;font-family:var(--f-mono);font-size:.75rem;background:rgba(0,0,0,.75);color:#fff;padding:1px 6px;border-radius:4px}
+.meta{padding:12px 14px;display:grid;gap:3px}
+.meta b{font-family:var(--f-head);font-weight:600;font-size:.98rem}
+.meta span{font-size:.9rem;color:var(--muted)}
+.meta small{font-family:var(--f-head);font-size:.78rem;color:var(--accent)}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:12px;padding:20px;color:var(--muted);font-family:var(--f-head)}
+.note{font-family:var(--f-head);font-size:.86rem;color:var(--muted);margin:0}
+</style>
+</head>
+<body>
+<header class="band"><div class="wrap">
+  <a class="back" href="./">← Retour aux cours</a>
+  <div class="uni">UNIVERSITÉ SOULEYMANE NIANG DE MATAM • PHYSIQUE L1</div>
+  <h1>Vidéos</h1>
+  <p>Des vidéos pour revoir les notions du cours. Elles s'ouvrent dans YouTube (connexion internet nécessaire).</p>
+</div></header>
+<main><div class="wrap" id="list"></div></main>
+<footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré</div></footer>
+<script src="assets/videos.js"></script>
+<script>
+const NOMS={meca1:"Mécanique — Chapitre 1 : Calcul vectoriel",meca2:"Mécanique — Chapitre 2 : Cinématique",meca3:"Mécanique — Chapitre 3 : Dynamique",meca4:"Mécanique — Chapitre 4 : Travail et énergie",elec1:"Électricité — Chapitre 1 : Charge et loi de Coulomb",elec2:"Électricité — Chapitre 2 : Champ et potentiel"};
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function ytId(u){try{const x=new URL(u);if(x.hostname.includes("youtu.be"))return x.pathname.slice(1);if(x.searchParams.get("v"))return x.searchParams.get("v");const m=x.pathname.match(/\/(embed|shorts|live)\/([^/?]+)/);return m?m[2]:""}catch(e){return""}}
+const V=window.VIDEOS||{};
+const parts=Object.keys(NOMS).filter(k=>(V[k]||[]).length).map(k=>`<section><h2>${esc(NOMS[k])}</h2><div class="grid">${V[k].map(v=>{const id=ytId(v.url);
+  return `<a class="vid" href="${esc(v.url)}" target="_blank" rel="noopener"><div class="th">${id?`<img src="https://i.ytimg.com/vi/${esc(id)}/mqdefault.jpg" alt="" loading="lazy" onerror="this.remove()">`:""}<div class="play"><span></span></div>${v.duree?`<span class="dur">${esc(v.duree)}</span>`:""}</div><div class="meta"><b>${esc(v.titre)}</b>${v.note?`<span>${esc(v.note)}</span>`:""}<small>Ouvrir dans YouTube ↗</small></div></a>`}).join("")}</div></section>`);
+document.getElementById("list").innerHTML=parts.length?parts.join("")+`<p class="note">Les vidéos ne sont pas disponibles hors connexion.</p>`:`<div class="empty">Les vidéos du cours seront ajoutées ici prochainement.</div>`;
+</script>
+<script>
+if("serviceWorker" in navigator){addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+</script>
+</body>
+</html>
