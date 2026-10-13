@@ -6,6 +6,6 @@
    Laisser "" pour ne pas proposer ce moyen de contact.
    ===================================================================== */
 window.SITE_CONFIG = {
-  email: "",
+  email: "papatouty.traore@ucad.edu.sn",
   whatsapp: ""
 };
