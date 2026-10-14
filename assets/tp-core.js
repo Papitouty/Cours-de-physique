@@ -3,6 +3,8 @@
    chronomètre, compte rendu remplissable et exportable. */
 (function () {
   "use strict";
+  /* page de début de chaque TP dans le fascicule (docs/Fascicule_TP_Physique_L1.pdf, numéro de page du fichier) */
+  const FASC = { 1: 7, 2: 12, 3: 17, 4: 21, 5: 26, 6: 32, 7: 37, 8: 43 };
   const $ = s => document.querySelector(s);
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -181,6 +183,7 @@
       <div class="eyebrow">${esc(T.disc)} • TP n°${T.num}</div>
       <h2>${esc(T.titre)}</h2>
       <p class="obj"><b>Objectifs.</b> ${T.objectifs}</p>
+      ${FASC[T.num] ? `<p class="fasc-link"><a href="docs/Fascicule_TP_Physique_L1.pdf#page=${FASC[T.num]}" target="_blank" rel="noopener">Lire ce TP dans le fascicule (PDF, page ${FASC[T.num] - 1})</a> : théorie détaillée, schémas de montage et tableaux de mesures.</p>` : ""}
       <ul class="mat" aria-label="Matériel">${T.materiel.map(m => `<li>${esc(m)}</li>`).join("")}</ul>
       <details open><summary>Rappels théoriques</summary><div class="sec">${T.theorie}</div></details>
       <details open><summary>Protocole détaillé</summary><div class="sec">${T.protocole}</div></details>
@@ -397,5 +400,5 @@
     const loop = ts => { const dt = last == null ? 0 : Math.min(0.05, (ts - last) / 1000); last = ts; const T = TPS.find(t => t.id === cur); if (T && T.tick && dt > 0) T.tick(dt); requestAnimationFrame(loop); };
     requestAnimationFrame(loop);
   }
-  window.TPCORE = { build: 17, register, start, $, css, esc, fr, gauss, store, fit, txt, linreg, chrono, isCur: id => cur === id };
+  window.TPCORE = { build: 18, register, start, $, css, esc, fr, gauss, store, fit, txt, linreg, chrono, isCur: id => cur === id };
 })();

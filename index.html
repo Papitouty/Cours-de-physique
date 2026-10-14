@@ -196,7 +196,7 @@ footer .wrap{padding-block:18px}
       <p id="offMsg">Après une première visite avec internet, les pages, les quiz, les simulations, les supports de cours et les TD fonctionnent sans connexion. Les diaporamas, plus lourds, s'enregistrent sur demande.</p>
     </div>
     <div class="off-act">
-      <button type="button" class="obtn primary" id="dlDocs">Enregistrer les cours et TD<small>3,4 Mo</small></button>
+      <button type="button" class="obtn primary" id="dlDocs">Enregistrer les cours, TD et TP<small>3,8 Mo</small></button>
       <button type="button" class="obtn" id="dlSlides">Enregistrer les diaporamas<small>37 Mo</small></button>
       <button type="button" class="obtn" id="install" hidden>Installer l'application</button>
       <button type="button" class="olink" id="offClear">Supprimer les documents enregistrés</button>
@@ -317,7 +317,24 @@ function render(){
     h+=`<section class="td-card"><div><div class="eyebrow">Travaux dirigés</div><h3>${esc(s.title)}</h3><p><b>${esc(s.sub)}.</b> ${esc(s.text)}</p></div>
       <div class="res">${pdfBtn(s.e,"Énoncés",s.ep,"pdf",true)}${pdfBtn(s.c,"Corrigé détaillé",s.cp,"cor")}</div></section>`;
   });
-  if(!chs.length&&!series.length){
+  const FTP=["Pendule simple","Oscillateur harmonique (masse-ressort)","Pendule de torsion","Loi d'Ohm et mesures de résistances","L'oscilloscope cathodique","Réfraction : lois de Descartes","Lentilles : distance focale","Le microscope"];
+  const tpShow=!q||norm("travaux pratiques tp fascicule "+FTP.join(" ")).includes(q);
+  if(tpShow){
+    h+=`<article class="chap fasc-card">
+      <button type="button" class="cover" data-pdf="Fascicule_TP_Physique_L1" data-title="Fascicule de travaux pratiques" aria-label="Ouvrir le fascicule de TP"><img src="img/Fascicule_TP_Physique_L1.jpg" alt="" loading="lazy" width="120" height="170"></button>
+      <div class="chap-body">
+        <div class="chap-num">TRAVAUX PRATIQUES</div>
+        <h3>Fascicule de travaux pratiques</h3>
+        <div class="meta">8 TP • 46 pages • mécanique, électricité, optique</div>
+        <details${q?" open":""}><summary>Contenu du fascicule</summary><ol class="toc">${FTP.map((t,i)=>`<li data-n="${i+1}.">${esc(t)}</li>`).join("")}</ol></details>
+        <p class="meta" style="margin-top:6px">Rappels théoriques et démonstrations, schémas de montage, protocoles, tableaux de mesures et exploitation. À lire avant chaque séance.</p>
+      </div>
+      <div class="res">
+        ${pdfBtn("Fascicule_TP_Physique_L1","Fascicule de TP",46,"pdf",true)}
+        <a class="btn" href="tp.html"><span class="k k-sim">TP</span><span class="lbl">Faire les TP en ligne</span></a>
+      </div></article>`;
+  }
+  if(!chs.length&&!series.length&&!tpShow){
     const other=COURSES.filter(o=>o.id!==current&&o.chapters.some(match));
     h+=`<p class="empty">Aucun chapitre de ce cours ne contient « ${esc($("#q").value)} ».${other.length?` Essayez l'onglet ${other.map(o=>esc(o.tab)).join(", ")}.`:""}</p>`;
   }
@@ -415,7 +432,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-pdf]");if(
 var PDF_CACHE="pdf-v1";
 var pdfPath=f=>(f.includes("/")?f:"docs/"+f)+".pdf";
 var absPath=u=>new URL(u,location.href).pathname;
-function allDocs(){const d=[],s=[];COURSES.forEach(c=>{c.chapters.forEach(ch=>{d.push(pdfPath(ch.key));if(ch.td){d.push(pdfPath(ch.td.e),pdfPath(ch.td.c))}if(ch.slides)s.push(pdfPath("slides/"+ch.key+"_diapo"))});(c.series||[]).forEach(x=>d.push(pdfPath(x.e),pdfPath(x.c)))});return{d:[...new Set(d)],s}}
+function allDocs(){const d=[],s=[];COURSES.forEach(c=>{c.chapters.forEach(ch=>{d.push(pdfPath(ch.key));if(ch.td){d.push(pdfPath(ch.td.e),pdfPath(ch.td.c))}if(ch.slides)s.push(pdfPath("slides/"+ch.key+"_diapo"))});(c.series||[]).forEach(x=>d.push(pdfPath(x.e),pdfPath(x.c)))});d.push(pdfPath("Fascicule_TP_Physique_L1"));return{d:[...new Set(d)],s}}
 async function savedPaths(){try{if(!("caches" in window))return new Set();const c=await caches.open(PDF_CACHE);return new Set((await c.keys()).map(r=>new URL(r.url).pathname))}catch(e){return new Set()}}
 async function markCached(){const set=await savedPaths();document.querySelectorAll(".btn[data-pdf]").forEach(b=>b.classList.toggle("saved",set.has(absPath(pdfPath(b.dataset.pdf)))));
   const {d,s}=allDocs(),nd=d.filter(u=>set.has(absPath(u))).length,ns=s.filter(u=>set.has(absPath(u))).length;
