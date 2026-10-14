@@ -47,6 +47,10 @@ main .wrap{padding-block:24px 10px;display:grid;gap:20px}
 .panel ul{margin:0;padding-left:18px;display:grid;gap:4px}
 .score{font-family:var(--f-mono);font-size:1.8rem;color:var(--accent);font-variant-numeric:tabular-nums}
 .score small{font-size:.9rem;color:var(--muted)}
+.fig{margin:0;display:grid;gap:6px;justify-items:center}
+.fig>svg{width:100%;max-width:470px;height:auto;background:var(--plot-bg);border:1px solid var(--line);border-radius:10px}
+.fig figcaption{font-family:var(--f-head);font-size:.86rem;line-height:1.45;color:var(--muted);text-align:center;max-width:560px}
+.exnav button .fg{color:var(--warm);margin-left:2px}
 @media (max-width:860px){.layout{grid-template-columns:1fr}}
 @media (max-width:520px){.ans{grid-template-columns:auto minmax(0,1fr) auto}.ans .st{grid-column:1/-1;text-align:right}}
 </style>
@@ -76,6 +80,7 @@ main .wrap{padding-block:24px 10px;display:grid;gap:20px}
 <footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré</div></footer>
 
 <script src="assets/exos.js"></script>
+<script src="assets/exos-reperes.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
 <script>
@@ -98,13 +103,14 @@ function parse(s){
   if(s===""||!/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s))return NaN;return Number(s)}
 function fmtVal(x){if(x===0)return"0";const a=Math.abs(x);if(a>=1e-2&&a<1e4)return(+x.toPrecision(3)).toString().replace(".",",");const ex=Math.floor(Math.log10(a));return(+(x/10**ex).toPrecision(3)).toString().replace(".",",")+" × 10^"+ex}
 
+function figHtml(f){return f?`<figure class="fig">${f.svg}<figcaption>${f.legende}</figcaption></figure>`:""}
 function gen(){
   const list=EX[key];cur=list[idx]();shown=false;done=false;tried++;updScore();
-  $("#card").innerHTML=`<div class="head"><h2>${esc(cur.titre)}</h2><div class="exnav">${list.map((_,i)=>`<button type="button" data-i="${i}" aria-pressed="${i===idx}" title="Exercice ${i+1}">Ex. ${i+1}</button>`).join("")}</div></div>
-   <div class="enonce">${cur.enonce}</div>
+  $("#card").innerHTML=`<div class="head"><h2>${esc(cur.titre)}</h2><div class="exnav">${list.map((_,i)=>`<button type="button" data-i="${i}" aria-pressed="${i===idx}" title="Exercice ${i+1}${list[i].fig?" (avec schéma)":""}">Ex. ${i+1}${list[i].fig?'<span class="fg" aria-hidden="true">◩</span>':""}</button>`).join("")}</div></div>
+   <div class="enonce">${cur.enonce}</div>${figHtml(cur.figure)}
    <form class="answers" id="ansForm" autocomplete="off">${cur.reponses.map((r,i)=>`<div class="ans"><span class="nm">${tex(r.nom)} =</span><input id="a${i}" inputmode="decimal" aria-label="Réponse ${i+1}"><span class="u">${esc(r.unite||"")}</span><span class="st" id="s${i}"></span></div>`).join("")}
    <div class="actions"><button type="submit" class="btn primary">Vérifier</button><button type="button" class="btn" id="showSol">Voir la correction</button><button type="button" class="btn" id="newEx">Nouvelles valeurs</button></div></form>
-   <div class="sol" id="sol" hidden><div class="eyebrow">Correction</div><ol>${cur.correction.map(c=>`<li>${c}</li>`).join("")}</ol></div>`;
+   <div class="sol" id="sol" hidden><div class="eyebrow">Correction</div><ol>${cur.correction.map(c=>`<li>${c}</li>`).join("")}</ol>${figHtml(cur.figureCor)}</div>`;
   math($("#card"));
 }
 function check(){

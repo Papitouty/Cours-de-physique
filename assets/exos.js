@@ -287,5 +287,6 @@
   ];
 
   window.EXOS = EX;
+  window.EXO_OUTILS = { R, g, K, e0, rnd, pick, nz, N, deg, rad, vec, sgn };
   window.EXO_TITRES = { meca1: "Chapitre 1 — Calcul vectoriel", meca2: "Chapitre 2 — Cinématique", meca3: "Chapitre 3 — Dynamique", meca4: "Chapitre 4 — Travail et énergie", elec1: "Chapitre 1 — Charge et loi de Coulomb", elec2: "Chapitre 2 — Champ et potentiel", elec3: "Chapitre 3 — Le dipôle électrostatique" };
 })();
