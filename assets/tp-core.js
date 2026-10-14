@@ -91,7 +91,18 @@
   const device = () => { let d = store.get("device", null); if (!d) { d = Math.random().toString(36).slice(2, 10) + Date.now().toString(36); store.set("device", d); } return d; };
   const wipe = () => { try { Object.keys(localStorage).filter(k => k.startsWith("tp2_") && k !== "tp2_device").forEach(k => localStorage.removeItem(k)); } catch (e) {} };
   const endpoint = () => (window.SITE_CONFIG || {}).crEndpoint;
-  const post = async o => { const r = await fetch(endpoint(), { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(o) }); return r.json(); };
+  /* envoi au correcteur, avec nouveaux essais automatiques si le serveur est occupé (beaucoup d'étudiants en même temps) */
+  const post = async (o, onWait, tries = 6) => {
+    for (let k = 1; ; k++) {
+      let R = null;
+      try { const r = await fetch(endpoint(), { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(o) }); R = await r.json(); } catch (e) { R = null; }
+      if (R && !R.busy) return R;
+      if (k >= tries) { if (R) return R; throw new Error("réseau"); }
+      if (onWait) onWait(k);
+      await new Promise(res => setTimeout(res, (2000 + Math.random() * 4000) * Math.min(k, 4)));
+    }
+  };
+  const waitMsg = k => `Serveur très sollicité : nouvel essai automatique (${k})… Ne ferme pas la page.`;
   const dfmt = iso => { const d = new Date(iso); return d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }) + " à " + d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }); };
   /* installe le matériel personnel reçu du serveur ; efface les mesures faites avec un autre matériel */
   function applySession() {
@@ -110,8 +121,8 @@
     });
     return changed;
   }
-  async function login(carte, code, quiet) {
-    const R = await post({ action: "login", carte, code, device: device() });
+  async function login(carte, code, onWait) {
+    const R = await post({ action: "login", carte, code, device: device() }, onWait);
     if (!R.ok) return R;
     const old = sess();
     if (old && old.etudiant.carte !== R.etudiant.carte) wipe();
@@ -129,7 +140,7 @@
         e.preventDefault(); const m = $("#lgMsg");
         if (!endpoint()) { m.textContent = "La connexion n'est pas encore activée par l'enseignant."; m.className = "msg bad"; return; }
         m.textContent = "Connexion en cours…"; m.className = "msg"; $("#lgGo").disabled = true;
-        try { const R = await login($("#lgCarte").value.trim(), $("#lgCode").value.trim()); if (R.ok) { location.reload(); return; } m.textContent = R.error || "Connexion refusée."; m.className = "msg bad"; }
+        try { const R = await login($("#lgCarte").value.trim(), $("#lgCode").value.trim(), k => { m.textContent = waitMsg(k); }); if (R.ok) { location.reload(); return; } m.textContent = R.error || "Connexion refusée."; m.className = "msg bad"; }
         catch (err) { m.textContent = "Connexion impossible : vérifie ta connexion internet puis réessaie."; m.className = "msg bad"; }
         $("#lgGo").disabled = false;
       };
@@ -142,7 +153,7 @@
       <p class="msg" id="lgMsg" role="status"></p>`;
     $("#lgOut").onclick = () => { if (!confirm("Se déconnecter ? Les mesures et réponses non soumises enregistrées sur cet appareil seront effacées.")) return; wipe(); location.reload(); };
     $("#lgRef").onclick = async () => { const m = $("#lgMsg"); m.textContent = "Actualisation…"; m.className = "msg";
-      try { const R = await login(E.carte, s.code); if (R.ok) { location.reload(); return; } m.textContent = R.error; m.className = "msg bad"; } catch (err) { m.textContent = "Pas de connexion internet."; m.className = "msg bad"; } };
+      try { const R = await login(E.carte, s.code, k => { m.textContent = waitMsg(k); }); if (R.ok) { location.reload(); return; } m.textContent = R.error; m.className = "msg bad"; } catch (err) { m.textContent = "Pas de connexion internet."; m.className = "msg bad"; } };
   }
 
   /* minuteurs : un seul battement par seconde pour tous les TP minutés */
@@ -273,8 +284,7 @@
       const payload = { action: "submit", tp: T.id, num: T.num, id, seance, device: device(), raw: T.rows, fill: fillOut, calc: S.calc, qcm: qOut, rem: ($("#" + T.id + "-rem").value || "").slice(0, 2000), client: new Date().toISOString() };
       const btn = $("#" + T.id + "-send"); btn.disabled = true; sending = true; smsg(auto ? "Temps écoulé : envoi automatique de ton compte rendu…" : "Envoi et correction en cours…");
       try {
-        const res = await fetch(URL_, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
-        const R = await res.json();
+        const R = await post(payload, k => smsg(waitMsg(k), "bad"), auto ? 10 : 6);
         if (R.ok) { SUB = Object.assign({ date: new Date().toISOString() }, R); store.set(T.id + "_submitted", SUB); const s2 = sess(); if (s2 && s2.tps[T.id]) { s2.tps[T.id].soumis = SUB; store.set("session", s2); }
           smsg(R.nonConforme ? "Compte rendu enregistré. Attention : tes mesures ne correspondent pas au matériel qui t'a été attribué ; ton enseignant en est informé." : "Compte rendu soumis et corrigé.", R.nonConforme ? "bad" : "ok"); showNote(SUB); }
         else if (R.duplicate) { SUB = { date: new Date().toISOString(), note: NaN }; store.set(T.id + "_submitted", SUB); smsg(R.error, "bad"); showNote(SUB); }
@@ -301,7 +311,7 @@
           if (!confirm(`Commencer le TP n°${T.num} ? Tu disposeras de ${ST.duree} minutes à partir de maintenant. Les mesures d'entraînement déjà faites pour ce TP seront effacées.`)) return;
           go.disabled = true; const m = $("#" + T.id + "-tmsg"); m.textContent = "Démarrage…"; m.className = "msg";
           try {
-            const R = await post({ action: "start", tp: T.id, carte: SS.etudiant.carte, code: SS.code, device: device() });
+            const R = await post({ action: "start", tp: T.id, carte: SS.etudiant.carte, code: SS.code, device: device() }, k => { m.textContent = waitMsg(k); });
             if (!R.ok) { go.disabled = false; m.textContent = R.error; m.className = "msg bad"; return; }
             ST.debutTP = R.debutTP; ST.finTP = R.finTP; const s2 = sess(); if (s2) { s2.tps[T.id].debutTP = R.debutTP; s2.tps[T.id].finTP = R.finTP; s2.skew = Date.parse(R.serveur) - Date.now() || 0; store.set("session", s2); }
             T.clearRows(); T.msg("Le TP a commencé : bon travail !", "ok"); drawTimer();
@@ -312,9 +322,14 @@
       const ms = left(), tot = ST.duree * 60000;
       tbox.dataset.st = st;
       tbox.className = "timer noprint run" + (ms <= 120000 ? " bad" : ms <= 600000 ? " warn" : "");
-      tbox.innerHTML = st === "fini" ? `<b>Temps écoulé.</b> <span>${SUB ? "" : "Envoi automatique du compte rendu…"}</span>`
+      tbox.innerHTML = st === "fini" ? `<b>Temps écoulé.</b> <span>${SUB ? "" : "Envoi automatique du compte rendu dans quelques instants (ne ferme pas la page)…"}</span>`
         : `<span>Temps restant</span><b class="tleft">${hms(ms)}</b><span class="tbar"><i style="width:${Math.max(0, Math.min(100, ms / tot * 100)).toFixed(1)}%"></i></span><span>fin à ${new Date(Date.parse(ST.finTP) - ((sess() || {}).skew || 0)).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</span>`;
-      if (st === "fini" && !autoDone && !SUB) { autoDone = true; cr.querySelectorAll("input, textarea").forEach(e => e.disabled = true); doSend(true); }
+      if (st === "fini" && !autoDone && !SUB) {
+        autoDone = true; cr.querySelectorAll("input, textarea").forEach(e => e.disabled = true);
+        // envoi étalé sur 90 s pour ne pas saturer le serveur quand tout un groupe termine en même temps
+        smsg("Temps écoulé : ton compte rendu va être envoyé automatiquement dans quelques instants. Ne ferme pas la page.", "bad");
+        setTimeout(() => doSend(true), Math.random() * 90000);
+      }
     };
     if (tbox) { TIMERS.push(drawTimer); drawTimer(); }
     $("#" + T.id + "-dl").onclick = () => {
