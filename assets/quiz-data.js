@@ -754,5 +754,131 @@ window.QUIZ={
 "s": "Forme locale : équations de Poisson et de Laplace"
 }
 ]
+},
+"elec3": {
+"course": "Électricité",
+"title": "Chapitre 3 — Le dipôle électrostatique",
+"qs": [
+{
+"q": "Le moment dipolaire $\\vec p$ d'un dipôle $(-q\\text{ en }A\\,;\\,+q\\text{ en }B)$ est :",
+"c": [
+"$\\vec p=q\\,\\vec{BA}$",
+"$\\vec p=q\\,\\vec{AB}$, dirigé de $-q$ vers $+q$",
+"$\\vec p=2q\\,\\vec{AB}$",
+"un scalaire égal à $q/a$"
+],
+"a": 1,
+"e": "$\\vec p=q\\,\\vec{AB}$ : il va de la charge négative vers la charge positive.",
+"s": "Définitions"
+},
+{
+"q": "Dans le Système international, le moment dipolaire s'exprime en :",
+"c": [
+"C/m",
+"C·m",
+"V·m",
+"N·m"
+],
+"a": 1,
+"e": "$p=q\\,a$ : coulomb × mètre.",
+"s": "Définitions"
+},
+{
+"q": "À grande distance, le potentiel d'un dipôle varie comme :",
+"c": [
+"$1/\\rho$",
+"$1/\\rho^2$",
+"$1/\\rho^3$",
+"$\\rho$"
+],
+"a": 1,
+"e": "$V=\\dfrac{p\\cos\\theta}{4\\pi\\varepsilon_0\\rho^2}$ : les deux charges opposées se compensent presque, d'où une décroissance plus rapide qu'en $1/\\rho$.",
+"s": "Potentiel créé à grande distance"
+},
+{
+"q": "À grande distance, l'intensité du champ d'un dipôle varie comme :",
+"c": [
+"$1/\\rho$",
+"$1/\\rho^2$",
+"$1/\\rho^3$",
+"$1/\\rho^4$"
+],
+"a": 2,
+"e": "$E=\\dfrac{p\\sqrt{1+3\\cos^2\\theta}}{4\\pi\\varepsilon_0\\rho^3}$.",
+"s": "Champ créé à grande distance"
+},
+{
+"q": "Dans le plan médiateur du dipôle ($\\theta=\\pi/2$) :",
+"c": [
+"$V=0$ et $E=0$",
+"$V=0$ mais $E\\neq0$",
+"$V\\neq0$ et $E=0$",
+"$V$ est maximal"
+],
+"a": 1,
+"e": "$\\cos\\theta=0$ donne $V=0$, mais $E_\\theta=\\dfrac{p}{4\\pi\\varepsilon_0\\rho^3}\\neq0$.",
+"s": "Positions principales de Gauss"
+},
+{
+"q": "Les composantes polaires du champ d'un dipôle sont :",
+"c": [
+"$E_\\rho=\\dfrac{p\\sin\\theta}{4\\pi\\varepsilon_0\\rho^3}$, $E_\\theta=\\dfrac{2p\\cos\\theta}{4\\pi\\varepsilon_0\\rho^3}$",
+"$E_\\rho=\\dfrac{2p\\cos\\theta}{4\\pi\\varepsilon_0\\rho^3}$, $E_\\theta=\\dfrac{p\\sin\\theta}{4\\pi\\varepsilon_0\\rho^3}$",
+"$E_\\rho=\\dfrac{p\\cos\\theta}{4\\pi\\varepsilon_0\\rho^2}$, $E_\\theta=0$",
+"$E_\\rho=E_\\theta$"
+],
+"a": 1,
+"e": "$E_\\rho=-\\dfrac{\\partial V}{\\partial\\rho}$ et $E_\\theta=-\\dfrac1\\rho\\dfrac{\\partial V}{\\partial\\theta}$.",
+"s": "Champ créé à grande distance"
+},
+{
+"q": "Sur l'axe du dipôle (première position de Gauss), à la distance $\\rho$, le champ vaut :",
+"c": [
+"$-\\dfrac{\\vec p}{4\\pi\\varepsilon_0\\rho^3}$",
+"$\\dfrac{2\\vec p}{4\\pi\\varepsilon_0\\rho^3}$",
+"$\\dfrac{\\vec p}{4\\pi\\varepsilon_0\\rho^2}$",
+"$\\vec 0$"
+],
+"a": 1,
+"e": "Pour $\\theta=0$ ou $\\pi$, $E_\\theta=0$ et $\\vec E=\\dfrac{2\\vec p}{4\\pi\\varepsilon_0\\rho^3}$ (même sens que $\\vec p$).",
+"s": "Positions principales de Gauss"
+},
+{
+"q": "L'angle $\\varphi$ entre $\\vec E$ et $\\vec{OM}$ vérifie :",
+"c": [
+"$\\tan\\varphi=2\\tan\\theta$",
+"$\\tan\\varphi=\\tfrac12\\tan\\theta$",
+"$\\varphi=\\theta$",
+"$\\varphi=\\pi/2$"
+],
+"a": 1,
+"e": "$\\tan\\varphi=\\dfrac{E_\\theta}{E_\\rho}=\\dfrac{\\sin\\theta}{2\\cos\\theta}$.",
+"s": "Champ créé à grande distance"
+},
+{
+"q": "Un dipôle placé dans un champ uniforme $\\vec E$ subit :",
+"c": [
+"une force $q\\vec E$",
+"un couple de moment $\\vec C=\\vec p\\wedge\\vec E$ et une résultante nulle",
+"une force $\\vec p\\cdot\\vec E$",
+"aucune action"
+],
+"a": 1,
+"e": "Les forces $-q\\vec E$ et $+q\\vec E$ sont opposées : résultante nulle, mais elles forment un couple $\\vec p\\wedge\\vec E$.",
+"s": "Action d'un champ extérieur"
+},
+{
+"q": "Dans un champ uniforme, la position d'équilibre stable du dipôle est :",
+"c": [
+"$\\vec p$ perpendiculaire à $\\vec E$",
+"$\\vec p$ de même sens que $\\vec E$",
+"$\\vec p$ de sens opposé à $\\vec E$",
+"n'importe quelle orientation"
+],
+"a": 1,
+"e": "$E_p=-\\vec p\\cdot\\vec E$ est minimale quand $\\vec p$ et $\\vec E$ ont le même sens.",
+"s": "Action d'un champ extérieur"
+}
+]
 }
 };

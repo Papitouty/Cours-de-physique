@@ -242,12 +242,14 @@ const COURSES=[
     toc:["Introduction et outils","Travail d'une force","Travail dans les différents systèmes de coordonnées","Travail de quelques forces usuelles","Puissance d'une force","Énergie cinétique","Forces conservatives et énergie potentielle","Énergie mécanique","Équilibre et stabilité"]}
   ]},
  {id:"elec",tab:"Électricité",eyebrow:"Électricité",title:"Électrostatique",
-  intro:"Deux chapitres : la charge et la loi de Coulomb, puis le champ, le potentiel et le théorème de Gauss. Les distributions classiques (fil, anneau, disque, boule) sont traitées dans la série de TD.",
+  intro:"Trois chapitres : la charge et la loi de Coulomb ; le champ, le potentiel et le théorème de Gauss ; le dipôle électrostatique. Les distributions classiques (fil, anneau, disque, boule) sont traitées dans la série de TD.",
   chapters:[
    {n:1,title:"Électrostatique : charge et loi de Coulomb",key:"Electricite_Chapitre_1_Electrostatique",pages:11,
     toc:["La charge électrique","Électrisation de la matière","Distributions de charges","Force électrostatique : loi de Coulomb","Principe de superposition"]},
    {n:2,title:"Champ et potentiel électrostatiques",key:"Electricite_Chapitre_2_Champ_potentiel",pages:15,
-    toc:["Le champ électrostatique","Le potentiel électrostatique","Plusieurs charges ponctuelles","Distributions continues","Angle solide","Flux et théorème de Gauss","Propriétés du champ et du potentiel","Équations de Poisson et de Laplace"]}
+    toc:["Le champ électrostatique","Le potentiel électrostatique","Plusieurs charges ponctuelles","Distributions continues","Angle solide","Flux et théorème de Gauss","Propriétés du champ et du potentiel","Équations de Poisson et de Laplace"]},
+   {n:3,title:"Le dipôle électrostatique",key:"Electricite_Chapitre_3_Dipole",pages:16,
+    toc:["Définitions : dipôle, moment dipolaire","Potentiel créé à grande distance","Champ créé à grande distance","Positions principales de Gauss","Lignes de champ et équipotentielles","Action d'un champ extérieur : couple, énergie, force"]}
   ],
   series:[{title:"Série de TD n°1 — chapitres 1 et 2",sub:"Charges, champ et potentiel",
     text:"11 exercices : quantification, Coulomb et superposition, charges ponctuelles, fil infini et anneau, disque et plan, boule chargée en volume par le théorème de Gauss, équation de Poisson.",
@@ -272,7 +274,7 @@ function pdfBtn(file,label,n,kind,primary){
   const k=kind==="cor"?'<span class="k k-cor">CORRIGÉ</span>':'<span class="k k-pdf">PDF</span>';
   return `<button type="button" class="btn${primary?" primary":""}" data-pdf="${file}" data-title="${esc(label)}">${k}<span class="lbl">${esc(label)}</span><span class="n">${n} p.</span></button>`;
 }
-const SIMS={meca2:[["frenet","Simulation : base de Frenet"]],meca4:[["energie","Simulation : énergie potentielle"]],elec1:[["champ","Simulation : lignes de champ"]],elec2:[["champ","Simulation : champ et potentiel"],["anneau","Simulation : anneau chargé"],["boule","Simulation : théorème de Gauss"]]};
+const SIMS={meca2:[["frenet","Simulation : base de Frenet"]],meca4:[["energie","Simulation : énergie potentielle"]],elec1:[["champ","Simulation : lignes de champ"]],elec2:[["champ","Simulation : champ et potentiel"],["anneau","Simulation : anneau chargé"],["boule","Simulation : théorème de Gauss"]],elec3:[["champ","Simulation : lignes de champ du dipôle"],["dipole","Simulation : dipôle dans un champ uniforme"]]};
 function pptBtn(key,n,t){
   return `<button type="button" class="btn" data-pdf="slides/${key}_diapo" data-title="${esc(t)}"><span class="k k-ppt">DIAPO</span><span class="lbl">Diaporama</span><span class="n">${n} diap.</span></button>`;
 }

@@ -92,7 +92,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
           <li>Les lignes partent des charges positives et arrivent sur les charges négatives.</li>
           <li>Les équipotentielles coupent toujours les lignes de champ à angle droit.</li>
           <li>Deux charges égales : au milieu, E = 0 mais V ≠ 0 (TD, exercice 4).</li>
-          <li>Dipôle : sur la médiatrice, V = 0 mais E ≠ 0 (TD, exercice 5).</li>
+          <li>Dipôle : sur la médiatrice, V = 0 mais E ≠ 0 (TD, exercice 5). Loin des charges, on retrouve les lignes ρ = k sin²θ du chapitre 3.</li>
         </ul>
       </div>
     </div>
@@ -146,6 +146,34 @@ input[type=range]{width:100%;accent-color:var(--accent)}
         <li>Le champ est maximal en z = R/√2.</li>
         <li>Loin de l'anneau (z ≫ R), la courbe rejoint KQ/z² : l'anneau se comporte comme une charge ponctuelle.</li>
       </ul><p class="hint">Avec R = 10 cm, Q = 10 nC, z = 10 cm : V ≈ 636 V et E ≈ 3,2 × 10³ V/m (TD, exercice 6).</p></div>
+    </div>
+  </section>
+
+  <!-- ============ 3 bis. Dipôle dans un champ uniforme ============ -->
+  <section class="sim" id="dipole" hidden>
+    <div class="stage">
+      <canvas id="cvDipole" aria-label="Dipôle dans un champ uniforme"></canvas>
+      <div class="legend"><span><i style="background:var(--muted)"></i>champ uniforme E</span><span><i style="background:var(--saff)"></i>moment dipolaire p</span><span><i style="background:var(--accent)"></i>Ep(α) = −pE cos α</span></div>
+      <div class="hint">Choisis l'angle de départ puis lâche le dipôle : le couple le fait tourner vers le sens du champ.</div>
+    </div>
+    <div class="side">
+      <div class="panel">
+        <h3>Paramètres</h3>
+        <div class="ctl"><label for="dE">Champ E <b id="dEv"></b></label><input id="dE" type="range" min="1" max="20" step="1" value="10"></div>
+        <div class="ctl"><label for="dA">Angle de départ α₀ = (p, E) <b id="dAv"></b></label><input id="dA" type="range" min="-180" max="180" step="5" value="60"></div>
+        <label class="chk"><input type="checkbox" id="dF" checked> Frottements (amortissement)</label>
+        <div class="row"><button type="button" class="btn sm" id="dGo">Lâcher le dipôle</button><button type="button" class="btn sm" id="dSt">Arrêter</button></div>
+      </div>
+      <div class="panel">
+        <h3>Valeurs instantanées</h3>
+        <dl class="read"><dt>Angle α</dt><dd id="dAl">—</dd><dt>Couple C = pE sin α</dt><dd id="dC">—</dd><dt>Énergie Ep = −pE cos α</dt><dd id="dEp">—</dd></dl>
+        <div class="hint">Dipôle : q = 2 nC, a = 2 cm, soit p = 4 × 10⁻¹¹ C·m.</div>
+      </div>
+      <div class="panel note"><h3>À observer</h3><ul>
+        <li>Les deux forces sont opposées : la résultante est nulle, il ne reste qu'un couple.</li>
+        <li>Le dipôle oscille autour de α = 0 puis s'y arrête : minimum de Ep, équilibre stable.</li>
+        <li>Lâché exactement à α = 180°, il reste immobile, mais le moindre écart l'en éloigne : équilibre instable.</li>
+      </ul><p class="hint">Cours, chapitre 3 : action d'un champ extérieur sur un dipôle.</p></div>
     </div>
   </section>
 
@@ -245,7 +273,7 @@ function curve(c,f,xr,X,Y,col,lw=2,dash=[],n=400,clip){c.save();if(clip){c.begin
   c.stroke();c.restore()}
 
 /* ============ onglets ============ */
-const SIMS=[["champ","Lignes de champ et équipotentielles","E"],["boule","Boule chargée : théorème de Gauss","E"],["anneau","Champ sur l'axe d'un anneau","E"],["frenet","Base de Frenet","M"],["energie","Énergie potentielle et stabilité","M"]];
+const SIMS=[["champ","Lignes de champ et équipotentielles","E"],["boule","Boule chargée : théorème de Gauss","E"],["anneau","Champ sur l'axe d'un anneau","E"],["dipole","Dipôle dans un champ uniforme","E"],["frenet","Base de Frenet","M"],["energie","Énergie potentielle et stabilité","M"]];
 let cur=SIMS.some(s=>s[0]===location.hash.slice(1))?location.hash.slice(1):"champ";
 function tabs(){["E","M"].forEach(g=>$("#tabs"+g).innerHTML=SIMS.filter(s=>s[2]===g).map(s=>`<button type="button" class="pill" data-s="${s[0]}" aria-selected="${s[0]===cur}">${s[1]}</button>`).join(""))}
 function go(id){cur=id;tabs();SIMS.forEach(s=>$("#"+s[0]).hidden=s[0]!==id);history.replaceState(null,"","#"+id);redraw()}
@@ -395,6 +423,46 @@ if(matchMedia)matchMedia("(prefers-color-scheme: dark)").addEventListener?.("cha
   }
   ["#aR","#aQ","#az"].forEach(id=>$(id).addEventListener("input",draw));
   DRAW.anneau=draw;
+})();
+
+/* ============ 3 bis. DIPÔLE DANS UN CHAMP UNIFORME ============ */
+(function(){
+  const cv=$("#cvDipole"),P=4e-11;let al=60*Math.PI/180,w=0,run=false,last=null;
+  const Ev=()=>+$("#dE").value*1000;
+  function setA(){al=+$("#dA").value*Math.PI/180;w=0}
+  $("#dA").addEventListener("input",()=>{run=false;setA();draw()});
+  $("#dE").addEventListener("input",draw);
+  $("#dGo").onclick=()=>{setA();run=true};$("#dSt").onclick=()=>{run=false;w=0;draw()};
+  function step(dt){const k=0.09*Ev()/1000,g=$("#dF").checked?0.6:0,n=20,h=dt/n;for(let i=0;i<n;i++){w+=(-k*Math.sin(al)-g*w)*h;al+=w*h}
+    al=Math.atan2(Math.sin(al),Math.cos(al));}
+  function draw(){
+    const E=Ev(),narrow=innerWidth<600,F=fit(cv,narrow?1.1:0.55),c=F.c,W=F.w,H=F.h;
+    c.fillStyle=css("--plot-bg");c.fillRect(0,0,W,H);
+    $("#dEv").textContent=num(E/1000,0)+" kV/m";$("#dAv").textContent=$("#dA").value+"°";
+    const sw=narrow?W:W*0.5,sh=narrow?H*0.5:H,cx=sw/2,cy=sh/2,L=Math.min(sw,sh)*0.3;
+    // lignes de champ
+    for(let y=sh*0.12;y<sh;y+=sh*0.19)arrow(c,10,y,sw-10,y,css("--muted"),1,7);
+    text(c,"E",sw-14,sh*0.12-6,css("--muted"),"right");
+    const ax=cx-L*Math.cos(al),ay=cy+L*Math.sin(al),bx=cx+L*Math.cos(al),by=cy-L*Math.sin(al);
+    c.strokeStyle=css("--fg");c.lineWidth=2;c.beginPath();c.moveTo(ax,ay);c.lineTo(bx,by);c.stroke();
+    const fl=18+E/20000*40;arrow(c,bx,by,bx+fl,by,css("--rouge"),2.6,9);arrow(c,ax,ay,ax-fl,ay,css("--bleu"),2.6,9);
+    arrow(c,cx-0.45*L*Math.cos(al),cy+0.45*L*Math.sin(al),cx+0.45*L*Math.cos(al),cy-0.45*L*Math.sin(al),css("--saff"),3,10);
+    [[ax,ay,css("--bleu"),"−q"],[bx,by,css("--rouge"),"+q"]].forEach(([x,y,col,l])=>{c.fillStyle=col;c.beginPath();c.arc(x,y,8,0,7);c.fill();text(c,l,x,y-12,col,"center")});
+    const C=P*E*Math.sin(al),Ep=-P*E*Math.cos(al);
+    if(Math.abs(Math.sin(al))>0.05){c.strokeStyle=css("--accent");c.lineWidth=2;const sg=Math.sin(al)>0;c.beginPath();c.arc(cx,cy,L*0.28,sg?-2.2:2.2,sg?-0.6:0.6,sg?false:true);c.stroke();}
+    $("#dAl").textContent=num(al*180/Math.PI,0)+"°";$("#dC").textContent=fmt(C)+" N·m";$("#dEp").textContent=fmt(Ep)+" J";
+    // graphe Ep(alpha)
+    const gx=narrow?46:sw+46,gy=narrow?sh+16:18,gw=(narrow?W:W-sw)-(narrow?60:60),gh=(narrow?H-sh:H)-50,ym=P*20000*1.1;
+    const p=plotFrame(c,{x:gx,y:gy,w:gw,h:gh},[-Math.PI,Math.PI],[-ym,ym],{xt:[-Math.PI,-Math.PI/2,0,Math.PI/2,Math.PI],xf:t=>Math.round(t*180/Math.PI)+"°",xl:"α",yl:"Ep (J)"});
+    curve(c,x=>-P*E*Math.cos(x),[-Math.PI,Math.PI],p.X,p.Y,css("--accent"),2.4,[],300,{x:gx,y:gy,w:gw,h:gh});
+    c.fillStyle=css("--ok");c.beginPath();c.arc(p.X(0),p.Y(-P*E),5,0,7);c.fill();text(c,"stable",p.X(0),p.Y(-P*E)+18,css("--ok"),"center");
+    [-Math.PI,Math.PI].forEach(x=>{c.strokeStyle=css("--ko");c.lineWidth=2;c.beginPath();c.arc(p.X(x),p.Y(P*E),5,0,7);c.stroke()});
+    text(c,"instable",p.X(Math.PI)-6,p.Y(P*E)-10,css("--ko"),"right");
+    c.fillStyle=css("--fg");c.beginPath();c.arc(p.X(al),p.Y(Ep),6,0,7);c.fill();
+  }
+  function loop(ts){if(cur==="dipole"&&run){if(last!=null)step(Math.min(0.05,(ts-last)/1000)*1.5);last=ts;draw()}else last=null;requestAnimationFrame(loop)}
+  requestAnimationFrame(loop);
+  DRAW.dipole=draw;
 })();
 
 /* ============ 4. FRENET ============ */

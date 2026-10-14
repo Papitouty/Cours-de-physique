@@ -250,6 +250,42 @@
     }
   ];
 
+  /* ===================== ÉLECTRICITÉ 3 : DIPÔLE ÉLECTROSTATIQUE ===================== */
+  EX.elec3 = [
+    function () {
+      const q = rnd(1, 10), a = rnd(1, 10), r = rnd(10, 50), th = pick([0, 30, 45, 60, 120, 135, 150, 180]);
+      const p = q*1e-9*a/1000, rm = r/100, t = th*Math.PI/180, V = K*p*Math.cos(t)/rm**2, E = K*p*Math.sqrt(1 + 3*Math.cos(t)**2)/rm**3;
+      return { titre: "Potentiel et champ d'un dipôle",
+        enonce: R`Un dipôle est formé de deux charges $\pm q$ avec $q=${q}$ nC, distantes de $a=${a}$ mm. Calculer son moment dipolaire $p$, puis le potentiel $V$ et l'intensité du champ $E$ au point $M$ tel que $\rho=OM=${r}$ cm et $\theta=${th}^\circ$ ($\rho\gg a$).`,
+        reponses: [{ nom: "p", unite: "C·m", val: p }, { nom: "V", unite: "V", val: V, abs: 1e-3 }, { nom: "E", unite: "V/m", val: E }],
+        correction: [
+          R`$p=q\,a=${q}\times10^{-9}\times${N(a/1000)}=${N(p)}$ C$\cdot$m.`,
+          R`$V=K\dfrac{p\cos\theta}{\rho^2}=\dfrac{9\times10^9\times${N(p)}\times\cos ${th}^\circ}{${N(rm)}^2}\approx${N(V)}$ V.`,
+          R`$E=K\dfrac{p\sqrt{1+3\cos^2\theta}}{\rho^3}=\dfrac{9\times10^9\times${N(p)}\times\sqrt{1+3\cos^2${th}^\circ}}{${N(rm)}^3}\approx${N(E)}$ V/m.`,
+          th === 90 ? "" : R`Remarque : $V$ a le signe de $\cos\theta$ ; il est nul dans le plan médiateur.`].filter(Boolean) };
+    },
+    function () {
+      const q = rnd(1, 10), a = rnd(1, 10), r = rnd(10, 40), p = q*1e-9*a/1000, rm = r/100, Ea = 2*K*p/rm**3, Em = K*p/rm**3;
+      return { titre: "Positions principales de Gauss",
+        enonce: R`Un dipôle ($q=${q}$ nC, $a=${a}$ mm) est étudié à la distance $\rho=${r}$ cm de son centre. Calculer l'intensité du champ sur l'axe du dipôle ($\theta=0$) puis sur sa médiatrice ($\theta=90^\circ$).`,
+        reponses: [{ nom: R`E_{\text{axe}}`, unite: "V/m", val: Ea }, { nom: R`E_{\text{médiatrice}}`, unite: "V/m", val: Em }],
+        correction: [
+          R`$p=q\,a=${N(p)}$ C$\cdot$m.`,
+          R`Sur l'axe : $E=K\dfrac{2p}{\rho^3}=\dfrac{9\times10^9\times2\times${N(p)}}{${N(rm)}^3}\approx${N(Ea)}$ V/m, de même sens que $\vec p$.`,
+          R`Sur la médiatrice : $E=K\dfrac{p}{\rho^3}\approx${N(Em)}$ V/m, de sens opposé à $\vec p$ : deux fois plus faible que sur l'axe.`] };
+    },
+    function () {
+      const q = rnd(1, 10), a = rnd(1, 10), E = rnd(1, 20), al = pick([30, 45, 60, 90, 120, 150]), p = q*1e-9*a/1000, t = al*Math.PI/180, C = p*E*1000*Math.sin(t), Ep = -p*E*1000*Math.cos(t);
+      return { titre: "Dipôle dans un champ uniforme",
+        enonce: R`Un dipôle ($q=${q}$ nC, $a=${a}$ mm) est placé dans un champ uniforme $E=${E}$ kV/m ; son moment dipolaire fait l'angle $\alpha=${al}^\circ$ avec $\vec E$. Calculer le moment du couple $C$ et l'énergie potentielle $E_p$ du dipôle.`,
+        reponses: [{ nom: "C", unite: "N·m", val: C }, { nom: R`E_p`, unite: "J", val: Ep, abs: 1e-12 }],
+        correction: [
+          R`$p=q\,a=${N(p)}$ C$\cdot$m ; la résultante des forces est nulle (champ uniforme).`,
+          R`$C=pE\sin\alpha=${N(p)}\times${E}\times10^3\times\sin ${al}^\circ\approx${N(C)}$ N$\cdot$m.`,
+          R`$E_p=-pE\cos\alpha\approx${N(Ep)}$ J. Le couple tend à ramener $\vec p$ dans le sens de $\vec E$ (équilibre stable pour $\alpha=0$).`] };
+    }
+  ];
+
   window.EXOS = EX;
-  window.EXO_TITRES = { meca1: "Chapitre 1 — Calcul vectoriel", meca2: "Chapitre 2 — Cinématique", meca3: "Chapitre 3 — Dynamique", meca4: "Chapitre 4 — Travail et énergie", elec1: "Chapitre 1 — Charge et loi de Coulomb", elec2: "Chapitre 2 — Champ et potentiel" };
+  window.EXO_TITRES = { meca1: "Chapitre 1 — Calcul vectoriel", meca2: "Chapitre 2 — Cinématique", meca3: "Chapitre 3 — Dynamique", meca4: "Chapitre 4 — Travail et énergie", elec1: "Chapitre 1 — Charge et loi de Coulomb", elec2: "Chapitre 2 — Champ et potentiel", elec3: "Chapitre 3 — Le dipôle électrostatique" };
 })();

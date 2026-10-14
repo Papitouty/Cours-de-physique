@@ -16,6 +16,10 @@
    ===================================================================== */
 window.ANNONCES = [
   { date: "2026-10-14", important: true,
+    titre: "Nouveau : chapitre 3 d'électrostatique — Le dipôle",
+    texte: "Support de cours complet (démonstrations pas à pas, figures, fiche de synthèse), quiz, exercices d'entraînement et une nouvelle simulation : le dipôle dans un champ uniforme.",
+    lien: "./#elec" },
+  { date: "2026-10-14",
     titre: "TP : connexion avec ton code personnel",
     texte: "Pour soumettre un compte rendu de TP, connecte-toi en haut de la page TP avec ton numéro de carte et le code personnel remis par ton enseignant. Chaque étudiant reçoit son propre matériel et ses propres questions : des mesures recopiées sont détectées automatiquement. Ne communique ton code à personne.",
     lien: "tp.html" },

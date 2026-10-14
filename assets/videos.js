@@ -17,7 +17,8 @@ window.VIDEOS = {
   elec2: [     // Électricité — Ch. 2 Champ et potentiel
     { titre: "Sphère chargée en volume", url: "https://www.youtube.com/watch?v=hVLKwntLCM0",
       note: "Exercice : application du théorème de Gauss (TD n°1, exercice 10)" }
-  ]
+  ],
+  elec3: []    // Électricité — Ch. 3 Le dipôle électrostatique
   /* Exemple de ligne :
   elec2: [ { titre: "Le théorème de Gauss expliqué", url: "https://www.youtube.com/watch?v=XXXXXXXXXXX", duree: "15 min" } ]
   */

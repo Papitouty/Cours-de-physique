@@ -2,7 +2,7 @@
    - pages et ressources du site : réseau d'abord, copie locale si pas de connexion
    - documents PDF : copie locale d'abord (un document ouvert une fois reste disponible)
    - bibliothèques et polices externes : copie locale, rafraîchie en arrière-plan */
-const VERSION = "v24";
+const VERSION = "v25";
 const SHELL = "shell-" + VERSION;
 const PDFS = "pdf-v1";          // nom stable : les documents enregistrés survivent aux mises à jour du site
 const EXT = "ext-" + VERSION;
@@ -14,12 +14,13 @@ const SHELL_FILES = [
   "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png",
   "img/Support_Chapitre_1_Calcul_vectoriel.jpg", "img/Support_Chapitre_2_Cinematique.jpg",
   "img/Support_Chapitre_3_Dynamique.jpg", "img/Support_Chapitre_4_Travail_energie.jpg",
-  "img/Electricite_Chapitre_1_Electrostatique.jpg", "img/Electricite_Chapitre_2_Champ_potentiel.jpg"
+  "img/Electricite_Chapitre_1_Electrostatique.jpg", "img/Electricite_Chapitre_2_Champ_potentiel.jpg", "img/Electricite_Chapitre_3_Dipole.jpg"
 ];
 /* supports de cours et TD (≈ 3,4 Mo) : enregistrés dès la première visite */
 const DOC_FILES = [
   "docs/Electricite_Chapitre_1_Electrostatique.pdf",
   "docs/Electricite_Chapitre_2_Champ_potentiel.pdf",
+  "docs/Electricite_Chapitre_3_Dipole.pdf",
   "docs/Support_Chapitre_1_Calcul_vectoriel.pdf",
   "docs/Support_Chapitre_2_Cinematique.pdf",
   "docs/Support_Chapitre_3_Dynamique.pdf",
