@@ -15,7 +15,11 @@
      detail : consignes (facultatif)
    ===================================================================== */
 window.ANNONCES = [
-  { date: "2026-10-13", important: true,
+  { date: "2026-10-14", important: true,
+    titre: "TP : connexion avec ton code personnel",
+    texte: "Pour soumettre un compte rendu de TP, connecte-toi en haut de la page TP avec ton numéro de carte et le code personnel remis par ton enseignant. Chaque étudiant reçoit son propre matériel et ses propres questions : des mesures recopiées sont détectées automatiquement. Ne communique ton code à personne.",
+    lien: "tp.html" },
+  { date: "2026-10-13",
     titre: "Travaux pratiques : 7 TP simulés",
     texte: "Pendule simple, oscillateur harmonique, pendule de torsion, mesures de résistances, réfraction, lentilles et microscope : protocole détaillé, mesures simulées et compte rendu à remplir en ligne.",
     lien: "tp.html" },

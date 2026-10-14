@@ -82,8 +82,67 @@
       }
       if (S.show) S.show();
     };
-    S.reading = () => ({ t: S.t, n: S.auto ? S.n : Math.max(1, Math.round(+$("#" + id + "-nb").value || 10)) });
+    S.reading = () => ({ t: S.t, n: S.auto ? S.n : Math.max(1, Math.round(+$("#" + id + "-nb").value || 10)), man: !S.auto });
     return { html, S, bind };
+  }
+
+  /* ---------- session de l'étudiant connecté (n° de carte + code personnel) ---------- */
+  const sess = () => store.get("session", null);
+  const device = () => { let d = store.get("device", null); if (!d) { d = Math.random().toString(36).slice(2, 10) + Date.now().toString(36); store.set("device", d); } return d; };
+  const wipe = () => { try { Object.keys(localStorage).filter(k => k.startsWith("tp2_") && k !== "tp2_device").forEach(k => localStorage.removeItem(k)); } catch (e) {} };
+  const endpoint = () => (window.SITE_CONFIG || {}).crEndpoint;
+  const post = async o => { const r = await fetch(endpoint(), { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(o) }); return r.json(); };
+  const dfmt = iso => { const d = new Date(iso); return d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }) + " à " + d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }); };
+  /* installe le matériel personnel reçu du serveur ; efface les mesures faites avec un autre matériel */
+  function applySession() {
+    const s = sess(); if (!s) return [];
+    const changed = [];
+    TPS.forEach(T => {
+      const st = s.tps[T.id]; if (!st) return;
+      const pk = (window.TPCR_PARAMS || {})[T.id];
+      if (pk && st.params && JSON.stringify(store.get(pk, null)) !== JSON.stringify(st.params)) {
+        store.set(pk, st.params);
+        Object.keys(window.TPCR[T.id].parts).forEach(k => { try { localStorage.removeItem("tp2_" + T.id + "_v2_" + k); } catch (e) {} });
+        const cr = store.get(T.id + "_crv2", null); if (cr) { cr.fill = {}; cr.calc = {}; store.set(T.id + "_crv2", cr); }
+        changed.push(T.num);
+      }
+      if (st.soumis) store.set(T.id + "_submitted", st.soumis); else { try { localStorage.removeItem("tp2_" + T.id + "_submitted"); } catch (e) {} }
+    });
+    return changed;
+  }
+  async function login(carte, code, quiet) {
+    const R = await post({ action: "login", carte, code, device: device() });
+    if (!R.ok) return R;
+    const old = sess();
+    if (old && old.etudiant.carte !== R.etudiant.carte) wipe();
+    store.set("session", { etudiant: R.etudiant, code: String(code).trim().toUpperCase(), tps: R.tps, at: new Date().toISOString() });
+    return R;
+  }
+  function loginCard(changed) {
+    const box = $("#tpLogin"); if (!box) return; const s = sess();
+    if (!s) {
+      box.innerHTML = `<h2>Connexion aux TP</h2>
+        <p>Connecte-toi avec ton <b>numéro de carte étudiant</b> et le <b>code personnel</b> remis par ton enseignant. Tu recevras ton propre matériel et tes propres questions ; sans connexion, tu peux t'entraîner mais pas soumettre de compte rendu.</p>
+        <form class="loginf" id="lgForm" autocomplete="off"><label>N° carte étudiant<input id="lgCarte" required></label><label>Code personnel<input id="lgCode" required autocapitalize="characters" spellcheck="false"></label><button class="btn primary" type="submit" id="lgGo">Se connecter</button></form>
+        <p class="msg" id="lgMsg" role="status"></p>`;
+      $("#lgForm").onsubmit = async e => {
+        e.preventDefault(); const m = $("#lgMsg");
+        if (!endpoint()) { m.textContent = "La connexion n'est pas encore activée par l'enseignant."; m.className = "msg bad"; return; }
+        m.textContent = "Connexion en cours…"; m.className = "msg"; $("#lgGo").disabled = true;
+        try { const R = await login($("#lgCarte").value.trim(), $("#lgCode").value.trim()); if (R.ok) { location.reload(); return; } m.textContent = R.error || "Connexion refusée."; m.className = "msg bad"; }
+        catch (err) { m.textContent = "Connexion impossible : vérifie ta connexion internet puis réessaie."; m.className = "msg bad"; }
+        $("#lgGo").disabled = false;
+      };
+      return;
+    }
+    const E = s.etudiant;
+    box.innerHTML = `<div class="who"><div><div class="eyebrow">Connecté(e)</div><b>${esc(E.prenom)} ${esc(E.nom)}</b> — carte n° ${esc(E.carte)} — groupe ${esc(E.groupe)}${E.sousgroupe ? ", sous-groupe " + esc(E.sousgroupe) : ""}</div>
+      <div class="row"><button type="button" class="btn sm" id="lgRef">Actualiser</button><button type="button" class="btn sm" id="lgOut">Se déconnecter</button></div></div>
+      ${changed && changed.length ? `<p class="msg ok">Ton matériel personnel est installé (TP ${changed.join(", ")}) : les mesures d'entraînement faites avec un autre matériel ont été effacées.</p>` : ""}
+      <p class="msg" id="lgMsg" role="status"></p>`;
+    $("#lgOut").onclick = () => { if (!confirm("Se déconnecter ? Les mesures et réponses non soumises enregistrées sur cet appareil seront effacées.")) return; wipe(); location.reload(); };
+    $("#lgRef").onclick = async () => { const m = $("#lgMsg"); m.textContent = "Actualisation…"; m.className = "msg";
+      try { const R = await login(E.carte, s.code); if (R.ok) { location.reload(); return; } m.textContent = R.error; m.className = "msg bad"; } catch (err) { m.textContent = "Pas de connexion internet."; m.className = "msg bad"; } };
   }
 
   const TPS = [];
@@ -94,6 +153,7 @@
 
   function mount(T) {
     const CR = window.TPCR[T.id], L = "ABCDEFG", keys = Object.keys(CR.parts);
+    const SS = sess(), ST = SS && SS.tps[T.id], QS = ST ? ST.qcm : [];   // questions attribuées : [[n° question, ordre des réponses], ...]
     const host = document.createElement("section"); host.className = "tp"; host.id = T.id; host.hidden = true;
     const idField = (f, label, opt) => `<label>${label}${opt ? ' <span class="opt">(facultatif)</span>' : ""}<input id="${T.id}-${f}" data-id="${f}" autocomplete="off"></label>`;
     host.innerHTML = `
@@ -114,6 +174,8 @@
     <section class="card report" id="${T.id}-cr" aria-labelledby="${T.id}-crh">
       <h3 id="${T.id}-crh">Compte rendu — TP n°${T.num}</h3>
       <div class="note-box" id="${T.id}-noteBox" hidden></div>
+      <p class="crstate${SS ? (ST && ST.etat ? " bad" : "") : " warn"}" id="${T.id}-state">${!SS ? "<b>Mode entraînement.</b> Connecte-toi en haut de la page pour recevoir ton matériel personnel, tes questions et pouvoir soumettre ce compte rendu."
+        : ST && ST.etat ? esc(ST.etat) : ST && ST.fin ? "Soumission possible jusqu'au " + esc(dfmt(ST.fin)) + "." : "Matériel personnel attribué à " + esc(SS.etudiant.prenom + " " + SS.etudiant.nom) + "."}</p>
       <div class="id">${idField("nom", "Nom")}${idField("prenom", "Prénom")}${idField("carte", "N° carte étudiant")}${idField("groupe", "Groupe")}${idField("sousgroupe", "Sous-groupe")}${idField("binome", "Binôme", true)}</div>
       <p class="hint">Les mesures relevées sur la paillasse s'ajoutent automatiquement aux tableaux. À toi de calculer et de remplir les colonnes colorées, puis les résultats et le QCM. Tout est enregistré sur cet appareil jusqu'à la soumission.</p>
       ${keys.map((k, i) => { const p = CR.parts[k]; return `<div class="crpart">
@@ -126,10 +188,12 @@
         ${CR.calc.map(c => `<div class="calc"><label for="${T.id}-c-${c.k}">${c.h}</label><div class="cin"><input id="${T.id}-c-${c.k}" data-calc="${c.k}" inputmode="decimal"><span>${esc(c.u)}</span></div></div>`).join("")}
       </div></div>
       <div class="crblock"><h4>Questions (QCM)</h4>
-        ${CR.qcm.map((q, i) => `<fieldset class="qcm"><legend><b>${i + 1}.</b> ${q.q}</legend>${q.o.map((o, j) => `<label><input type="radio" name="${T.id}-q${i}" value="${j}"> ${o}</label>`).join("")}</fieldset>`).join("")}
+        ${QS.length ? QS.map(([qi, ord], i) => { const q = CR.qcm[qi]; return `<fieldset class="qcm"><legend><b>${i + 1}.</b> ${q.q}</legend>${ord.map(j => `<label><input type="radio" name="${T.id}-q${qi}" value="${j}"> ${q.o[j]}</label>`).join("")}</fieldset>`; }).join("")
+          : `<p class="hint">Les questions te seront attribuées après connexion (chaque étudiant reçoit ses propres questions).</p>`}
       </div>
       <div class="crblock"><h4>Remarques <span class="opt">(facultatif, non noté)</span></h4><textarea id="${T.id}-rem" data-id="rem"></textarea></div>
       <div class="submit noprint" id="${T.id}-sub">
+        ${ST && ST.seance ? `<label class="seance">Code de séance <span class="opt">(donné par l'enseignant en salle)</span><input id="${T.id}-seance" autocomplete="off" autocapitalize="characters"></label>` : ""}
         <label class="chk"><input type="checkbox" id="${T.id}-ok"> <span>Je certifie que ce compte rendu est mon travail. J'ai compris qu'<b>une seule soumission</b> est possible pour ce TP et que la note est définitive.</span></label>
         <div class="row"><button type="button" class="btn primary" id="${T.id}-send">Soumettre le compte rendu</button><button type="button" class="btn" id="${T.id}-dl">Télécharger une copie</button><button type="button" class="btn" id="${T.id}-clr">Effacer toutes les mesures</button></div>
         <p class="msg" id="${T.id}-smsg" role="status"></p>
@@ -158,19 +222,20 @@
     T.renderAll = () => keys.forEach(T.renderPart);
     T.locked = () => !!SUB;
     T.clearRows = () => { keys.forEach(k => { T.rows[k] = []; S.fill[k] = []; }); T.renderAll(); };
-    T.add = (k, row) => { if (SUB) { T.msg("Ce compte rendu a déjà été soumis : les nouvelles mesures ne sont plus enregistrées.", "bad"); return; } T.rows[k].push(ROUND(row, CR.parts[k].r)); S.fill[k].push({}); T.renderPart(k); };
+    T.add = (k, row) => { if (SUB) { T.msg("Ce compte rendu a déjà été soumis : les nouvelles mesures ne sont plus enregistrées.", "bad"); return; } T.rows[k].push(Object.assign(ROUND(row, CR.parts[k].r), { ts: Date.now() })); S.fill[k].push({}); T.renderPart(k); };
     const cr = $("#" + T.id + "-cr");
     cr.addEventListener("click", e => { const b = e.target.closest("[data-del]"); if (!b || SUB) return; const [k, i] = b.dataset.del.split(":"); T.rows[k].splice(+i, 1); S.fill[k].splice(+i, 1); T.renderPart(k); });
     cr.addEventListener("input", e => {
-      const t = e.target;
+      const t = e.target; if (SUB) return;
       if (t.dataset.f) { const [k, i, c] = t.dataset.f.split(":"); S.fill[k][+i] = S.fill[k][+i] || {}; S.fill[k][+i][c] = t.value; plotPart(k); save(); }
       else if (t.dataset.calc) { S.calc[t.dataset.calc] = t.value; save(); }
       else if (t.dataset.id) { S.id[t.dataset.id] = t.value; save(); }
     });
-    cr.addEventListener("change", e => { if (e.target.type === "radio") { S.qcm["q" + e.target.name.split("-q").pop()] = e.target.value; save(); } });
+    cr.addEventListener("change", e => { if (!SUB && e.target.type === "radio") { S.qcm["q" + e.target.name.split("-q").pop()] = e.target.value; save(); } });
     Object.keys(S.id).forEach(f => { const e = $("#" + T.id + "-" + f); if (e) e.value = S.id[f]; });
     Object.keys(S.calc).forEach(c => { const e = $("#" + T.id + "-c-" + c); if (e) e.value = S.calc[c]; });
     Object.keys(S.qcm).forEach(q => { const e = host.querySelector(`input[name="${T.id}-${q}"][value="${S.qcm[q]}"]`); if (e) e.checked = true; });
+    if (SS) { const E = SS.etudiant; [["nom", E.nom], ["prenom", E.prenom], ["carte", E.carte], ["groupe", E.groupe], ["sousgroupe", E.sousgroupe]].forEach(([f, v]) => { const e = $("#" + T.id + "-" + f); e.value = v || ""; e.disabled = true; }); }
     $("#" + T.id + "-clr").onclick = () => { if (SUB) return; keys.forEach(k => { T.rows[k] = []; S.fill[k] = []; }); T.renderAll(); T.msg("Toutes les mesures ont été effacées."); };
 
     const showNote = R => {
@@ -186,22 +251,26 @@
     const smsg = (s, kind) => { const e = $("#" + T.id + "-smsg"); e.textContent = s; e.className = "msg" + (kind ? " " + kind : ""); };
     $("#" + T.id + "-send").onclick = async () => {
       if (SUB) return;
+      if (!SS) { smsg("Connecte-toi d'abord en haut de la page (n° de carte et code personnel) : la soumission est réservée aux étudiants inscrits.", "bad"); $("#tpLogin").scrollIntoView({ behavior: "smooth" }); return; }
       const id = {}; ["nom", "prenom", "carte", "groupe", "sousgroupe", "binome"].forEach(f => id[f] = ($("#" + T.id + "-" + f).value || "").trim());
       const miss = ["nom", "prenom", "carte", "groupe", "sousgroupe"].filter(f => !id[f]);
       if (miss.length) { smsg("Complète d'abord l'identification : nom, prénom, n° de carte étudiant, groupe et sous-groupe.", "bad"); $("#" + T.id + "-" + miss[0]).focus(); return; }
+      const seance = ($("#" + T.id + "-seance") || {}).value || "";
+      if (ST && ST.seance && !seance.trim()) { smsg("Saisis le code de séance donné par l'enseignant.", "bad"); $("#" + T.id + "-seance").focus(); return; }
       if (!$("#" + T.id + "-ok").checked) { smsg("Coche la case de certification avant de soumettre.", "bad"); return; }
-      const URL_ = (window.SITE_CONFIG || {}).crEndpoint;
+      const URL_ = endpoint(); id.carte = SS.etudiant.carte; id.code = SS.code;
       if (!URL_) { smsg("La soumission en ligne n'est pas encore activée par l'enseignant. Utilise « Télécharger une copie » en attendant.", "bad"); return; }
       const fillOut = {}; keys.forEach(k => fillOut[k] = T.rows[k].map((_, i) => { const o = {}; CR.parts[k].fill.forEach(c => o[c.k] = (S.fill[k][i] || {})[c.k] ?? ""); return o; }));
-      const pk = (window.TPCR_PARAMS || {})[T.id];
-      const payload = { tp: T.id, num: T.num, id, raw: T.rows, fill: fillOut, calc: S.calc, qcm: S.qcm, rem: ($("#" + T.id + "-rem").value || "").slice(0, 2000), params: pk ? store.get(pk, null) : null, client: new Date().toISOString() };
+      const qOut = {}; QS.forEach(([qi]) => { if (S.qcm["q" + qi] != null) qOut["q" + qi] = S.qcm["q" + qi]; });
+      const payload = { action: "submit", tp: T.id, num: T.num, id, seance, device: device(), raw: T.rows, fill: fillOut, calc: S.calc, qcm: qOut, rem: ($("#" + T.id + "-rem").value || "").slice(0, 2000), client: new Date().toISOString() };
       const btn = $("#" + T.id + "-send"); btn.disabled = true; smsg("Envoi et correction en cours…");
       try {
         const res = await fetch(URL_, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
         const R = await res.json();
-        if (R.ok) { SUB = Object.assign({ date: new Date().toISOString() }, R); store.set(T.id + "_submitted", SUB); smsg("Compte rendu soumis et corrigé.", "ok"); showNote(SUB); }
+        if (R.ok) { SUB = Object.assign({ date: new Date().toISOString() }, R); store.set(T.id + "_submitted", SUB); const s2 = sess(); if (s2 && s2.tps[T.id]) { s2.tps[T.id].soumis = SUB; store.set("session", s2); }
+          smsg(R.nonConforme ? "Compte rendu enregistré. Attention : tes mesures ne correspondent pas au matériel qui t'a été attribué ; ton enseignant en est informé." : "Compte rendu soumis et corrigé.", R.nonConforme ? "bad" : "ok"); showNote(SUB); }
         else if (R.duplicate) { SUB = { date: new Date().toISOString(), note: NaN }; store.set(T.id + "_submitted", SUB); smsg(R.error, "bad"); showNote(SUB); }
-        else { btn.disabled = false; smsg(R.error || "La soumission a échoué.", "bad"); }
+        else { btn.disabled = false; smsg((R.error || "La soumission a échoué.") + (R.auth ? " Déconnecte-toi puis reconnecte-toi en haut de la page." : ""), "bad"); }
       } catch (err) { btn.disabled = false; smsg("Envoi impossible : vérifie ta connexion internet puis réessaie. Tes réponses sont conservées sur cet appareil.", "bad"); }
     };
     $("#" + T.id + "-dl").onclick = () => {
@@ -209,7 +278,7 @@
       const tables = keys.map((k, i) => { const p = CR.parts[k]; const cv = p.plot ? $("#" + T.id + "-gr-" + k) : null;
         return `<h2>Partie ${L[i]} — ${esc(p.titre)}</h2><table><tr>${p.cols.concat(p.fill.map(f => f.h)).map(c => `<th>${c}</th>`).join("")}</tr>${T.rows[k].map((r, j) => `<tr>${p.cells(r, j).concat(p.fill.map(c => esc((S.fill[k][j] || {})[c.k] ?? ""))).map(v => `<td>${v}</td>`).join("")}</tr>`).join("") || `<tr><td colspan="9">Aucune mesure</td></tr>`}</table>${cv && T.rows[k].length ? `<img src="${cv.toDataURL("image/png")}" alt="Graphe" style="max-width:100%;border:1px solid #ccc">` : ""}`; }).join("");
       const calcs = CR.calc.map(c => `<tr><td style="text-align:left">${c.h}</td><td>${esc(S.calc[c.k] || "")} ${esc(c.u)}</td></tr>`).join("");
-      const qcm = CR.qcm.map((q, i) => `<p><b>${i + 1}. ${q.q}</b><br>${S.qcm["q" + i] != null ? esc(q.o[+S.qcm["q" + i]]) : "(sans réponse)"}</p>`).join("");
+      const qcm = QS.map(([qi], i) => { const q = CR.qcm[qi]; return `<p><b>${i + 1}. ${q.q}</b><br>${S.qcm["q" + qi] != null ? esc(q.o[+S.qcm["q" + qi]]) : "(sans réponse)"}</p>`; }).join("");
       const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Compte rendu TP ${T.num} — ${esc(val("nom"))}</title><style>body{font-family:Georgia,serif;max-width:820px;margin:24px auto;padding:0 16px;color:#111}h1{font-family:Arial,sans-serif;font-size:20px;border-bottom:3px solid #D98E04;padding-bottom:6px}h2{font-family:Arial,sans-serif;font-size:16px;color:#1F7A8C;margin-top:22px}table{border-collapse:collapse;margin:8px 0;font-family:monospace;font-size:13px}th,td{border:1px solid #999;padding:4px 8px;text-align:right}th{background:#EEF4F6}</style></head><body>
         <div style="font-family:Arial;font-size:12px;color:#B87503;font-weight:bold">UNIVERSITÉ SOULEYMANE NIANG DE MATAM • PHYSIQUE L1</div><h1>Compte rendu — TP n°${T.num} : ${esc(T.titre)}</h1>
         <p><b>${esc(val("nom"))} ${esc(val("prenom"))}</b> — carte n° ${esc(val("carte"))} — groupe ${esc(val("groupe"))}, sous-groupe ${esc(val("sousgroupe"))}${val("binome") ? " — binôme : " + esc(val("binome")) : ""}</p>
@@ -219,26 +288,29 @@
     };
 
     T.init(T);
+    if (SS) host.querySelectorAll('.panel button[id$="New"]').forEach(b => b.remove());   // matériel personnel : on ne peut plus en changer
     T.renderAll();
     if (SUB) showNote(SUB);
   }
   let cur = null;
-  function go(id) {
+  function go(id, initial) {
     cur = id;
     document.querySelectorAll("#tabs [data-t]").forEach(b => b.setAttribute("aria-pressed", b.dataset.t === id));
     TPS.forEach(t => { document.getElementById(t.id).hidden = t.id !== id; });
-    history.replaceState(null, "", "#" + id);
+    if (!initial) history.replaceState(null, "", "#" + id);   // au chargement, ne pas ajouter d'ancre : le navigateur ferait défiler la page
     const T = TPS.find(t => t.id === id); T.draw && T.draw(); T.renderAll();
   }
   function start() {
     TPS.sort((a, b) => a.num - b.num);
     const groups = {}; TPS.forEach(t => (groups[t.disc] = groups[t.disc] || []).push(t));
     $("#tabs").innerHTML = Object.entries(groups).map(([g, l]) => `<div class="grp"><div class="grp-t">${esc(g)}</div><div class="pill-row">${l.map(t => `<button type="button" class="pill" data-t="${t.id}" aria-pressed="false">TP ${t.num} · ${esc(t.court)}</button>`).join("")}</div></div>`).join("");
+    const changed = applySession();
+    loginCard(changed);
     TPS.forEach(mount);
     $("#tabs").addEventListener("click", e => { const b = e.target.closest("[data-t]"); if (b) go(b.dataset.t); });
     addEventListener("hashchange", () => { const h = location.hash.slice(1); if (TPS.some(t => t.id === h) && h !== cur) go(h); });
     let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { const T = TPS.find(t => t.id === cur); T.draw && T.draw(); T.renderAll(); }, 120); });
-    const h = location.hash.slice(1); go(TPS.some(t => t.id === h) ? h : TPS[0].id);
+    const h = location.hash.slice(1); go(TPS.some(t => t.id === h) ? h : TPS[0].id, true);
     // boucle d'animation unique : seul le TP affiché avance
     let last = null;
     const loop = ts => { const dt = last == null ? 0 : Math.min(0.05, (ts - last) / 1000); last = ts; const T = TPS.find(t => t.id === cur); if (T && T.tick && dt > 0) T.tick(dt); requestAnimationFrame(loop); };

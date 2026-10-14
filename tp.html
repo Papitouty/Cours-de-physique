@@ -117,6 +117,19 @@ fieldset.qcm input{width:auto;margin-top:4px;accent-color:var(--accent)}
   details{display:block}
   .tblwrap{max-height:none}
 }
+.login{display:grid;gap:10px;border-left:5px solid var(--saff)}
+.login h2{font-family:var(--f-head);font-size:1.15rem;margin:0}
+.login p{margin:0}
+.loginf{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.loginf label{font-family:var(--f-head);font-size:.85rem;display:grid;gap:4px;flex:1 1 180px}
+.loginf input{font:inherit;font-family:var(--f-mono);font-size:1rem;padding:9px 11px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);width:100%;letter-spacing:.04em}
+.who{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px}
+.crstate{margin:0;padding:9px 12px;border-radius:9px;font-family:var(--f-head);font-size:.9rem;background:var(--tint);border-left:4px solid var(--accent)}
+.crstate.warn{border-left-color:var(--saff)}
+.crstate.bad{background:var(--ko-bg);border-left-color:var(--ko)}
+.seance{max-width:340px}
+.seance input{font-family:var(--f-mono)!important;letter-spacing:.06em}
+@media print{.login{display:none!important}}
 </style>
 </head>
 <body>
@@ -128,10 +141,11 @@ fieldset.qcm input{width:auto;margin-top:4px;accent-color:var(--accent)}
 </div></header>
 
 <main><div class="wrap">
+  <section class="card login noprint" id="tpLogin" aria-label="Connexion étudiant"></section>
   <nav class="tabs-wrap" aria-label="Choix du TP" id="tabs"></nav>
   <div id="tpHost"></div>
 </div></main>
-<footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré • Les mesures sont simulées avec une incertitude réaliste : deux étudiants n'obtiennent pas exactement les mêmes valeurs.</div></footer>
+<footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré • Les mesures sont simulées avec une incertitude réaliste. Chaque étudiant connecté reçoit son propre matériel : deux étudiants n'obtiennent pas les mêmes valeurs.</div></footer>
 
 <script src="assets/config.js"></script>
 <script src="assets/tp-cr.js"></script>

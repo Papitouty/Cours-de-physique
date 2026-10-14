@@ -75,10 +75,10 @@
       $("#pdGo").onclick = () => { set(); reset(); run = true; T.msg("Pendule lâché : démarre le chronomètre au passage par une position extrême."); };
       $("#pdSt").onclick = () => { run = false; reset(); T.draw(); };
       $("#pdRec").onclick = () => {
-        const { t, n } = ch.S.reading();
+        const { t, n, man } = ch.S.reading();
         if (ch.S.on || ch.S.armed) { T.msg("Arrête d'abord le chronomètre.", "bad"); return; }
         if (t < 0.5) { T.msg("Chronomètre d'abord les oscillations.", "bad"); return; }
-        const p = $("#pd-part").value; T.add(p, { L, A, m, n, t }); T.msg(`Mesure enregistrée dans la partie ${p} : T = ${fr(t / n, 3)} s.`, "ok");
+        const p = $("#pd-part").value; T.add(p, { L, A, m, n, t, man }); T.msg(`Mesure enregistrée dans la partie ${p} : T = ${fr(t / n, 3)} s.`, "ok");
       };
       T.tick = dt => {
         let extreme = false;

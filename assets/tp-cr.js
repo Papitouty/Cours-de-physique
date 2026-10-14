@@ -187,3 +187,74 @@ window.TPCR = {
   Object.keys(RAW).forEach(k => Object.keys(RAW[k]).forEach(p => Object.assign(window.TPCR[k].parts[p], RAW[k][p])));
   window.TPCR_PARAMS = { ressort: "ressort_par", torsion: "torsion_par", ohm: "ohm_par", refraction: "refr_par", lentilles: "lent_par", microscope: "micro_par" };
 })();
+
+/* Banque de questions : 12 par TP. Chaque étudiant connecté reçoit 5 questions tirées
+   pour lui seul, avec les réponses dans un ordre mélangé (les bonnes réponses restent sur le serveur). */
+(function () {
+  const EXTRA = {
+    pendule: [
+      { q: "Pour mesurer g avec précision, il vaut mieux utiliser :", o: ["un pendule court et une grande amplitude", "un pendule long et de petites oscillations", "un pendule court et de petites oscillations", "une masse très légère"] },
+      { q: "La longueur L du pendule se mesure :", o: ["du point de suspension au centre de la masse", "du point de suspension au bas de la masse", "du point de suspension au haut de la masse", "le long de la potence"] },
+      { q: "Un pendule de longueur L = 1 m (g = 9,78 m/s²) a une période d'environ :", o: ["1,0 s", "2,0 s", "3,1 s", "6,3 s"] },
+      { q: "Si l'on multiplie la longueur du pendule par 4, la période :", o: ["est multipliée par 4", "est multipliée par 2", "est divisée par 2", "ne change pas"] },
+      { q: "La pente de la droite T² = f(L) vaut a = 4,04 s²/m. On en déduit g ≈", o: ["9,77 m/s²", "4,04 m/s²", "0,25 m/s²", "39,9 m/s²"] },
+      { q: "L'approximation sin θ ≈ θ (petites oscillations) est valable :", o: ["pour θ quelconque exprimé en degrés", "pour θ petit, exprimé en radians", "seulement pour θ = 90°", "pour toutes les amplitudes"] },
+      { q: "Une oscillation complète (une période) correspond :", o: ["à un aller seulement", "à un aller-retour : retour à la même position, dans le même sens", "à un passage par la verticale", "à la moitié d'un aller"] }
+    ],
+    ressort: [
+      { q: "Dans la méthode statique, la raideur k est :", o: ["la pente du graphe F = f(Δℓ)", "l'ordonnée à l'origine du graphe F = f(Δℓ)", "l'inverse de la pente du graphe F = f(Δℓ)", "la pente du graphe T₀² = f(m)"] },
+      { q: "L'unité de la raideur k est :", o: ["le newton (N)", "le newton-mètre (N·m)", "le newton par mètre (N/m)", "le kilogramme par seconde (kg/s)"] },
+      { q: "Une masse de 200 g allonge un ressort de 8,0 cm (g = 9,78 m/s²). Sa raideur vaut environ :", o: ["2,4 N/m", "24 N/m", "0,24 N/m", "245 N/m"] },
+      { q: "Pour le ressort vertical, le poids décale la position d'équilibre, mais la période :", o: ["dépend de g", "reste T₀ = 2π√(m/k), comme pour un ressort horizontal", "est doublée", "dépend de l'écart initial imposé"] },
+      { q: "La pente du graphe T₀² = f(m) vaut :", o: ["k/4π²", "4π²/k", "2π/k", "4π²k"] },
+      { q: "Avec un ressort deux fois plus raide (même masse), la période est :", o: ["multipliée par 2", "divisée par 2", "divisée par √2", "multipliée par √2"] },
+      { q: "Au-delà de la limite d'élasticité, le ressort :", o: ["reprend toujours sa longueur initiale", "se déforme définitivement : la loi de Hooke n'est plus valable", "devient plus raide", "n'a plus de masse"] }
+    ],
+    torsion: [
+      { q: "L'unité de la constante de torsion C est :", o: ["le N·m/rad", "le N/m", "le kg·m²", "le N·m²"] },
+      { q: "L'ordonnée à l'origine b de la droite T² = f(d²) permet de calculer :", o: ["la constante de torsion C", "le moment d'inertie J₀ de la barre seule", "la masse des cylindres", "la longueur du fil"] },
+      { q: "Le moment d'inertie de deux masses ponctuelles m placées à la distance d de l'axe vaut :", o: ["2md", "md²", "2md²", "md²/2"] },
+      { q: "Si la constante de torsion C est multipliée par 4 (J inchangé), la période :", o: ["est multipliée par 4", "est divisée par 2", "est multipliée par 2", "ne change pas"] },
+      { q: "L'équation du mouvement du pendule de torsion s'écrit :", o: ["J θ̈ + C θ = 0", "J θ̈ − C θ = 0", "C θ̈ + J θ = 0", "θ̈ + C J θ = 0"] },
+      { q: "Pour un fil de rayon r, C = πGr⁴/(2ℓ). Avec un fil de rayon double (même longueur), C est :", o: ["multipliée par 2", "multipliée par 4", "multipliée par 16", "inchangée"] },
+      { q: "On chronomètre 5 oscillations et on lit t = 21,0 s. La période vaut :", o: ["4,2 s", "105 s", "21,0 s", "0,24 s"] }
+    ],
+    ohm: [
+      { q: "La loi d'Ohm pour un conducteur ohmique s'écrit :", o: ["U = R/I", "U = R·I", "U = I/R", "U = R·I²"] },
+      { q: "Le voltmètre se branche :", o: ["en série avec le dipôle", "en dérivation, aux bornes du dipôle", "en série avec l'ampèremètre", "à la place du générateur"] },
+      { q: "En montage aval (courte dérivation), l'erreur systématique vient :", o: ["de la résistance de l'ampèremètre", "du courant qui traverse le voltmètre", "du générateur", "des fils de connexion"] },
+      { q: "Pour mesurer une grande résistance (47 kΩ), le montage le plus juste est :", o: ["le montage amont (longue dérivation)", "le montage aval (courte dérivation)", "les deux sont équivalents", "aucun des deux"] },
+      { q: "Deux résistances R₁ = 220 Ω et R₂ = 330 Ω en série ont une résistance équivalente de :", o: ["110 Ω", "132 Ω", "550 Ω", "726 Ω"] },
+      { q: "Les mêmes résistances (220 Ω et 330 Ω) en parallèle ont une résistance équivalente de :", o: ["132 Ω", "550 Ω", "275 Ω", "110 Ω"] },
+      { q: "Un résistor de 470 Ω parcouru par un courant de 20 mA a à ses bornes une tension de :", o: ["9,4 V", "23,5 V", "0,94 V", "4,7 V"] }
+    ],
+    refraction: [
+      { q: "Quand la lumière passe de l'air (n = 1) au plexiglas (n ≈ 1,5), le rayon réfracté :", o: ["s'écarte de la normale", "se rapproche de la normale", "n'est jamais dévié", "disparaît"] },
+      { q: "Les angles d'incidence et de réfraction se mesurent par rapport :", o: ["à la surface de séparation", "à la normale à la surface", "au rayon réfléchi", "au bord de la table"] },
+      { q: "Pour un plexiglas d'indice n = 1,50, l'angle limite vaut environ :", o: ["30°", "42°", "48°", "56°"] },
+      { q: "La loi de la réflexion indique que :", o: ["l'angle de réflexion est égal à l'angle d'incidence", "l'angle de réflexion est le double de l'angle d'incidence", "le rayon réfléchi est perpendiculaire au rayon incident", "le rayon réfléchi suit la normale"] },
+      { q: "Le graphe sin i = f(sin r) (air → plexiglas) est une droite de pente :", o: ["1/n", "n", "1", "n²"] },
+      { q: "Pour i = 30° dans l'air et n = 1,50, l'angle de réfraction vaut environ :", o: ["19,5°", "30°", "45°", "48,6°"] },
+      { q: "Le principe de la fibre optique repose sur :", o: ["la réfraction air → verre", "la réflexion totale à l'intérieur de la fibre", "la diffusion de la lumière", "l'absorption de la lumière"] }
+    ],
+    lentilles: [
+      { q: "La vergence d'une lentille de distance focale f′ = 20 cm vaut :", o: ["0,05 δ", "5 δ", "20 δ", "2 δ"] },
+      { q: "Un objet réel placé entre le foyer objet F et une lentille convergente donne une image :", o: ["réelle et renversée", "virtuelle et droite", "réelle et droite", "à l'infini"] },
+      { q: "Pour un objet placé au foyer objet d'une lentille convergente, l'image se forme :", o: ["au foyer image", "à l'infini", "sur la lentille", "à 2f′ de la lentille"] },
+      { q: "Le grandissement d'une lentille mince vaut :", o: ["γ = OA′/OA", "γ = OA/OA′", "γ = OA·OA′", "γ = f′/OA"] },
+      { q: "Méthode de Bessel (D : distance objet-écran, d : distance entre les deux positions de la lentille) :", o: ["f′ = (D² − d²)/(4D)", "f′ = (D² + d²)/(4D)", "f′ = D/4", "f′ = (D − d)/2"] },
+      { q: "Dans la méthode de Bessel, lorsque D = 4f′ :", o: ["les deux positions nettes sont très éloignées", "les deux positions de la lentille sont confondues (d = 0)", "il n'y a aucune image nette", "l'image est à l'infini"] },
+      { q: "Un objet est à OA = −30 cm d'une lentille de vergence 10 δ (f′ = 10 cm). L'image est à :", o: ["OA′ = 15 cm", "OA′ = 7,5 cm", "OA′ = −15 cm", "OA′ = 20 cm"] }
+    ],
+    microscope: [
+      { q: "L'oculaire d'un microscope joue le rôle :", o: ["d'une loupe qui observe l'image intermédiaire", "d'un miroir", "d'un écran", "d'un diaphragme"] },
+      { q: "L'objectif d'un microscope a une distance focale :", o: ["très grande (plusieurs mètres)", "courte (quelques millimètres)", "nulle", "négative (lentille divergente)"] },
+      { q: "Pour que l'objectif donne une image réelle et agrandie, l'objet doit être placé :", o: ["entre le foyer F₁ et l'objectif", "un peu avant le foyer objet F₁ (entre 2f₁ et f₁ de l'objectif)", "très loin de l'objectif", "au centre optique de l'objectif"] },
+      { q: "L'image finale donnée par un microscope réglé à l'infini est :", o: ["réelle et droite", "virtuelle et renversée par rapport à l'objet", "réelle et renversée, sur un écran", "virtuelle et droite"] },
+      { q: "La puissance P d'un instrument s'exprime :", o: ["en mètres", "en dioptries (δ), c'est-à-dire en m⁻¹", "en degrés", "sans unité"] },
+      { q: "Avec |γ₁| = 10 et un oculaire de focale f₂ = 2,5 cm, la puissance vaut :", o: ["400 δ", "25 δ", "4 δ", "250 δ"] },
+      { q: "Pour un microscope de puissance P = 400 δ, le grossissement commercial vaut :", o: ["100", "1600", "400", "4"] }
+    ]
+  };
+  Object.keys(EXTRA).forEach(k => window.TPCR[k].qcm.push(...EXTRA[k]));
+})();
