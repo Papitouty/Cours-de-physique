@@ -156,6 +156,7 @@ fieldset.qcm input{width:auto;margin-top:4px;accent-color:var(--accent)}
 </div></main>
 <footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré • Les mesures sont simulées avec une incertitude réaliste. Chaque étudiant connecté reçoit son propre matériel : deux étudiants n'obtiennent pas les mêmes valeurs.</div></footer>
 
+<script>window.__tpErr = []; addEventListener("error", function (e) { window.__tpErr.push((e.message || "erreur") + " (" + String(e.filename || "").split("/").pop() + ":" + (e.lineno || "") + ")"); });</script>
 <script src="assets/config.js?v=17"></script>
 <script src="assets/tp-cr.js?v=17"></script>
 <script src="assets/tp-core.js?v=17"></script>
@@ -168,19 +169,16 @@ fieldset.qcm input{width:auto;margin-top:4px;accent-color:var(--accent)}
    navigateur après une connexion lente), propose une remise à jour en un clic au lieu d'une page vide. */
 (function () {
   var BUILD = 17;
-  function repair() {
+  function repair(why) {
     var b = document.getElementById("tpLogin"); if (!b) return;
-    b.innerHTML = '<h2>Mise à jour de la page</h2><p>La page n\'a pas été entièrement mise à jour (connexion lente). Clique sur le bouton : elle se recharge avec la dernière version. Tes mesures enregistrées sont conservées.</p><button class="btn primary" type="button" id="tpFix">Mettre à jour la page</button>';
-    document.getElementById("tpFix").onclick = function () {
-      var p = ("caches" in window) ? caches.keys().then(function (k) { return Promise.all(k.filter(function (n) { return n.indexOf("shell") === 0; }).map(function (n) { return caches.delete(n); })); }) : Promise.resolve();
-      p.then(function () { location.reload(); }, function () { location.reload(); });
-    };
+    var det = (window.__tpErr || []).concat(why ? [why] : []).join(" ; ");
+    b.innerHTML = '<h2>Mise à jour de la page</h2><p>La page n\'a pas été entièrement mise à jour (connexion lente). Clique sur le bouton : elle se recharge avec la dernière version. Tes mesures enregistrées sont conservées.</p><p><a class="btn primary" href="reparer.html">Mettre à jour la page</a></p>' + (det ? '<p class="hint">Détail technique : ' + det.replace(/[<>&]/g, "") + '</p>' : '');
   }
   try {
     if (!window.TPCORE || TPCORE.build !== BUILD || !window.TPCR || !TPCR.oscillo) throw new Error("versions différentes");
     TPCORE.start();
-    if (!document.querySelector(".tp")) throw new Error("aucun TP affiché");
-  } catch (e) { console.error(e); repair(); }
+    if (!document.querySelector(".tp canvas")) throw new Error("aucun TP affiché");
+  } catch (e) { console.error(e); repair(e && e.message); }
 })();
 </script>
 <script>

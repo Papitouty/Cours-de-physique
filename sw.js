@@ -2,7 +2,7 @@
    - pages et ressources du site : réseau d'abord, copie locale si pas de connexion
    - documents PDF : copie locale d'abord (un document ouvert une fois reste disponible)
    - bibliothèques et polices externes : copie locale, rafraîchie en arrière-plan */
-const VERSION = "v17";
+const VERSION = "v18";
 const SHELL = "shell-" + VERSION;
 const PDFS = "pdf-v1";          // nom stable : les documents enregistrés survivent aux mises à jour du site
 const EXT = "ext-" + VERSION;
