@@ -370,6 +370,19 @@
     $("#tabs").innerHTML = Object.entries(groups).map(([g, l]) => `<div class="grp"><div class="grp-t">${esc(g)}</div><div class="pill-row">${l.map(t => `<button type="button" class="pill" data-t="${t.id}" aria-pressed="false">TP ${t.num} · ${esc(t.court)}</button>`).join("")}</div></div>`).join("");
     const changed = applySession();
     loginCard(changed);
+    // mise à jour silencieuse de la connexion à chaque ouverture : questions, dates, durée et copies déjà soumises
+    (async () => {
+      const s0 = sess(); if (!s0 || !endpoint() || !navigator.onLine) return;
+      try {
+        const R = await post({ action: "login", carte: s0.etudiant.carte, code: s0.code, device: device() }, null, 2);
+        if (!R || !R.ok || !R.tps) return;
+        const key = t => JSON.stringify(Object.keys(t).sort().map(k => [k, t[k].qcm, t[k].params, t[k].duree, t[k].debutTP || null, !!t[k].soumis, t[k].etat, t[k].seance]));
+        if (key(R.tps) === key(s0.tps)) return;
+        store.set("session", Object.assign({}, s0, { tps: R.tps, skew: Date.parse(R.serveur) - Date.now() || 0 }));
+        let n = 0; try { n = +sessionStorage.getItem("tp2_autoref") || 0; } catch (e) {}
+        if (n < 2) { try { sessionStorage.setItem("tp2_autoref", n + 1); } catch (e) {} location.reload(); }
+      } catch (e) {}
+    })();
     TPS.slice().forEach(T => { try { mount(T); } catch (err) { console.error("TP " + T.id, err); TPS.splice(TPS.indexOf(T), 1); const e = document.getElementById(T.id); if (e) e.remove(); const t = document.querySelector(`#tabs [data-t="${T.id}"]`); if (t) t.remove(); } });
     $("#tabs").addEventListener("click", e => { const b = e.target.closest("[data-t]"); if (b) go(b.dataset.t); });
     addEventListener("hashchange", () => { const h = location.hash.slice(1); if (TPS.some(t => t.id === h) && h !== cur) go(h); });
