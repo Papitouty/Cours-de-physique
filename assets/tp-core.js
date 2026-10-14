@@ -360,12 +360,14 @@
     const T = TPS.find(t => t.id === id); T.draw && T.draw(); T.renderAll();
   }
   function start() {
+    // un TP dont le fichier n'est pas encore à jour (copie ancienne en cache) est ignoré au lieu de bloquer toute la page
+    for (let i = TPS.length - 1; i >= 0; i--) if (!(window.TPCR || {})[TPS[i].id]) TPS.splice(i, 1);
     TPS.sort((a, b) => a.num - b.num);
     const groups = {}; TPS.forEach(t => (groups[t.disc] = groups[t.disc] || []).push(t));
     $("#tabs").innerHTML = Object.entries(groups).map(([g, l]) => `<div class="grp"><div class="grp-t">${esc(g)}</div><div class="pill-row">${l.map(t => `<button type="button" class="pill" data-t="${t.id}" aria-pressed="false">TP ${t.num} · ${esc(t.court)}</button>`).join("")}</div></div>`).join("");
     const changed = applySession();
     loginCard(changed);
-    TPS.forEach(mount);
+    TPS.slice().forEach(T => { try { mount(T); } catch (err) { console.error("TP " + T.id, err); TPS.splice(TPS.indexOf(T), 1); const e = document.getElementById(T.id); if (e) e.remove(); const t = document.querySelector(`#tabs [data-t="${T.id}"]`); if (t) t.remove(); } });
     $("#tabs").addEventListener("click", e => { const b = e.target.closest("[data-t]"); if (b) go(b.dataset.t); });
     addEventListener("hashchange", () => { const h = location.hash.slice(1); if (TPS.some(t => t.id === h) && h !== cur) go(h); });
     let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { const T = TPS.find(t => t.id === cur); T.draw && T.draw(); T.renderAll(); }, 120); });
