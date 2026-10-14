@@ -377,5 +377,5 @@
     const loop = ts => { const dt = last == null ? 0 : Math.min(0.05, (ts - last) / 1000); last = ts; const T = TPS.find(t => t.id === cur); if (T && T.tick && dt > 0) T.tick(dt); requestAnimationFrame(loop); };
     requestAnimationFrame(loop);
   }
-  window.TPCORE = { register, start, $, css, esc, fr, gauss, store, fit, txt, linreg, chrono, isCur: id => cur === id };
+  window.TPCORE = { build: 17, register, start, $, css, esc, fr, gauss, store, fit, txt, linreg, chrono, isCur: id => cur === id };
 })();
