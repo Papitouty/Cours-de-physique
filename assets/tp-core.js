@@ -87,7 +87,8 @@
   }
 
   /* ---------- session de l'étudiant connecté (n° de carte + code personnel) ---------- */
-  const sess = () => store.get("session", null);
+  /* session valide uniquement si elle contient l'identité et les données des TP (sinon : on l'oublie, il suffit de se reconnecter) */
+  const sess = () => { const s = store.get("session", null); if (s && s.etudiant && s.tps && typeof s.tps === "object") return s; if (s) { try { localStorage.removeItem("tp2_session"); } catch (e) {} } return null; };
   const device = () => { let d = store.get("device", null); if (!d) { d = Math.random().toString(36).slice(2, 10) + Date.now().toString(36); store.set("device", d); } return d; };
   const wipe = () => { try { Object.keys(localStorage).filter(k => k.startsWith("tp2_") && k !== "tp2_device").forEach(k => localStorage.removeItem(k)); } catch (e) {} };
   const endpoint = () => (window.SITE_CONFIG || {}).crEndpoint;
@@ -124,6 +125,7 @@
   async function login(carte, code, onWait) {
     const R = await post({ action: "login", carte, code, device: device() }, onWait);
     if (!R.ok) return R;
+    if (!R.etudiant || !R.tps) return { ok: false, error: "Réponse incomplète du correcteur : vérifie que la dernière version du script est installée (Déployer → Gérer les déploiements → Nouvelle version)." };
     const old = sess();
     if (old && old.etudiant.carte !== R.etudiant.carte) wipe();
     store.set("session", { etudiant: R.etudiant, code: String(code).trim().toUpperCase(), tps: R.tps, at: new Date().toISOString(), skew: Date.parse(R.serveur) - Date.now() || 0 });
