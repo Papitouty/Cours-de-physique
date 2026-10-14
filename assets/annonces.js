@@ -17,7 +17,7 @@
 window.ANNONCES = [
   { date: "2026-10-14", important: true,
     titre: "Nouveau : le fascicule de travaux pratiques",
-    texte: "Les 8 TP réunis dans un PDF de 48 pages : rappels théoriques avec démonstrations, schémas de montage, protocoles, tableaux de mesures à remplir et questions d'exploitation. À lire avant chaque séance.",
+    texte: "Les 8 TP réunis dans un PDF de 50 pages : rappels théoriques avec démonstrations, schémas de montage, protocoles, tableaux de mesures à remplir et questions d'exploitation. À lire avant chaque séance.",
     lien: "docs/Fascicule_TP_Physique_L1.pdf" },
   { date: "2026-10-14",
     titre: "Tous les diaporamas sont en ligne, aussi en PowerPoint",
