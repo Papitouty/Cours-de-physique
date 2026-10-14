@@ -152,7 +152,9 @@
     box.innerHTML = `<div class="who"><div><div class="eyebrow">Connecté(e)</div><b>${esc(E.prenom)} ${esc(E.nom)}</b> — carte n° ${esc(E.carte)} — groupe ${esc(E.groupe)}${E.sousgroupe ? ", sous-groupe " + esc(E.sousgroupe) : ""}</div>
       <div class="row"><button type="button" class="btn sm" id="lgRef">Actualiser</button><button type="button" class="btn sm" id="lgOut">Se déconnecter</button></div></div>
       ${changed && changed.length ? `<p class="msg ok">Ton matériel personnel est installé (TP ${changed.join(", ")}) : les mesures d'entraînement faites avec un autre matériel ont été effacées.</p>` : ""}
-      <p class="msg" id="lgMsg" role="status"></p>`;
+      <p class="msg" id="lgMsg" role="status"></p><p class="hint" id="lgSrv"></p>`;
+    // version du correcteur relié au site (aide au diagnostic) et TP connus par lui
+    fetch(endpoint()).then(r => r.json()).then(o => { const v = (String(o.service || "").match(/\(v[\d.]+\)/) || ["(version inconnue)"])[0]; $("#lgSrv").textContent = `Correcteur relié : ${v} • adresse …${endpoint().slice(-12)} • TP reçus : ${Object.keys(s.tps).length}`; }).catch(() => {});
     $("#lgOut").onclick = () => { if (!confirm("Se déconnecter ? Les mesures et réponses non soumises enregistrées sur cet appareil seront effacées.")) return; wipe(); location.reload(); };
     $("#lgRef").onclick = async () => { const m = $("#lgMsg"); m.textContent = "Actualisation…"; m.className = "msg";
       try { const R = await login(E.carte, s.code, k => { m.textContent = waitMsg(k); }); if (R.ok) { location.reload(); return; } m.textContent = R.error; m.className = "msg bad"; } catch (err) { m.textContent = "Pas de connexion internet."; m.className = "msg bad"; } };
