@@ -208,6 +208,7 @@
       </div></div>
       <div class="crblock"><h4>Questions (QCM)</h4>
         ${QS.length ? QS.map(([qi, ord], i) => { const q = CR.qcm[qi]; return `<fieldset class="qcm"><legend><b>${i + 1}.</b> ${q.q}</legend>${ord.map(j => `<label><input type="radio" name="${T.id}-q${qi}" value="${j}"> ${q.o[j]}</label>`).join("")}</fieldset>`; }).join("")
+          : SS ? `<p class="hint"><b>Questions non disponibles pour ce TP.</b> Le correcteur de l'enseignant ne connaît pas encore ce TP (il doit installer la dernière version du script), puis clique sur « Actualiser » en haut de la page.</p>`
           : `<p class="hint">Les questions te seront attribuées après connexion (chaque étudiant reçoit ses propres questions).</p>`}
       </div>
       <div class="crblock"><h4>Remarques <span class="opt">(facultatif, non noté)</span></h4><textarea id="${T.id}-rem" data-id="rem"></textarea></div>
