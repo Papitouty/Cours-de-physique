@@ -129,6 +129,15 @@ fieldset.qcm input{width:auto;margin-top:4px;accent-color:var(--accent)}
 .crstate.bad{background:var(--ko-bg);border-left-color:var(--ko)}
 .seance{max-width:340px}
 .seance input{font-family:var(--f-mono)!important;letter-spacing:.06em}
+.timer{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;background:var(--surface);border:2px solid var(--saff);border-radius:12px;padding:12px 16px;box-shadow:var(--shadow);font-family:var(--f-head);font-size:.92rem}
+.timer > div{flex:1 1 320px}
+.timer .msg{flex-basis:100%}
+.timer.run{border-color:var(--accent)}
+.timer .tleft{font-family:var(--f-mono);font-size:1.5rem;color:var(--accent)}
+.timer .tbar{flex:1 1 140px;height:8px;border-radius:4px;background:var(--tint);overflow:hidden}
+.timer .tbar i{display:block;height:100%;background:var(--accent);transition:width 1s linear}
+.timer.warn{border-color:var(--saff)} .timer.warn .tleft{color:var(--saff)} .timer.warn .tbar i{background:var(--saff)}
+.timer.bad{border-color:var(--ko);background:var(--ko-bg)} .timer.bad .tleft{color:var(--ko)} .timer.bad .tbar i{background:var(--ko)}
 @media print{.login{display:none!important}}
 </style>
 </head>

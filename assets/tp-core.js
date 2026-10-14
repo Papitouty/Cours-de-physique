@@ -115,7 +115,7 @@
     if (!R.ok) return R;
     const old = sess();
     if (old && old.etudiant.carte !== R.etudiant.carte) wipe();
-    store.set("session", { etudiant: R.etudiant, code: String(code).trim().toUpperCase(), tps: R.tps, at: new Date().toISOString() });
+    store.set("session", { etudiant: R.etudiant, code: String(code).trim().toUpperCase(), tps: R.tps, at: new Date().toISOString(), skew: Date.parse(R.serveur) - Date.now() || 0 });
     return R;
   }
   function loginCard(changed) {
@@ -145,6 +145,11 @@
       try { const R = await login(E.carte, s.code); if (R.ok) { location.reload(); return; } m.textContent = R.error; m.className = "msg bad"; } catch (err) { m.textContent = "Pas de connexion internet."; m.className = "msg bad"; } };
   }
 
+  /* minuteurs : un seul battement par seconde pour tous les TP minutés */
+  const TIMERS = [];
+  setInterval(() => TIMERS.forEach(f => f()), 1000);
+  const hms = ms => { const t = Math.max(0, Math.ceil(ms / 1000)), h = Math.floor(t / 3600), m = Math.floor(t / 60) % 60, s = t % 60; return (h ? h + " h " : "") + String(m).padStart(2, "0") + " min " + String(s).padStart(2, "0") + " s"; };
+
   const TPS = [];
   function register(T) { TPS.push(T); }
 
@@ -167,6 +172,7 @@
       <details><summary>Précautions et incertitudes</summary><div class="sec">${T.precautions}</div></details>
       <details><summary>Préparation (à faire avant la séance)</summary><div class="sec"><ol>${T.preparation.map(q => `<li>${q}</li>`).join("")}</ol></div></details>
     </article>
+    ${ST && ST.duree ? `<div class="timer noprint" id="${T.id}-timer" role="timer" aria-live="off"></div>` : ""}
     <div class="lab">
       <div class="bench"><canvas id="${T.id}-cv" aria-label="Montage simulé"></canvas><p class="hint">${T.hint}</p></div>
       <div class="panel">${T.controls}<p class="msg" id="${T.id}-msg" role="status"></p></div>
@@ -205,7 +211,9 @@
     T.rows = {}; keys.forEach(k => { T.rows[k] = store.get(T.id + "_v2_" + k, []); S.fill[k] = S.fill[k] || []; while (S.fill[k].length < T.rows[k].length) S.fill[k].push({}); });
     const save = () => { store.set(T.id + "_crv2", S); keys.forEach(k => store.set(T.id + "_v2_" + k, T.rows[k])); };
     let SUB = store.get(T.id + "_submitted", null);
-    T.msg = (s, kind) => { const e = $("#" + T.id + "-msg"); e.textContent = s || ""; e.className = "msg" + (kind ? " " + kind : ""); };
+    let refused = false;   // mesure refusée : on ne laisse pas le message « enregistrée » du montage la recouvrir
+    const refuse = (s) => { T.msg(s, "bad"); refused = true; Promise.resolve().then(() => { refused = false; }); };
+    T.msg = (s, kind) => { if (refused && kind === "ok") return; const e = $("#" + T.id + "-msg"); e.textContent = s || ""; e.className = "msg" + (kind ? " " + kind : ""); };
     const plotPart = k => {
       const p = CR.parts[k]; if (!p.plot) return;
       const P = T.rows[k].map((r, i) => { const f = {}; p.fill.forEach(c => f[c.k] = parseNum((S.fill[k][i] || {})[c.k])); return [p.plot.x(r, f), p.plot.y(r, f)]; }).filter(q => isFinite(q[0]) && isFinite(q[1]));
@@ -222,7 +230,7 @@
     T.renderAll = () => keys.forEach(T.renderPart);
     T.locked = () => !!SUB;
     T.clearRows = () => { keys.forEach(k => { T.rows[k] = []; S.fill[k] = []; }); T.renderAll(); };
-    T.add = (k, row) => { if (SUB) { T.msg("Ce compte rendu a déjà été soumis : les nouvelles mesures ne sont plus enregistrées.", "bad"); return; } T.rows[k].push(Object.assign(ROUND(row, CR.parts[k].r), { ts: Date.now() })); S.fill[k].push({}); T.renderPart(k); };
+    T.add = (k, row) => { if (timed() === "avant") { refuse("Ce TP est minuté : clique d'abord sur « Commencer le TP » au-dessus de la paillasse."); return; } if (timed() === "fini") { refuse("Le temps imparti est écoulé : les mesures ne sont plus enregistrées."); return; } if (SUB) { refuse("Ce compte rendu a déjà été soumis : les nouvelles mesures ne sont plus enregistrées."); return; } T.rows[k].push(Object.assign(ROUND(row, CR.parts[k].r), { ts: Date.now() })); S.fill[k].push({}); T.renderPart(k); };
     const cr = $("#" + T.id + "-cr");
     cr.addEventListener("click", e => { const b = e.target.closest("[data-del]"); if (!b || SUB) return; const [k, i] = b.dataset.del.split(":"); T.rows[k].splice(+i, 1); S.fill[k].splice(+i, 1); T.renderPart(k); });
     cr.addEventListener("input", e => {
@@ -249,30 +257,66 @@
       cr.querySelectorAll("[data-del]").forEach(b => b.remove());
     };
     const smsg = (s, kind) => { const e = $("#" + T.id + "-smsg"); e.textContent = s; e.className = "msg" + (kind ? " " + kind : ""); };
-    $("#" + T.id + "-send").onclick = async () => {
-      if (SUB) return;
+    const doSend = async auto => {
+      if (SUB || (auto && sending)) return;
       if (!SS) { smsg("Connecte-toi d'abord en haut de la page (n° de carte et code personnel) : la soumission est réservée aux étudiants inscrits.", "bad"); $("#tpLogin").scrollIntoView({ behavior: "smooth" }); return; }
       const id = {}; ["nom", "prenom", "carte", "groupe", "sousgroupe", "binome"].forEach(f => id[f] = ($("#" + T.id + "-" + f).value || "").trim());
       const miss = ["nom", "prenom", "carte", "groupe", "sousgroupe"].filter(f => !id[f]);
-      if (miss.length) { smsg("Complète d'abord l'identification : nom, prénom, n° de carte étudiant, groupe et sous-groupe.", "bad"); $("#" + T.id + "-" + miss[0]).focus(); return; }
+      if (miss.length && !auto) { smsg("Complète d'abord l'identification : nom, prénom, n° de carte étudiant, groupe et sous-groupe.", "bad"); $("#" + T.id + "-" + miss[0]).focus(); return; }
       const seance = ($("#" + T.id + "-seance") || {}).value || "";
-      if (ST && ST.seance && !seance.trim()) { smsg("Saisis le code de séance donné par l'enseignant.", "bad"); $("#" + T.id + "-seance").focus(); return; }
-      if (!$("#" + T.id + "-ok").checked) { smsg("Coche la case de certification avant de soumettre.", "bad"); return; }
+      if (ST && ST.seance && !seance.trim() && !auto) { smsg("Saisis le code de séance donné par l'enseignant.", "bad"); $("#" + T.id + "-seance").focus(); return; }
+      if (!$("#" + T.id + "-ok").checked && !auto) { smsg("Coche la case de certification avant de soumettre.", "bad"); return; }
       const URL_ = endpoint(); id.carte = SS.etudiant.carte; id.code = SS.code;
       if (!URL_) { smsg("La soumission en ligne n'est pas encore activée par l'enseignant. Utilise « Télécharger une copie » en attendant.", "bad"); return; }
       const fillOut = {}; keys.forEach(k => fillOut[k] = T.rows[k].map((_, i) => { const o = {}; CR.parts[k].fill.forEach(c => o[c.k] = (S.fill[k][i] || {})[c.k] ?? ""); return o; }));
       const qOut = {}; QS.forEach(([qi]) => { if (S.qcm["q" + qi] != null) qOut["q" + qi] = S.qcm["q" + qi]; });
       const payload = { action: "submit", tp: T.id, num: T.num, id, seance, device: device(), raw: T.rows, fill: fillOut, calc: S.calc, qcm: qOut, rem: ($("#" + T.id + "-rem").value || "").slice(0, 2000), client: new Date().toISOString() };
-      const btn = $("#" + T.id + "-send"); btn.disabled = true; smsg("Envoi et correction en cours…");
+      const btn = $("#" + T.id + "-send"); btn.disabled = true; sending = true; smsg(auto ? "Temps écoulé : envoi automatique de ton compte rendu…" : "Envoi et correction en cours…");
       try {
         const res = await fetch(URL_, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
         const R = await res.json();
         if (R.ok) { SUB = Object.assign({ date: new Date().toISOString() }, R); store.set(T.id + "_submitted", SUB); const s2 = sess(); if (s2 && s2.tps[T.id]) { s2.tps[T.id].soumis = SUB; store.set("session", s2); }
           smsg(R.nonConforme ? "Compte rendu enregistré. Attention : tes mesures ne correspondent pas au matériel qui t'a été attribué ; ton enseignant en est informé." : "Compte rendu soumis et corrigé.", R.nonConforme ? "bad" : "ok"); showNote(SUB); }
         else if (R.duplicate) { SUB = { date: new Date().toISOString(), note: NaN }; store.set(T.id + "_submitted", SUB); smsg(R.error, "bad"); showNote(SUB); }
-        else { btn.disabled = false; smsg((R.error || "La soumission a échoué.") + (R.auth ? " Déconnecte-toi puis reconnecte-toi en haut de la page." : ""), "bad"); }
-      } catch (err) { btn.disabled = false; smsg("Envoi impossible : vérifie ta connexion internet puis réessaie. Tes réponses sont conservées sur cet appareil.", "bad"); }
+        else { btn.disabled = false; sending = false; smsg((R.error || "La soumission a échoué.") + (R.auth ? " Déconnecte-toi puis reconnecte-toi en haut de la page." : ""), "bad"); }
+      } catch (err) { btn.disabled = false; sending = false; smsg("Envoi impossible : vérifie ta connexion internet puis réessaie. Tes réponses sont conservées sur cet appareil." + (auto ? " Nouvel essai automatique dans 15 s." : ""), "bad"); if (auto) setTimeout(() => doSend(true), 15000); }
+      if (SUB) sending = false;
     };
+    let sending = false;
+    $("#" + T.id + "-send").onclick = () => doSend(false);
+
+    /* minuteur du TP (durée fixée par l'enseignant ; heure du serveur) */
+    const left = () => Date.parse(ST.finTP) - (Date.now() + ((sess() || {}).skew || 0));
+    const timed = () => !(ST && ST.duree) || SUB ? "" : !ST.finTP ? "avant" : left() <= 0 ? "fini" : "en cours";
+    const tbox = $("#" + T.id + "-timer");
+    let autoDone = false;
+    const drawTimer = () => {
+      if (!tbox) return;
+      if (SUB) { tbox.hidden = true; return; }
+      const st = timed();
+      if (st === "avant") {
+        if (!tbox.dataset.st) tbox.innerHTML = `<div><b>TP minuté : ${ST.duree} min.</b> Le minuteur démarre quand tu cliques sur « Commencer le TP » et ne peut plus être arrêté, même si tu fermes la page. À la fin du temps, ton compte rendu est envoyé automatiquement dans l'état où il se trouve.</div>${ST.etat ? "" : `<button type="button" class="btn primary" id="${T.id}-go">Commencer le TP</button>`}<p class="msg" id="${T.id}-tmsg"></p>`;
+        tbox.dataset.st = "avant"; tbox.className = "timer noprint";
+        const go = $("#" + T.id + "-go"); if (go && !go.onclick) go.onclick = async () => {
+          if (!confirm(`Commencer le TP n°${T.num} ? Tu disposeras de ${ST.duree} minutes à partir de maintenant. Les mesures d'entraînement déjà faites pour ce TP seront effacées.`)) return;
+          go.disabled = true; const m = $("#" + T.id + "-tmsg"); m.textContent = "Démarrage…"; m.className = "msg";
+          try {
+            const R = await post({ action: "start", tp: T.id, carte: SS.etudiant.carte, code: SS.code, device: device() });
+            if (!R.ok) { go.disabled = false; m.textContent = R.error; m.className = "msg bad"; return; }
+            ST.debutTP = R.debutTP; ST.finTP = R.finTP; const s2 = sess(); if (s2) { s2.tps[T.id].debutTP = R.debutTP; s2.tps[T.id].finTP = R.finTP; s2.skew = Date.parse(R.serveur) - Date.now() || 0; store.set("session", s2); }
+            T.clearRows(); T.msg("Le TP a commencé : bon travail !", "ok"); drawTimer();
+          } catch (err) { go.disabled = false; m.textContent = "Pas de connexion internet : impossible de démarrer le minuteur."; m.className = "msg bad"; }
+        };
+        return;
+      }
+      const ms = left(), tot = ST.duree * 60000;
+      tbox.dataset.st = st;
+      tbox.className = "timer noprint run" + (ms <= 120000 ? " bad" : ms <= 600000 ? " warn" : "");
+      tbox.innerHTML = st === "fini" ? `<b>Temps écoulé.</b> <span>${SUB ? "" : "Envoi automatique du compte rendu…"}</span>`
+        : `<span>Temps restant</span><b class="tleft">${hms(ms)}</b><span class="tbar"><i style="width:${Math.max(0, Math.min(100, ms / tot * 100)).toFixed(1)}%"></i></span><span>fin à ${new Date(Date.parse(ST.finTP) - ((sess() || {}).skew || 0)).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</span>`;
+      if (st === "fini" && !autoDone && !SUB) { autoDone = true; cr.querySelectorAll("input, textarea").forEach(e => e.disabled = true); doSend(true); }
+    };
+    if (tbox) { TIMERS.push(drawTimer); drawTimer(); }
     $("#" + T.id + "-dl").onclick = () => {
       const val = f => ($("#" + T.id + "-" + f) || {}).value || "";
       const tables = keys.map((k, i) => { const p = CR.parts[k]; const cv = p.plot ? $("#" + T.id + "-gr-" + k) : null;
