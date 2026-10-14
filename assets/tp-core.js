@@ -327,9 +327,11 @@
       const ms = left(), tot = ST.duree * 60000;
       tbox.dataset.st = st;
       tbox.className = "timer noprint run" + (ms <= 120000 ? " bad" : ms <= 600000 ? " warn" : "");
-      tbox.innerHTML = st === "fini" ? `<b>Temps écoulé.</b> <span>${SUB ? "" : "Envoi automatique du compte rendu dans quelques instants (ne ferme pas la page)…"}</span>`
+      const trop = st === "fini" && ms < -270000;   // fin dépassée depuis plus de 4 min 30 : le serveur n'acceptera plus la copie
+      tbox.innerHTML = st === "fini" ? (trop ? `<b>Temps écoulé</b> <span>depuis le ${esc(dfmt(ST.finTP))}. Le compte rendu n'a pas été envoyé à temps ; adresse-toi à ton enseignant.</span>` : `<b>Temps écoulé.</b> <span>${SUB ? "" : "Envoi automatique du compte rendu dans quelques instants (ne ferme pas la page)…"}</span>`)
         : `<span>Temps restant</span><b class="tleft">${hms(ms)}</b><span class="tbar"><i style="width:${Math.max(0, Math.min(100, ms / tot * 100)).toFixed(1)}%"></i></span><span>fin à ${new Date(Date.parse(ST.finTP) - ((sess() || {}).skew || 0)).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</span>`;
-      if (st === "fini" && !autoDone && !SUB) {
+      if (st === "fini" && trop && !autoDone) { autoDone = true; cr.querySelectorAll("input, textarea").forEach(e => e.disabled = true); }
+      if (st === "fini" && !trop && !autoDone && !SUB) {
         autoDone = true; cr.querySelectorAll("input, textarea").forEach(e => e.disabled = true);
         // envoi étalé sur 90 s pour ne pas saturer le serveur quand tout un groupe termine en même temps
         smsg("Temps écoulé : ton compte rendu va être envoyé automatiquement dans quelques instants. Ne ferme pas la page.", "bad");
