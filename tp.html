@@ -117,6 +117,10 @@ fieldset.qcm input{width:auto;margin-top:4px;accent-color:var(--accent)}
   details{display:block}
   .tblwrap{max-height:none}
 }
+.band a.fasc{display:inline-block;margin-top:4px;padding:8px 14px;border-radius:8px;background:var(--saff);color:#1B2A41;font-family:var(--f-head);font-weight:700;text-decoration:none}
+.band a.fasc:hover{filter:brightness(1.08)}
+.band .fasc-sub{display:block;margin-top:6px;font-size:.85rem;color:var(--band-muted)}
+@media print{.band a.fasc,.band .fasc-sub{display:none}}
 .login{display:grid;gap:10px;border-left:5px solid var(--saff)}
 .login h2{font-family:var(--f-head);font-size:1.15rem;margin:0}
 .login p{margin:0}
@@ -147,6 +151,7 @@ fieldset.qcm input{width:auto;margin-top:4px;accent-color:var(--accent)}
   <div class="uni">UNIVERSITÉ SOULEYMANE NIANG DE MATAM • PHYSIQUE L1</div>
   <h1>Travaux pratiques</h1>
   <p>Pour chaque TP : le protocole détaillé, un montage simulé pour faire les mesures, les tableaux et graphes, et le compte rendu à remplir en ligne.</p>
+  <p><a class="fasc" href="docs/Fascicule_TP_Physique_L1.pdf" target="_blank" rel="noopener">Télécharger le fascicule de TP (PDF, 46 pages)</a> <span class="fasc-sub">les 8 TP : théorie, schémas de montage, protocoles, tableaux de mesures — à lire avant chaque séance</span></p>
 </div></header>
 
 <main><div class="wrap">

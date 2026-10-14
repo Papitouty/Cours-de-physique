@@ -2,7 +2,7 @@
    - pages et ressources du site : réseau d'abord, copie locale si pas de connexion
    - documents PDF : copie locale d'abord (un document ouvert une fois reste disponible)
    - bibliothèques et polices externes : copie locale, rafraîchie en arrière-plan */
-const VERSION = "v33";
+const VERSION = "v34";
 const SHELL = "shell-" + VERSION;
 const PDFS = "pdf-v1";          // nom stable : les documents enregistrés survivent aux mises à jour du site
 const EXT = "ext-" + VERSION;
@@ -18,6 +18,7 @@ const SHELL_FILES = [
 ];
 /* supports de cours et TD (≈ 3,4 Mo) : enregistrés dès la première visite */
 const DOC_FILES = [
+  "docs/Fascicule_TP_Physique_L1.pdf",
   "docs/Electricite_Chapitre_1_Electrostatique.pdf",
   "docs/Electricite_Chapitre_2_Champ_potentiel.pdf",
   "docs/Electricite_Chapitre_3_Dipole.pdf",

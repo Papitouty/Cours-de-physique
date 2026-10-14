@@ -16,6 +16,10 @@
    ===================================================================== */
 window.ANNONCES = [
   { date: "2026-10-14", important: true,
+    titre: "Nouveau : le fascicule de travaux pratiques",
+    texte: "Les 8 TP réunis dans un PDF de 46 pages : rappels théoriques avec démonstrations, schémas de montage, protocoles, tableaux de mesures à remplir et questions d'exploitation. À lire avant chaque séance.",
+    lien: "docs/Fascicule_TP_Physique_L1.pdf" },
+  { date: "2026-10-14",
     titre: "Tous les diaporamas sont en ligne, aussi en PowerPoint",
     texte: "Nouveaux diaporamas pour les chapitres 1 et 2 d'électricité. Chaque chapitre de mécanique et d'électricité a maintenant son diaporama à consulter en ligne et à télécharger au format PowerPoint (bouton PPTX).",
     lien: "./#elec" },
