@@ -197,7 +197,7 @@ footer .wrap{padding-block:18px}
     </div>
     <div class="off-act">
       <button type="button" class="obtn primary" id="dlDocs">Enregistrer les cours et TD<small>3,4 Mo</small></button>
-      <button type="button" class="obtn" id="dlSlides">Enregistrer les diaporamas<small>28 Mo</small></button>
+      <button type="button" class="obtn" id="dlSlides">Enregistrer les diaporamas<small>32 Mo</small></button>
       <button type="button" class="obtn" id="install" hidden>Installer l'application</button>
       <button type="button" class="olink" id="offClear">Supprimer les documents enregistrés</button>
     </div>
@@ -242,13 +242,14 @@ const COURSES=[
     toc:["Introduction et outils","Travail d'une force","Travail dans les différents systèmes de coordonnées","Travail de quelques forces usuelles","Puissance d'une force","Énergie cinétique","Forces conservatives et énergie potentielle","Énergie mécanique","Équilibre et stabilité"]}
   ]},
  {id:"elec",tab:"Électricité",eyebrow:"Électricité",title:"Électrostatique",
-  intro:"Trois chapitres : la charge et la loi de Coulomb ; le champ, le potentiel et le théorème de Gauss ; le dipôle électrostatique. Les distributions classiques (fil, anneau, disque, boule) sont traitées dans la série de TD.",
+  intro:"Trois chapitres : la charge et la loi de Coulomb ; le champ, le potentiel et le théorème de Gauss ; le dipôle électrostatique (support de cours, diaporama et série de TD n°2 avec corrigé). Les distributions classiques (fil, anneau, disque, boule) sont traitées dans la série de TD.",
   chapters:[
    {n:1,title:"Électrostatique : charge et loi de Coulomb",key:"Electricite_Chapitre_1_Electrostatique",pages:11,
     toc:["La charge électrique","Électrisation de la matière","Distributions de charges","Force électrostatique : loi de Coulomb","Principe de superposition"]},
    {n:2,title:"Champ et potentiel électrostatiques",key:"Electricite_Chapitre_2_Champ_potentiel",pages:15,
     toc:["Le champ électrostatique","Le potentiel électrostatique","Plusieurs charges ponctuelles","Distributions continues","Angle solide","Flux et théorème de Gauss","Propriétés du champ et du potentiel","Équations de Poisson et de Laplace"]},
-   {n:3,title:"Le dipôle électrostatique",key:"Electricite_Chapitre_3_Dipole",pages:16,
+   {n:3,title:"Le dipôle électrostatique",key:"Electricite_Chapitre_3_Dipole",pages:16,slides:33,pptx:true,
+    td:{n:2,e:"TD_Electricite_2_enonces",ep:4,c:"TD_Electricite_2_corrige",cp:9},
     toc:["Définitions : dipôle, moment dipolaire","Potentiel créé à grande distance","Champ créé à grande distance","Positions principales de Gauss","Lignes de champ et équipotentielles","Action d'un champ extérieur : couple, énergie, force"]}
   ],
   series:[{title:"Série de TD n°1 — chapitres 1 et 2",sub:"Charges, champ et potentiel",
@@ -269,7 +270,7 @@ if(location.hash&&COURSES.some(c=>c.id===location.hash.slice(1)))current=locatio
 /* statistiques */
 (function(){
   let ch=0,pg=0,sl=0,td=0;
-  COURSES.forEach(c=>{c.chapters.forEach(x=>{ch++;pg+=x.pages;if(x.slides)sl+=x.slides;if(x.td)td++});(c.series||[]).forEach(()=>td++)});
+  COURSES.forEach(c=>{c.chapters.forEach(x=>{ch++;pg+=x.pages;if(x.slides)sl+=x.slides;if(x.td&&!x.td.n)td++});(c.series||[]).forEach(()=>td++)});
   $("#stats").innerHTML=`<span><b>${COURSES.length}</b>cours</span><span><b>${ch}</b>chapitres</span><span><b>${pg}</b>pages de cours</span><span><b>${sl}</b>diapositives</span><span><b>${td}</b>séries de TD corrigées</span><span><b>60</b>questions de quiz</span><span><b>5</b>simulations</span><span><b>19</b>exercices d'entraînement</span>`;
 })();
 
@@ -302,7 +303,8 @@ function render(){
       <div class="res">
         ${pdfBtn(ch.key,"Support de cours",ch.pages,"pdf",true).replace('data-title="Support de cours"',`data-title="${esc("Chapitre "+ch.n+" — "+ch.title)}"`)}
         ${ch.slides?pptBtn(ch.key,ch.slides,"Diaporama — chapitre "+ch.n+" : "+ch.title):""}
-        ${ch.td?pdfBtn(ch.td.e,"TD "+ch.n+" — énoncés",ch.td.ep,"pdf")+pdfBtn(ch.td.c,"TD "+ch.n+" — corrigé détaillé",ch.td.cp,"cor"):""}
+        ${ch.pptx?`<a class="btn" href="slides/${ch.key}.pptx" download><span class="k k-ppt">PPTX</span><span class="lbl">PowerPoint</span><span class="n">${ch.slides} diap.</span></a>`:""}
+        ${ch.td?pdfBtn(ch.td.e,"TD "+(ch.td.n||ch.n)+" — énoncés",ch.td.ep,"pdf")+pdfBtn(ch.td.c,"TD "+(ch.td.n||ch.n)+" — corrigé détaillé",ch.td.cp,"cor"):""}
         <a class="btn" href="entrainement.html#${c.id}${ch.n}"><span class="k k-quiz">EXOS</span><span class="lbl">Exercices d'entraînement</span></a>
         <a class="btn" href="quiz.html#${c.id}${ch.n}"><span class="k k-quiz">QUIZ</span><span class="lbl">Quiz d'auto-évaluation</span><span class="n">10 q.</span></a>
         ${((window.VIDEOS||{})[c.id+ch.n]||[]).map(v=>`<a class="btn" href="${esc(v.url)}" target="_blank" rel="noopener"><span class="k k-vid">VIDÉO</span><span class="lbl">${esc(v.titre)}</span>${v.duree?`<span class="n">${esc(v.duree)}</span>`:""}</a>`).join("")}
@@ -413,7 +415,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-pdf]");if(
 var PDF_CACHE="pdf-v1";
 var pdfPath=f=>(f.includes("/")?f:"docs/"+f)+".pdf";
 var absPath=u=>new URL(u,location.href).pathname;
-function allDocs(){const d=[],s=[];COURSES.forEach(c=>{c.chapters.forEach(ch=>{d.push(pdfPath(ch.key));if(ch.td){d.push(pdfPath(ch.td.e),pdfPath(ch.td.c))}if(ch.slides)s.push(pdfPath("slides/"+ch.key+"_diapo"))});(c.series||[]).forEach(x=>d.push(pdfPath(x.e),pdfPath(x.c)))});return{d,s}}
+function allDocs(){const d=[],s=[];COURSES.forEach(c=>{c.chapters.forEach(ch=>{d.push(pdfPath(ch.key));if(ch.td){d.push(pdfPath(ch.td.e),pdfPath(ch.td.c))}if(ch.slides)s.push(pdfPath("slides/"+ch.key+"_diapo"))});(c.series||[]).forEach(x=>d.push(pdfPath(x.e),pdfPath(x.c)))});return{d:[...new Set(d)],s}}
 async function savedPaths(){try{if(!("caches" in window))return new Set();const c=await caches.open(PDF_CACHE);return new Set((await c.keys()).map(r=>new URL(r.url).pathname))}catch(e){return new Set()}}
 async function markCached(){const set=await savedPaths();document.querySelectorAll(".btn[data-pdf]").forEach(b=>b.classList.toggle("saved",set.has(absPath(pdfPath(b.dataset.pdf)))));
   const {d,s}=allDocs(),nd=d.filter(u=>set.has(absPath(u))).length,ns=s.filter(u=>set.has(absPath(u))).length;

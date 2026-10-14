@@ -17,7 +17,7 @@
 window.ANNONCES = [
   { date: "2026-10-14", important: true,
     titre: "Nouveau : chapitre 3 d'électrostatique — Le dipôle",
-    texte: "Support de cours complet (démonstrations pas à pas, figures, fiche de synthèse), série de TD n°2 avec corrigé détaillé, quiz, exercices d'entraînement et une nouvelle simulation : le dipôle dans un champ uniforme.",
+    texte: "Support de cours complet (démonstrations pas à pas, figures, fiche de synthèse), diaporama de 33 diapositives (à consulter en ligne ou à télécharger au format PowerPoint), série de TD n°2 avec corrigé détaillé, quiz, exercices d'entraînement et une nouvelle simulation : le dipôle dans un champ uniforme.",
     lien: "./#elec" },
   { date: "2026-10-14",
     titre: "TP : connexion avec ton code personnel",
