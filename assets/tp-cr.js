@@ -84,6 +84,26 @@ window.TPCR = {
       { q: "Un résistor de 22 Ω (0,5 W) supporte au maximum une tension d'environ :", o: ["12 V", "1 V", "3,3 V", "22 V"] }
     ]
   },
+  oscillo: {
+    parts: {
+      A: { min: 3, fill: [{ k: "U", h: "E = d × S (V)" }] },
+      B: { min: 4, fill: [{ k: "Um", h: "U_m (V)" }, { k: "T", h: "T (ms)" }, { k: "f", h: "f mesurée (Hz)" }, { k: "Ueff", h: "U_eff = U_m/√2 (V)" }], plot: { x: (r, f) => r.fa, y: (r, f) => f.f, xl: "f affichée (Hz)", yl: "f mesurée (Hz)" } },
+      C: { min: 4, fill: [{ k: "phi", h: "φ = 360°·τ/T (°)" }], plot: { x: (r, f) => r.fa, y: (r, f) => f.phi, xl: "f affichée (Hz)", yl: "φ (°)" } }
+    },
+    calc: [
+      { k: "E", h: "Partie A : tension continue E (moyenne de tes mesures)", u: "V" },
+      { k: "Ueff", h: "Partie B : valeur efficace U_eff = U_m/√2 (moyenne)", u: "V" },
+      { k: "ecartV", h: "Écart relatif entre U_eff (oscilloscope) et l'indication moyenne du voltmètre", u: "%" },
+      { k: "C", h: "Partie C : capacité C = 1/(R ω tan φ) (moyenne ; R = 1 kΩ, ω = 2π/T mesurée)", u: "µF" }
+    ],
+    qcm: [
+      { q: "Sur un oscilloscope, la sensibilité verticale s'exprime en :", o: ["s/div", "V/div", "Hz/div", "div/V"] },
+      { q: "La base de temps (balayage horizontal) s'exprime en :", o: ["V/div", "s/div (ou ms/div)", "Hz", "div/s"] },
+      { q: "Un signal occupe 6 divisions crête à crête avec une sensibilité de 0,5 V/div. Son amplitude U_m vaut :", o: ["3 V", "1,5 V", "6 V", "0,75 V"] },
+      { q: "Une période occupe 4 divisions avec une base de temps de 0,2 ms/div. La fréquence vaut :", o: ["1 250 Hz", "800 Hz", "5 000 Hz", "125 Hz"] },
+      { q: "Pour une tension sinusoïdale, la valeur efficace vaut :", o: ["U_eff = U_m/√2", "U_eff = U_m·√2", "U_eff = U_m/2", "U_eff = 2U_m"] }
+    ]
+  },
   refraction: {
     parts: {
       A: { min: 6, fill: [{ k: "si", h: "sin i" }, { k: "sr", h: "sin r" }], plot: { x: (r, f) => f.sr, y: (r, f) => f.si, xl: "sin r", yl: "sin i" } },
@@ -169,6 +189,11 @@ window.TPCR = {
       B: { cols: ["n°", "Résistor", "Montage", "U (V)", "I (mA)"], cells: (r, i) => [i + 1, r.nom, r.mont, fr(r.U, 2), s4(r.I)], r: { U: 2, I: "s4" }, titre: "Montage amont ou aval ?" },
       C: { cols: ["n°", "Dipôle", "U (V)", "I (mA)"], cells: (r, i) => [i + 1, r.nom, fr(r.U, 2), s4(r.I)], r: { U: 2, I: "s4" }, titre: "Associations de résistances" }
     },
+    oscillo: {
+      A: { cols: ["n°", "S (V/div)", "d (div)"], cells: (r, i) => [i + 1, String(r.S).replace(".", ","), fr(r.d, 1)], r: { d: 2 }, titre: "Mesure d'une tension continue" },
+      B: { cols: ["n°", "f affichée (Hz)", "S (V/div)", "Crête à crête (div)", "B (ms/div)", "Période (div)", "Voltmètre (V)"], cells: (r, i) => [i + 1, r.fa, String(r.S).replace(".", ","), fr(r.ypp, 1), String(r.B).replace(".", ","), fr(r.x, 1), fr(r.V, 2)], r: { ypp: 2, x: 2, V: 2 }, titre: "Tension sinusoïdale du GBF" },
+      C: { cols: ["n°", "f affichée (Hz)", "B (ms/div)", "τ (div)", "Période (div)"], cells: (r, i) => [i + 1, r.fa, String(r.B).replace(".", ","), fr(r.tau, 1), fr(r.Tdiv, 1)], r: { tau: 2, Tdiv: 2 }, titre: "Déphasage dans le circuit RC" }
+    },
     refraction: {
       A: { cols: ["n°", "i (°)", "r (°)"], cells: (r, i) => [i + 1, fr(r.i, 1), fr(r.r, 1)], r: { i: 1, r: 1 }, titre: "Air → plexiglas" },
       B: { cols: ["n°", "i (°)", "r (°)"], cells: (r, i) => [i + 1, fr(r.i, 1), fr(r.r, 1)], r: { i: 1, r: 1 }, titre: "Plexiglas → air" },
@@ -185,7 +210,7 @@ window.TPCR = {
     }
   };
   Object.keys(RAW).forEach(k => Object.keys(RAW[k]).forEach(p => Object.assign(window.TPCR[k].parts[p], RAW[k][p])));
-  window.TPCR_PARAMS = { ressort: "ressort_par", torsion: "torsion_par", ohm: "ohm_par", refraction: "refr_par", lentilles: "lent_par", microscope: "micro_par" };
+  window.TPCR_PARAMS = { ressort: "ressort_par", torsion: "torsion_par", ohm: "ohm_par", oscillo: "osc_par", refraction: "refr_par", lentilles: "lent_par", microscope: "micro_par" };
 })();
 
 /* Banque de questions : 12 par TP. Chaque étudiant connecté reçoit 5 questions tirées
@@ -227,6 +252,15 @@ window.TPCR = {
       { q: "Deux résistances R₁ = 220 Ω et R₂ = 330 Ω en série ont une résistance équivalente de :", o: ["110 Ω", "132 Ω", "550 Ω", "726 Ω"] },
       { q: "Les mêmes résistances (220 Ω et 330 Ω) en parallèle ont une résistance équivalente de :", o: ["132 Ω", "550 Ω", "275 Ω", "110 Ω"] },
       { q: "Un résistor de 470 Ω parcouru par un courant de 20 mA a à ses bornes une tension de :", o: ["9,4 V", "23,5 V", "0,94 V", "4,7 V"] }
+    ],
+    oscillo: [
+      { q: "Un voltmètre en position alternative (V~) indique :", o: ["la valeur maximale", "la valeur efficace", "la valeur crête à crête", "la valeur moyenne"] },
+      { q: "En couplage AC, l'oscilloscope :", o: ["supprime la composante continue du signal", "supprime la composante alternative", "affiche la masse", "double la sensibilité"] },
+      { q: "La position GND (masse) de l'entrée sert à :", o: ["mesurer la fréquence", "repérer la ligne de référence 0 V sur l'écran", "augmenter l'amplitude", "déclencher le balayage"] },
+      { q: "Dans un circuit RC série, la tension u_R aux bornes de R, par rapport à la tension du générateur, est :", o: ["en retard", "en avance", "en phase", "en opposition de phase"] },
+      { q: "Un décalage τ entre deux signaux de période T correspond à un déphasage :", o: ["φ = 2πτ/T (rad), soit 360°·τ/T", "φ = τ·T", "φ = T/τ", "φ = 2πT/τ"] },
+      { q: "Dans un circuit RC série, tan φ vaut :", o: ["RCω", "1/(RCω)", "R/C", "ω/(RC)"] },
+      { q: "Pour mesurer une période avec le plus de précision, on choisit la base de temps telle que la période occupe :", o: ["moins d'une division", "le plus de divisions possible sans dépasser 10", "exactement 1 division", "plus de 10 divisions"] }
     ],
     refraction: [
       { q: "Quand la lumière passe de l'air (n = 1) au plexiglas (n ≈ 1,5), le rayon réfracté :", o: ["s'écarte de la normale", "se rapproche de la normale", "n'est jamais dévié", "disparaît"] },
