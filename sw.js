@@ -2,7 +2,7 @@
    - pages et ressources du site : réseau d'abord, copie locale si pas de connexion
    - documents PDF : copie locale d'abord (un document ouvert une fois reste disponible)
    - bibliothèques et polices externes : copie locale, rafraîchie en arrière-plan */
-const VERSION = "v25";
+const VERSION = "v26";
 const SHELL = "shell-" + VERSION;
 const PDFS = "pdf-v1";          // nom stable : les documents enregistrés survivent aux mises à jour du site
 const EXT = "ext-" + VERSION;
@@ -34,7 +34,9 @@ const DOC_FILES = [
   "docs/TD4_Travail_energie_corrige.pdf",
   "docs/TD4_Travail_energie_enonces.pdf",
   "docs/TD_Electricite_1_corrige.pdf",
-  "docs/TD_Electricite_1_enonces.pdf"
+  "docs/TD_Electricite_1_enonces.pdf",
+  "docs/TD_Electricite_2_corrige.pdf",
+  "docs/TD_Electricite_2_enonces.pdf"
 ];
 const EXT_FILES = [
   "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css",
