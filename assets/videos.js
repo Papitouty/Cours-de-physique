@@ -13,7 +13,7 @@ window.VIDEOS = {
   meca2: [],   // Mécanique — Ch. 2 Cinématique
   meca3: [],   // Mécanique — Ch. 3 Dynamique
   meca4: [],   // Mécanique — Ch. 4 Travail et énergie
-  elec1: [],   // Électricité — Ch. 1 Charge et loi de Coulomb
+  elec1: [],   // Électricité — Ch. 1 Généralités sur l'électrostatique
   elec2: [     // Électricité — Ch. 2 Champ et potentiel
     { titre: "Sphère chargée en volume", url: "https://www.youtube.com/watch?v=hVLKwntLCM0",
       note: "Exercice : application du théorème de Gauss (TD n°1, exercice 10)" }

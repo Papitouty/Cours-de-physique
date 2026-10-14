@@ -51,7 +51,7 @@ h2{font-family:var(--f-head);font-size:1.25rem;margin:0 0 12px}
   <section aria-labelledby="hA"><h2 id="hA">Annonces</h2><div class="list" id="ann"></div></section>
   <section aria-labelledby="hC"><h2 id="hC">Calendrier</h2><div id="cal"></div></section>
 </div></main>
-<footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré</div></footer>
+<footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré • <a href="reparer.html?retour=calendrier.html">Affichage incomplet ? Mettre le site à jour</a></div></footer>
 <script src="assets/annonces.js"></script>
 <script>
 const $=s=>document.querySelector(s);
@@ -75,7 +75,7 @@ $("#cal").innerHTML=C.length
   :`<div class="empty">Les dates des séances de TD, des contrôles et des examens seront publiées ici dès qu'elles seront fixées.</div>`;
 </script>
 <script>
-if("serviceWorker" in navigator){addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+if("serviceWorker" in navigator){const hadSW=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",()=>{/* nouvelle version du site installée : on recharge une fois */try{if(!hadSW||sessionStorage.getItem("swmaj"))return;sessionStorage.setItem("swmaj","1")}catch(e){return}location.reload()});addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
 </script>
 </body>
 </html>

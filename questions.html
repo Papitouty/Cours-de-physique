@@ -55,7 +55,7 @@ details ol{padding-left:20px;display:grid;gap:4px}
         <div class="f"><label for="type">Objet</label><select id="type">
           <option>Question sur le cours</option><option>Question sur un exercice de TD</option><option>Question sur un quiz ou un exercice d'entraînement</option><option>Signaler une erreur dans un document</option><option>Problème avec le site</option><option>Autre</option></select></div>
         <div class="f"><label for="chap">Chapitre</label><select id="chap">
-          <option>Mécanique — Ch. 1 Calcul vectoriel</option><option>Mécanique — Ch. 2 Cinématique</option><option>Mécanique — Ch. 3 Dynamique</option><option>Mécanique — Ch. 4 Travail et énergie</option><option>Électricité — Ch. 1 Charge et loi de Coulomb</option><option>Électricité — Ch. 2 Champ et potentiel</option><option>Électricité — Série de TD n°1</option><option>Autre / général</option></select></div>
+          <option>Mécanique — Ch. 1 Calcul vectoriel</option><option>Mécanique — Ch. 2 Cinématique</option><option>Mécanique — Ch. 3 Dynamique</option><option>Mécanique — Ch. 4 Travail et énergie</option><option>Électricité — Ch. 1 Généralités sur l'électrostatique</option><option>Électricité — Ch. 2 Champ et potentiel</option><option>Électricité — Série de TD n°1</option><option>Autre / général</option></select></div>
       </div>
       <div class="f"><label for="ref">Référence <small>(page, exercice, question — facultatif)</small></label><input id="ref" placeholder="Ex. : TD 3, exercice 4, question 2"></div>
       <div class="f"><label for="txt">Ta question</label><textarea id="txt" required placeholder="Explique ce que tu ne comprends pas et ce que tu as déjà essayé."></textarea></div>
@@ -80,7 +80,7 @@ details ol{padding-left:20px;display:grid;gap:4px}
     <details><summary>Un document ne s'ouvre pas.</summary><p>Vérifie la connexion, puis réessaie. Si la liseuse intégrée ne démarre pas, un bouton propose d'ouvrir le document avec le lecteur PDF du téléphone. Si le problème continue, signale-le avec le formulaire (objet « Problème avec le site »).</p></details>
   </section>
 </div></main>
-<footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré</div></footer>
+<footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré • <a href="reparer.html?retour=questions.html">Affichage incomplet ? Mettre le site à jour</a></div></footer>
 <script src="assets/config.js"></script>
 <script>
 const $=s=>document.querySelector(s),CFG=window.SITE_CONFIG||{};
@@ -110,7 +110,7 @@ $("#qForm").addEventListener("submit",async e=>{
 });
 </script>
 <script>
-if("serviceWorker" in navigator){addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+if("serviceWorker" in navigator){const hadSW=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",()=>{/* nouvelle version du site installée : on recharge une fois */try{if(!hadSW||sessionStorage.getItem("swmaj"))return;sessionStorage.setItem("swmaj","1")}catch(e){return}location.reload()});addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
 </script>
 </body>
 </html>

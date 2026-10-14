@@ -505,7 +505,7 @@ window.QUIZ={
 },
 "elec1": {
 "course": "Électricité",
-"title": "Chapitre 1 — Charge et loi de Coulomb",
+"title": "Chapitre 1 — Généralités sur l'électrostatique",
 "qs": [
 {
 "q": "La charge d'un corps est toujours de la forme $q=\\pm ne$. Une charge de $1{,}0\\times10^{-19}$ C est-elle possible ?",

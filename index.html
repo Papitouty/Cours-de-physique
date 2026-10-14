@@ -206,7 +206,7 @@ footer .wrap{padding-block:18px}
 </div>
 <main><div class="wrap" id="content"></div></main>
 
-<footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré. Les documents s'ouvrent dans la liseuse ; le bouton « Nouvel onglet » permet de les enregistrer.</div></footer>
+<footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré. Les documents s'ouvrent dans la liseuse ; le bouton « Nouvel onglet » permet de les enregistrer. • <a href="reparer.html?retour=index.html">Affichage incomplet ? Mettre le site à jour</a></div></footer>
 
 <div class="reader" id="reader" hidden role="dialog" aria-modal="true" aria-labelledby="rTitle">
   <div class="r-top">
@@ -244,7 +244,7 @@ const COURSES=[
  {id:"elec",tab:"Électricité",eyebrow:"Électricité",title:"Électrostatique",
   intro:"Trois chapitres : la charge et la loi de Coulomb ; le champ, le potentiel et le théorème de Gauss ; le dipôle électrostatique. Chaque chapitre a son support de cours et son diaporama (en ligne et en PowerPoint). Les distributions classiques (fil, anneau, disque, boule) sont traitées dans la série de TD.",
   chapters:[
-   {n:1,title:"Électrostatique : charge et loi de Coulomb",key:"Electricite_Chapitre_1_Electrostatique",pages:11,slides:22,pptx:true,
+   {n:1,title:"Généralités sur l'électrostatique",key:"Electricite_Chapitre_1_Electrostatique",pages:11,slides:22,pptx:true,
     toc:["La charge électrique","Électrisation de la matière","Distributions de charges","Force électrostatique : loi de Coulomb","Principe de superposition"]},
    {n:2,title:"Champ et potentiel électrostatiques",key:"Electricite_Chapitre_2_Champ_potentiel",pages:15,slides:29,pptx:true,
     toc:["Le champ électrostatique","Le potentiel électrostatique","Plusieurs charges ponctuelles","Distributions continues","Angle solide","Flux et théorème de Gauss","Propriétés du champ et du potentiel","Équations de Poisson et de Laplace"]},
@@ -466,7 +466,7 @@ if("serviceWorker" in navigator&&"caches" in window){
 })();
 </script>
 <script>
-if("serviceWorker" in navigator){addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+if("serviceWorker" in navigator){const hadSW=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",()=>{/* nouvelle version du site installée : on recharge une fois */try{if(!hadSW||sessionStorage.getItem("swmaj"))return;sessionStorage.setItem("swmaj","1")}catch(e){return}location.reload()});addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
 </script>
 </body>
 </html>

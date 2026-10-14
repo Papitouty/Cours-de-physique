@@ -14,15 +14,18 @@ h1{font-size:1.3rem;margin:0}p{margin:0;color:var(--muted)}a{color:var(--accent)
 </main>
 <script>
 /* Remet le site à neuf sur cet appareil : supprime les copies hors connexion des pages et du programme
-   (les documents PDF enregistrés et les mesures en cours sont conservés), puis rouvre la page des TP. */
+   (les documents PDF enregistrés et les mesures en cours sont conservés), puis rouvre la page d'où l'on vient (par défaut, la page des TP). */
 (async function () {
   const m = document.getElementById("m");
   try {
     if ("serviceWorker" in navigator) { const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(r => r.unregister())); }
     if ("caches" in window) { const ks = await caches.keys(); await Promise.all(ks.filter(k => !k.startsWith("pdf")).map(k => caches.delete(k))); }
-    m.innerHTML = "C'est fait. Ouverture de la page des TP…";
+    m.innerHTML = "C'est fait. Retour à la page…";
   } catch (e) { m.textContent = "Remise à jour partielle (" + e.message + ")."; }
-  setTimeout(() => { location.replace("tp.html?maj=" + Date.now()); }, 800);
+  // page de retour : uniquement une page de ce site (nom simple en .html)
+  let retour = new URLSearchParams(location.search).get("retour") || "tp.html";
+  if (!/^[a-z0-9_-]+\.html$/i.test(retour) || retour === "reparer.html") retour = "tp.html";
+  setTimeout(() => { location.replace(retour + "?maj=" + Date.now()); }, 800);
 })();
 </script>
 </body></html>

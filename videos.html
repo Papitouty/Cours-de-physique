@@ -40,10 +40,10 @@ h2{font-family:var(--f-head);font-size:1.15rem;margin:0 0 12px}
   <p>Des vidéos pour revoir les notions du cours. Elles s'ouvrent dans YouTube (connexion internet nécessaire).</p>
 </div></header>
 <main><div class="wrap" id="list"></div></main>
-<footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré</div></footer>
+<footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré • <a href="reparer.html?retour=videos.html">Affichage incomplet ? Mettre le site à jour</a></div></footer>
 <script src="assets/videos.js"></script>
 <script>
-const NOMS={meca1:"Mécanique — Chapitre 1 : Calcul vectoriel",meca2:"Mécanique — Chapitre 2 : Cinématique",meca3:"Mécanique — Chapitre 3 : Dynamique",meca4:"Mécanique — Chapitre 4 : Travail et énergie",elec1:"Électricité — Chapitre 1 : Charge et loi de Coulomb",elec2:"Électricité — Chapitre 2 : Champ et potentiel"};
+const NOMS={meca1:"Mécanique — Chapitre 1 : Calcul vectoriel",meca2:"Mécanique — Chapitre 2 : Cinématique",meca3:"Mécanique — Chapitre 3 : Dynamique",meca4:"Mécanique — Chapitre 4 : Travail et énergie",elec1:"Électricité — Chapitre 1 : Généralités sur l'électrostatique",elec2:"Électricité — Chapitre 2 : Champ et potentiel"};
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function ytId(u){try{const x=new URL(u);if(x.hostname.includes("youtu.be"))return x.pathname.slice(1);if(x.searchParams.get("v"))return x.searchParams.get("v");const m=x.pathname.match(/\/(embed|shorts|live)\/([^/?]+)/);return m?m[2]:""}catch(e){return""}}
 const V=window.VIDEOS||{};
@@ -52,7 +52,7 @@ const parts=Object.keys(NOMS).filter(k=>(V[k]||[]).length).map(k=>`<section><h2>
 document.getElementById("list").innerHTML=parts.length?parts.join("")+`<p class="note">Les vidéos ne sont pas disponibles hors connexion.</p>`:`<div class="empty">Les vidéos du cours seront ajoutées ici prochainement.</div>`;
 </script>
 <script>
-if("serviceWorker" in navigator){addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+if("serviceWorker" in navigator){const hadSW=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",()=>{/* nouvelle version du site installée : on recharge une fois */try{if(!hadSW||sessionStorage.getItem("swmaj"))return;sessionStorage.setItem("swmaj","1")}catch(e){return}location.reload()});addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
 </script>
 </body>
 </html>

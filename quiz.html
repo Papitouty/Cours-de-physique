@@ -65,7 +65,7 @@ main .wrap{padding-block:24px 20px;display:grid;gap:22px}
   <section class="card" id="card" aria-live="polite"></section>
   <p class="intro">Les réponses sont mélangées à chaque tentative. Ton meilleur score s'affiche à côté de chaque chapitre (il reste enregistré sur cet appareil uniquement).</p>
 </div></main>
-<footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré</div></footer>
+<footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré • <a href="reparer.html?retour=quiz.html">Affichage incomplet ? Mettre le site à jour</a></div></footer>
 
 <script src="assets/quiz-data.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
@@ -133,7 +133,7 @@ function result(){
 start();
 </script>
 <script>
-if("serviceWorker" in navigator){addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+if("serviceWorker" in navigator){const hadSW=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",()=>{/* nouvelle version du site installée : on recharge une fois */try{if(!hadSW||sessionStorage.getItem("swmaj"))return;sessionStorage.setItem("swmaj","1")}catch(e){return}location.reload()});addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
 </script>
 </body>
 </html>

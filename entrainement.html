@@ -77,7 +77,7 @@ main .wrap{padding-block:24px 10px;display:grid;gap:20px}
     </aside>
   </div>
 </div></main>
-<footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré</div></footer>
+<footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré • <a href="reparer.html?retour=entrainement.html">Affichage incomplet ? Mettre le site à jour</a></div></footer>
 
 <script src="assets/exos.js"></script>
 <script src="assets/exos-reperes.js"></script>
@@ -136,7 +136,7 @@ addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(KEYS.includ
 picker();gen();
 </script>
 <script>
-if("serviceWorker" in navigator){addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+if("serviceWorker" in navigator){const hadSW=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",()=>{/* nouvelle version du site installée : on recharge une fois */try{if(!hadSW||sessionStorage.getItem("swmaj"))return;sessionStorage.setItem("swmaj","1")}catch(e){return}location.reload()});addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
 </script>
 </body>
 </html>
