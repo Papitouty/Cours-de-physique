@@ -15,11 +15,15 @@
      detail : consignes (facultatif)
    ===================================================================== */
 window.ANNONCES = [
+  { date: "2026-10-14", important: true,
+    titre: "Tous les diaporamas sont en ligne, aussi en PowerPoint",
+    texte: "Nouveaux diaporamas pour les chapitres 1 et 2 d'électricité. Chaque chapitre de mécanique et d'électricité a maintenant son diaporama à consulter en ligne et à télécharger au format PowerPoint (bouton PPTX).",
+    lien: "./#elec" },
   { date: "2026-10-14",
     titre: "Entraînement : 10 exercices avec schéma dans un repère orthonormé",
     texte: "Lecture de vecteurs, moment d'une force, tir d'un projectile, mouvement circulaire, plan incliné, équilibre de trois forces, travail sur deux chemins, forces de Coulomb, champ de deux charges et champ du dipôle : chaque schéma est redessiné avec les nouvelles valeurs. Les exercices illustrés sont marqués d'un petit carré orange.",
     lien: "entrainement.html" },
-  { date: "2026-10-14", important: true,
+  { date: "2026-10-14",
     titre: "Nouveau : chapitre 3 d'électrostatique — Le dipôle",
     texte: "Support de cours complet (démonstrations pas à pas, figures, fiche de synthèse), diaporama de 33 diapositives (à consulter en ligne ou à télécharger au format PowerPoint), série de TD n°2 avec corrigé détaillé, quiz, exercices d'entraînement et une nouvelle simulation : le dipôle dans un champ uniforme.",
     lien: "./#elec" },

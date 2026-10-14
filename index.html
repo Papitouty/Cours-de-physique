@@ -197,7 +197,7 @@ footer .wrap{padding-block:18px}
     </div>
     <div class="off-act">
       <button type="button" class="obtn primary" id="dlDocs">Enregistrer les cours et TD<small>3,4 Mo</small></button>
-      <button type="button" class="obtn" id="dlSlides">Enregistrer les diaporamas<small>32 Mo</small></button>
+      <button type="button" class="obtn" id="dlSlides">Enregistrer les diaporamas<small>37 Mo</small></button>
       <button type="button" class="obtn" id="install" hidden>Installer l'application</button>
       <button type="button" class="olink" id="offClear">Supprimer les documents enregistrés</button>
     </div>
@@ -226,27 +226,27 @@ footer .wrap{padding-block:18px}
 <script>
 const COURSES=[
  {id:"meca",tab:"Mécanique",eyebrow:"Physique I",title:"Mécanique du point matériel",
-  intro:"Quatre chapitres, du calcul vectoriel au théorème de l'énergie. Chaque chapitre a son support de cours avec démonstrations détaillées, son diaporama et sa série de TD avec corrigé.",
+  intro:"Quatre chapitres, du calcul vectoriel au théorème de l'énergie. Chaque chapitre a son support de cours avec démonstrations détaillées, son diaporama (en ligne et en PowerPoint) et sa série de TD avec corrigé.",
   chapters:[
-   {n:1,title:"Calcul vectoriel",key:"Support_Chapitre_1_Calcul_vectoriel",pages:19,slides:39,
+   {n:1,title:"Calcul vectoriel",key:"Support_Chapitre_1_Calcul_vectoriel",pages:19,slides:39,pptx:true,
     td:{e:"TD1_Calcul_vectoriel_enonces",ep:3,c:"TD1_Calcul_vectoriel_corrige",cp:9},
     toc:["Grandeurs scalaires et vectorielles","Caractéristiques d'un vecteur","Somme et différence de vecteurs","Composantes et cosinus directeurs","Produit scalaire","Produit vectoriel","Produit mixte","Moment d'un vecteur","Dérivée d'un vecteur"]},
-   {n:2,title:"Cinématique du point",key:"Support_Chapitre_2_Cinematique",pages:40,slides:88,
+   {n:2,title:"Cinématique du point",key:"Support_Chapitre_2_Cinematique",pages:40,slides:88,pptx:true,
     td:{e:"TD2_Cinematique_enonces",ep:5,c:"TD2_Cinematique_corrige",cp:13},
     toc:["Référentiel, repère et systèmes de coordonnées","Mouvement rectiligne","Mouvement curviligne","Coordonnées cartésiennes","Coordonnées intrinsèques (base de Frenet)","Coordonnées polaires","Coordonnées cylindriques","Coordonnées sphériques","Mouvement relatif"]},
-   {n:3,title:"Dynamique du point matériel",key:"Support_Chapitre_3_Dynamique",pages:41,slides:83,
+   {n:3,title:"Dynamique du point matériel",key:"Support_Chapitre_3_Dynamique",pages:41,slides:83,pptx:true,
     td:{e:"TD3_Dynamique_enonces",ep:4,c:"TD3_Dynamique_corrige",cp:11},
     toc:["De la cinématique à la dynamique","Principe d'inertie","Quantité de mouvement","Principe fondamental de la dynamique","Principe des actions réciproques","Quelques lois de forces","Forces de frottement","Le moment cinétique","Les forces centrales","Équations différentielles du mouvement"]},
-   {n:4,title:"Travail et énergie",key:"Support_Chapitre_4_Travail_energie",pages:26,slides:51,
+   {n:4,title:"Travail et énergie",key:"Support_Chapitre_4_Travail_energie",pages:26,slides:51,pptx:true,
     td:{e:"TD4_Travail_energie_enonces",ep:4,c:"TD4_Travail_energie_corrige",cp:9},
     toc:["Introduction et outils","Travail d'une force","Travail dans les différents systèmes de coordonnées","Travail de quelques forces usuelles","Puissance d'une force","Énergie cinétique","Forces conservatives et énergie potentielle","Énergie mécanique","Équilibre et stabilité"]}
   ]},
  {id:"elec",tab:"Électricité",eyebrow:"Électricité",title:"Électrostatique",
-  intro:"Trois chapitres : la charge et la loi de Coulomb ; le champ, le potentiel et le théorème de Gauss ; le dipôle électrostatique (support de cours, diaporama et série de TD n°2 avec corrigé). Les distributions classiques (fil, anneau, disque, boule) sont traitées dans la série de TD.",
+  intro:"Trois chapitres : la charge et la loi de Coulomb ; le champ, le potentiel et le théorème de Gauss ; le dipôle électrostatique. Chaque chapitre a son support de cours et son diaporama (en ligne et en PowerPoint). Les distributions classiques (fil, anneau, disque, boule) sont traitées dans la série de TD.",
   chapters:[
-   {n:1,title:"Électrostatique : charge et loi de Coulomb",key:"Electricite_Chapitre_1_Electrostatique",pages:11,
+   {n:1,title:"Électrostatique : charge et loi de Coulomb",key:"Electricite_Chapitre_1_Electrostatique",pages:11,slides:22,pptx:true,
     toc:["La charge électrique","Électrisation de la matière","Distributions de charges","Force électrostatique : loi de Coulomb","Principe de superposition"]},
-   {n:2,title:"Champ et potentiel électrostatiques",key:"Electricite_Chapitre_2_Champ_potentiel",pages:15,
+   {n:2,title:"Champ et potentiel électrostatiques",key:"Electricite_Chapitre_2_Champ_potentiel",pages:15,slides:29,pptx:true,
     toc:["Le champ électrostatique","Le potentiel électrostatique","Plusieurs charges ponctuelles","Distributions continues","Angle solide","Flux et théorème de Gauss","Propriétés du champ et du potentiel","Équations de Poisson et de Laplace"]},
    {n:3,title:"Le dipôle électrostatique",key:"Electricite_Chapitre_3_Dipole",pages:16,slides:33,pptx:true,
     td:{n:2,e:"TD_Electricite_2_enonces",ep:4,c:"TD_Electricite_2_corrige",cp:9},
@@ -271,7 +271,7 @@ if(location.hash&&COURSES.some(c=>c.id===location.hash.slice(1)))current=locatio
 (function(){
   let ch=0,pg=0,sl=0,td=0;
   COURSES.forEach(c=>{c.chapters.forEach(x=>{ch++;pg+=x.pages;if(x.slides)sl+=x.slides;if(x.td&&!x.td.n)td++});(c.series||[]).forEach(()=>td++)});
-  $("#stats").innerHTML=`<span><b>${COURSES.length}</b>cours</span><span><b>${ch}</b>chapitres</span><span><b>${pg}</b>pages de cours</span><span><b>${sl}</b>diapositives</span><span><b>${td}</b>séries de TD corrigées</span><span><b>60</b>questions de quiz</span><span><b>5</b>simulations</span><span><b>32</b>exercices d'entraînement</span>`;
+  $("#stats").innerHTML=`<span><b>${COURSES.length}</b>cours</span><span><b>${ch}</b>chapitres</span><span><b>${pg}</b>pages de cours</span><span><b>${sl}</b>diapositives</span><span><b>${td}</b>séries de TD corrigées</span><span><b>70</b>questions de quiz</span><span><b>6</b>simulations</span><span><b>32</b>exercices d'entraînement</span>`;
 })();
 
 function pdfBtn(file,label,n,kind,primary){
