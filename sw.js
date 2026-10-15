@@ -2,14 +2,14 @@
    - pages et ressources du site : réseau d'abord, copie locale si pas de connexion
    - documents PDF : copie locale d'abord (un document ouvert une fois reste disponible)
    - bibliothèques et polices externes : copie locale, rafraîchie en arrière-plan */
-const VERSION = "v38";
+const VERSION = "v40";
 const SHELL = "shell-" + VERSION;
 const PDFS = "pdf-v1";          // nom stable : les documents enregistrés survivent aux mises à jour du site
 const EXT = "ext-" + VERSION;
 
 const SHELL_FILES = [
   "./", "index.html", "quiz.html", "simulations.html", "entrainement.html", "calendrier.html", "questions.html", "videos.html", "tp.html",
-  "assets/site.css", "assets/quiz-data.js", "assets/exos.js", "assets/exos-reperes.js", "assets/annonces.js", "assets/config.js", "assets/videos.js", "assets/tp-cr.js", "assets/tp-core.js", "assets/tp-meca.js", "assets/tp-elec.js", "assets/tp-oscillo.js", "assets/tp-optique.js", "manifest.webmanifest",
+  "assets/site.css", "assets/quiz-data.js", "assets/acces.js", "assets/exos.js", "assets/exos-reperes.js", "assets/annonces.js", "assets/config.js", "assets/videos.js", "assets/tp-cr.js", "assets/tp-core.js", "assets/tp-meca.js", "assets/tp-elec.js", "assets/tp-oscillo.js", "assets/tp-optique.js", "manifest.webmanifest",
   "vendor/pdfjs/pdf.js", "vendor/pdfjs/pdf.worker.js",
   "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png",
   "img/Support_Chapitre_1_Calcul_vectoriel.jpg", "img/Support_Chapitre_2_Cinematique.jpg",

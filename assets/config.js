@@ -10,5 +10,8 @@ window.SITE_CONFIG = {
   whatsapp: "",
   /* Adresse de l'application Web Google (Apps Script) qui reçoit et corrige les comptes rendus de TP.
      Laisser "" tant qu'elle n'est pas installée. */
+  /* true : la plateforme entière demande le n° de carte et le code personnel (liste « Étudiants » du tableur).
+     false : accès libre (seuls les TP demandent la connexion). */
+  accesReserve: true,
   crEndpoint: "https://script.google.com/macros/s/AKfycbzvMXiy8-_hXN7_JAfSHGQWg_djq3eTwjyOQ9HL5tGJqTyrYvov-a5KZWwafkcw0dEl_Q/exec"
 };
