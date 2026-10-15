@@ -9,6 +9,57 @@
   const fmtR = v => v >= 1000 ? fr(v / 1000, v >= 10000 ? 1 : 2) + " kΩ" : fr(v, v >= 100 ? 0 : 1) + " Ω";
   const fmtI = i => { const a = Math.abs(i); return a >= 100 ? fr(i, 1) : a >= 10 ? fr(i, 2) : fr(i, 3); };
 
+
+  /* ---------- schémas de principe des montages amont (longue dérivation) et aval (courte dérivation) ---------- */
+  function schema(type) {
+    const F = 'font-family="Fira Sans,Arial"', fg = "var(--fg)", acc = "var(--saff)", cur = "var(--rouge)", bleu = "var(--accent)";
+    const fl = (x, y, dir, c) => { const p = { r: `${x},${y} ${x - 8},${y - 4.5} ${x - 8},${y + 4.5}`, d: `${x},${y} ${x - 4.5},${y - 8} ${x + 4.5},${y - 8}`, u: `${x},${y} ${x - 4.5},${y + 8} ${x + 4.5},${y + 8}`, l: `${x},${y} ${x + 8},${y - 4.5} ${x + 8},${y + 4.5}` }[dir]; return `<polygon points="${p}" fill="${c}"/>`; };
+    const dot = (x, y) => `<circle cx="${x}" cy="${y}" r="3.5" fill="${fg}"/>`;
+    const app = (x, y, l, c) => `<circle cx="${x}" cy="${y}" r="16" fill="var(--plot-bg)" stroke="${c || fg}" stroke-width="2"/><text x="${x}" y="${y + 5}" text-anchor="middle" font-size="15" font-weight="700" fill="${c || fg}" ${F}>${l}</text>`;
+    let h = `<svg viewBox="0 0 330 250" role="img" aria-label="Schéma du montage ${type}" style="width:100%;max-width:360px;height:auto">`;
+    // zone mesurée par le voltmètre
+    if (type === "amont") h += `<rect x="124" y="22" width="140" height="132" rx="10" fill="${acc}" fill-opacity=".10" stroke="${acc}" stroke-dasharray="5 4"/>`;
+    else h += `<rect x="216" y="72" width="48" height="86" rx="10" fill="${acc}" fill-opacity=".10" stroke="${acc}" stroke-dasharray="5 4"/><text x="240" y="232" text-anchor="middle" font-size="11" fill="${acc}" ${F}>V mesure exactement U_R</text>`;
+    // circuit principal
+    h += `<line x1="30" y1="40" x2="30" y2="99" stroke="${fg}" stroke-width="2"/><line x1="30" y1="131" x2="30" y2="190" stroke="${fg}" stroke-width="2"/>`
+      + `<circle cx="30" cy="115" r="16" fill="var(--plot-bg)" stroke="${fg}" stroke-width="2"/><text x="30" y="120" text-anchor="middle" font-size="13" font-weight="700" fill="${fg}" ${F}>G</text><text x="44" y="96" font-size="13" font-weight="700" fill="${cur}" ${F}>+</text>`
+      + `<line x1="30" y1="40" x2="62" y2="40" stroke="${fg}" stroke-width="2"/>${dot(62, 40)}${dot(94, 40)}<line x1="62" y1="40" x2="94" y2="40" stroke="${fg}" stroke-width="2.5"/><text x="78" y="32" text-anchor="middle" font-size="11" fill="var(--muted)" ${F}>K</text>`
+      + `<line x1="94" y1="40" x2="139" y2="40" stroke="${fg}" stroke-width="2"/>${app(155, 40, "A", bleu)}<line x1="171" y1="40" x2="240" y2="40" stroke="${fg}" stroke-width="2"/>`
+      + `<line x1="240" y1="40" x2="240" y2="85" stroke="${fg}" stroke-width="2"/><rect x="230" y="85" width="20" height="60" fill="#e8d3a9" stroke="${fg}" stroke-width="1.5"/><text x="258" y="120" font-size="13" font-weight="700" fill="${fg}" ${F}>R</text>`
+      + `<line x1="240" y1="145" x2="240" y2="190" stroke="${fg}" stroke-width="2"/><line x1="240" y1="190" x2="30" y2="190" stroke="${fg}" stroke-width="2"/>`
+      + `${fl(118, 40, "r", cur)}<text x="112" y="58" font-size="12" font-style="italic" fill="${cur}" ${F}>I</text>`;
+    if (type === "aval") {
+      h += `${dot(240, 62)}${dot(240, 170)}<line x1="240" y1="62" x2="296" y2="62" stroke="${fg}" stroke-width="2"/><line x1="296" y1="62" x2="296" y2="99" stroke="${fg}" stroke-width="2"/>${app(296, 115, "V", acc)}<line x1="296" y1="131" x2="296" y2="170" stroke="${fg}" stroke-width="2"/><line x1="296" y1="170" x2="240" y2="170" stroke="${fg}" stroke-width="2"/>`
+        + `${fl(240, 80, "d", cur)}<text x="214" y="80" font-size="11" font-style="italic" fill="${cur}" ${F}>I_R</text>${fl(276, 62, "r", cur)}<text x="262" y="56" font-size="11" font-style="italic" fill="${cur}" ${F}>I_V</text>`
+        + `<text x="165" y="214" text-anchor="middle" font-size="11.5" fill="${fg}" ${F}>A mesure I = I_R + I_V (un peu trop)</text>`;
+    } else {
+      h += `${dot(110, 40)}${dot(240, 170)}<line x1="110" y1="40" x2="110" y2="10" stroke="${fg}" stroke-width="2"/><line x1="110" y1="10" x2="296" y2="10" stroke="${fg}" stroke-width="2"/><line x1="296" y1="10" x2="296" y2="99" stroke="${fg}" stroke-width="2"/>${app(296, 115, "V", acc)}<line x1="296" y1="131" x2="296" y2="170" stroke="${fg}" stroke-width="2"/><line x1="296" y1="170" x2="240" y2="170" stroke="${fg}" stroke-width="2"/>`
+        + `${fl(240, 80, "d", cur)}<text x="214" y="80" font-size="11" font-style="italic" fill="${cur}" ${F}>I</text>`
+        + `<text x="165" y="214" text-anchor="middle" font-size="11.5" fill="${fg}" ${F}>A mesure exactement le courant I dans R</text><text x="165" y="232" text-anchor="middle" font-size="11.5" fill="${fg}" ${F}>V mesure U_A + U_R (un peu trop)</text>`;
+    }
+    // indices : « U_A » → U avec A en indice
+    h = h.replace(/(<text[^>]*>)([^<]*_[A-Z][^<]*)(<\/text>)/g, (m, o, c, e) => { let n = 0; const t = c.replace(/_([A-Z])/g, (q, l) => { n++; return `<tspan dy="3" font-size="8">${l}</tspan><tspan dy="-3">`; }); return o + t + "</tspan>".repeat(n) + e; });
+    return h + `</svg>`;
+  }
+  const SCHEMAS = `<div class="ohm-schemas">
+      <figure><div>${schema("amont")}</div><figcaption><b>(a) Montage amont — longue dérivation.</b> Le voltmètre est branché <b>avant</b> l'ampèremètre : il mesure la tension aux bornes de l'ensemble ampèremètre + résistor. <b>R<sub>mes</sub> = U/I = R + r<sub>A</sub></b> : erreur faible pour les <b>grandes</b> résistances (R ≫ r<sub>A</sub>).</figcaption></figure>
+      <figure><div>${schema("aval")}</div><figcaption><b>(b) Montage aval — courte dérivation.</b> Le voltmètre est branché <b>directement aux bornes du résistor</b>, après l'ampèremètre : l'ampèremètre mesure aussi le petit courant I<sub>V</sub> qui traverse le voltmètre. <b>1/R<sub>mes</sub> = 1/R + 1/R<sub>V</sub></b> : erreur faible pour les <b>petites</b> résistances (R ≪ R<sub>V</sub>).</figcaption></figure>
+    </div>`;
+  const CABLAGE = `<div class="ohm-cablage"><div><b>Câbler le montage aval sur la paillasse</b><ol>
+      <li>Borne <b>+</b> du générateur → une borne de l'interrupteur.</li><li>Autre borne de l'interrupteur → borne <b>mA</b> de l'ampèremètre.</li>
+      <li>Borne <b>COM</b> de l'ampèremètre → borne haute du support du résistor.</li><li>Borne basse du support → borne <b>−</b> du générateur.</li>
+      <li>Voltmètre <b>aux bornes du résistor</b> : borne <b>V</b> → borne haute du support ; <b>COM</b> → borne basse.</li></ol></div>
+      <div><b>Passer au montage amont</b><ol><li>Garde les fils 1 à 4.</li><li>Retire le fil de la borne <b>V</b> du voltmètre et relie-la à la borne <b>mA</b> de l'ampèremètre (avant l'ampèremètre).</li>
+      <li>La borne <b>COM</b> du voltmètre reste sur la borne basse du support.</li></ol>
+      <p>Le courant entre toujours par la borne <b>mA</b> de l'ampèremètre ; la borne <b>V</b> du voltmètre est du côté du <b>+</b>.</p></div></div>`;
+  const SCH_CSS = `.ohm-schemas{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin:8px 0}
+.ohm-schemas figure{margin:0;display:grid;gap:6px;justify-items:center;background:var(--plot-bg);border:1px solid var(--line);border-radius:10px;padding:10px}
+.ohm-schemas figcaption{font-family:var(--f-head);font-size:.84rem;line-height:1.45;color:var(--muted)}
+.ohm-cablage{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;font-size:.92rem}
+.ohm-cablage ol{margin:6px 0 0;padding-left:20px;display:grid;gap:3px}.ohm-cablage p{margin:6px 0 0;font-size:.88rem;color:var(--muted)}
+.ohm-ref{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}.ohm-ref>summary{font-family:var(--f-head);font-weight:600;cursor:pointer;color:var(--accent)}`;
+  if (!document.getElementById("ohm-sch-style")) { const st = document.createElement("style"); st.id = "ohm-sch-style"; st.textContent = SCH_CSS; document.head.appendChild(st); }
+
   register({
     id: "ohm", num: 4, disc: "Électricité", court: "Mesures de résistances",
     titre: "Mesures de résistances : vérification de la loi d'Ohm",
@@ -22,6 +73,7 @@
       <ul><li><b>Montage amont</b> (longue dérivation : le voltmètre est en amont de l'ampèremètre) : le voltmètre mesure U<sub>R</sub> + U<sub>A</sub>. On trouve R<sub>mes</sub> = U/I = R + r<sub>A</sub> : erreur faible si <b>R ≫ r<sub>A</sub></b> (grandes résistances).</li>
         <li><b>Montage aval</b> (courte dérivation : le voltmètre est directement aux bornes de R) : l'ampèremètre mesure aussi le courant du voltmètre. On trouve 1/R<sub>mes</sub> = 1/R + 1/R<sub>V</sub> : erreur faible si <b>R ≪ R<sub>V</sub></b> (petites résistances).</li></ul>
       <div class="formula">Amont :  R = U/I − r_A          Aval :  1/R = I/U − 1/R_V</div>
+      ${SCHEMAS}
       <h4>Associations</h4><div class="formula">Série : R_éq = R₁ + R₂          Parallèle : 1/R_éq = 1/R₁ + 1/R₂</div>`,
     protocole: `<h4>Partie A — Caractéristique du résistor X</h4><ol>
         <li>Place le résistor X sur un support et <b>réalise toi-même le câblage</b> du montage aval (générateur, interrupteur, ampèremètre en série, voltmètre aux bornes de X). Lis la valeur nominale de X grâce au code des couleurs.</li>
@@ -40,13 +92,14 @@
       <li>Surveille la puissance : P = U²/R ≤ 0,5 W, soit U ≤ 3,3 V pour 22 Ω. Le simulateur signale la surchauffe.</li>
       <li>Incertitude : ΔR/R = ΔU/U + ΔI/I. Préfère les mesures en milieu ou haut de calibre.</li></ul>`,
     preparation: ["Fais les schémas des montages amont et aval avec le sens du courant et les flèches tension.", "Démontre les expressions R_mes = R + r_A (amont) et 1/R_mes = 1/R + 1/R_V (aval).", "Avec r_A = 2 Ω et R_V = 1 MΩ, calcule l'erreur relative de chaque montage pour R = 22 Ω et pour R = 47 kΩ.", "Calcule la tension maximale admissible pour un résistor de 22 Ω de puissance 0,5 W."],
-    hint: "Réalise toi-même le câblage : touche une borne, puis une autre, pour les relier par un fil. Touche un fil pour le retirer. Touche l'interrupteur pour l'ouvrir ou le fermer.",
+    hint: "Réalise toi-même le câblage : touche une borne, puis une autre, pour les relier par un fil. Touche un fil pour le retirer, l'interrupteur pour l'ouvrir ou le fermer. « Déplacer les appareils » permet de les faire glisser sur la paillasse.",
     controls: `<h3>Résistors sur les supports</h3>
       <div class="ctl"><label for="ohS1">Support 1</label><select id="ohS1"></select></div>
       <div class="ctl"><label for="ohS2">Support 2</label><select id="ohS2"></select></div>
       <h3>Générateur</h3>
       <div class="ctl"><label for="ohU">Tension de consigne <b id="ohUv"></b></label><input id="ohU" type="range" min="0" max="12" step="0.1" value="2"></div>
       <div class="row"><button type="button" class="btn sm" id="ohK">Fermer l'interrupteur</button><button type="button" class="btn sm" id="ohClr">Retirer tous les fils</button></div>
+      <div class="row"><button type="button" class="btn sm" id="ohMove" aria-pressed="false">Déplacer les appareils</button><button type="button" class="btn sm" id="ohReset">Remettre en place</button></div>
       <h3>Multimètres</h3><dl class="lcd"><dt>Voltmètre</dt><dd id="ohV">—</dd><dt>Ampèremètre</dt><dd id="ohI">—</dd><dt>Montage reconnu</dt><dd id="ohM">—</dd></dl>
       <button type="button" class="btn primary sm" id="ohRec">Enregistrer la mesure</button>
       <button type="button" class="btn sm" id="ohNew">Nouveaux résistors</button>`,
@@ -72,20 +125,27 @@
       const NOMS = { X: "Résistor X (inconnu)", F: "Résistor 22 Ω", G: "Résistor 47 kΩ", R1: "R₁", R2: "R₂" };
       const label = k => ({ X: "X", F: "22 Ω", G: "47 kΩ", R1: "R₁", R2: "R₂", S: "R₁ + R₂ (série)", P: "R₁ // R₂" }[k]);
 
-      /* ---------- bornes de la paillasse (coordonnées dans le dessin 640 × 400) ---------- */
-      const TERM = {
-        "G+": { x: 80, y: 128, t: "+", rouge: true, nom: "borne + du générateur" }, "G-": { x: 80, y: 272, t: "−", nom: "borne − du générateur" },
-        "K1": { x: 168, y: 62, t: "", nom: "borne gauche de l'interrupteur" }, "K2": { x: 248, y: 62, t: "", nom: "borne droite de l'interrupteur" },
-        "A+": { x: 300, y: 104, t: "mA", rouge: true, nom: "borne mA de l'ampèremètre" }, "A-": { x: 380, y: 104, t: "COM", nom: "borne COM de l'ampèremètre" },
-        "V+": { x: 300, y: 332, t: "V", rouge: true, nom: "borne V du voltmètre" }, "V-": { x: 380, y: 332, t: "COM", nom: "borne COM du voltmètre" },
-        "S1a": { x: 480, y: 108, t: "", nom: "borne haute du support 1" }, "S1b": { x: 480, y: 252, t: "", nom: "borne basse du support 1" },
-        "S2a": { x: 576, y: 108, t: "", nom: "borne haute du support 2" }, "S2b": { x: 576, y: 252, t: "", nom: "borne basse du support 2" }
+      /* ---------- appareils de la paillasse (dessin 640 × 400) : position du centre, déplaçable ---------- */
+      const POS0 = { G: [80, 200], K: [208, 62], A: [340, 104], V: [340, 332], S1: [480, 180], S2: [576, 180] };
+      const BOX = { G: [52, 92], K: [48, 30], A: [56, 66], V: [56, 66], S1: [26, 80], S2: [26, 80] };   // demi-largeur, demi-hauteur (zone de prise)
+      let POS = Object.assign({}, POS0, store.get("ohm_pos", {}));
+      const TDEF = {
+        "G+": ["G", 0, -72, "+", true, "borne + du générateur"], "G-": ["G", 0, 72, "−", false, "borne − du générateur"],
+        "K1": ["K", -40, 0, "", false, "borne gauche de l'interrupteur"], "K2": ["K", 40, 0, "", false, "borne droite de l'interrupteur"],
+        "A+": ["A", -40, 0, "mA", true, "borne mA de l'ampèremètre"], "A-": ["A", 40, 0, "COM", false, "borne COM de l'ampèremètre"],
+        "V+": ["V", -40, 0, "V", true, "borne V du voltmètre"], "V-": ["V", 40, 0, "COM", false, "borne COM du voltmètre"],
+        "S1a": ["S1", 0, -72, "", false, "borne haute du support 1"], "S1b": ["S1", 0, 72, "", false, "borne basse du support 1"],
+        "S2a": ["S2", 0, -72, "", false, "borne haute du support 2"], "S2b": ["S2", 0, 72, "", false, "borne basse du support 2"]
       };
+      const TERM = {};
+      const placer = () => Object.entries(TDEF).forEach(([id, [c, dx, dy, t, rouge, nom]]) => { TERM[id] = { c, x: POS[c][0] + dx, y: POS[c][1] + dy, t, rouge, nom }; });
+      placer();
       let W = store.get("ohm_fils", []);                // fils : paires de bornes
       let SL = store.get("ohm_supports", { S1: "X", S2: "" });
       W = (Array.isArray(W) ? W : []).filter(f => TERM[f[0]] && TERM[f[1]]);
       let U = 2, K = false, pick = null, meas = { V: 0, I: 0, ok: false };
-      const save = () => { store.set("ohm_fils", W); store.set("ohm_supports", SL); };
+      const save = () => { store.set("ohm_fils", W); store.set("ohm_supports", SL); store.set("ohm_pos", POS); };
+      let bouger = false, drag = null;
 
       /* ---------- calcul du circuit réellement câblé (méthode des nœuds) ---------- */
       function solve() {
@@ -161,57 +221,71 @@
       /* ---------- dessin de la paillasse (SVG) ---------- */
       const cv = $("#ohm-cv"), box = document.createElement("div");
       box.className = "ohm-board"; box.setAttribute("aria-label", "Paillasse : câblage du circuit"); cv.replaceWith(box);
+      const ref = document.createElement("details"); ref.className = "ohm-ref"; ref.innerHTML = `<summary>Schémas de référence : montage amont (longue dérivation) et montage aval (courte dérivation)</summary>${SCHEMAS}${CABLAGE}`; box.after(ref);
       if (!document.getElementById("ohm-style")) {
         const st = document.createElement("style"); st.id = "ohm-style";
         st.textContent = `.ohm-board svg{width:100%;height:auto;display:block;background:var(--plot-bg);border-radius:10px;touch-action:manipulation;user-select:none}
 .ohm-board .term{cursor:pointer}.ohm-board .term:focus{outline:none}.ohm-board .term:focus .ring,.ohm-board .term.sel .ring{stroke:var(--saff);stroke-width:4}
-.ohm-board .wire{cursor:pointer}.ohm-board .wire:hover .w{stroke-width:6}.ohm-board .k{cursor:pointer}`;
+.ohm-board .wire{cursor:pointer}.ohm-board .wire:hover .w{stroke-width:6}.ohm-board #ohKsvg{cursor:pointer}.ohm-board .comp{cursor:grab}.ohm-board svg.mv{touch-action:none}.ohm-board .comp.drag{cursor:grabbing;opacity:.85}
+.ohm-board details{margin-top:8px}.ohm-board details summary{font-family:var(--f-head);font-weight:600;cursor:pointer;color:var(--accent)}`;
         document.head.appendChild(st);
       }
       const COLS = ["#c62828", "#1565c0", "#2e7d32", "#ef7d00", "#6a1b9a", "#00838f", "#5d4037", "#ad1457"];
-      const resSVG = (x, y1, y2, k) => {
-        if (!k) return `<rect x="${x - 15}" y="${y1 + 20}" width="30" height="${y2 - y1 - 40}" rx="5" fill="none" stroke="var(--line)" stroke-dasharray="5 4"/><text x="${x}" y="${(y1 + y2) / 2 + 4}" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="Fira Sans,Arial">vide</text>`;
-        const bd = bands(P[k].nom), h = y2 - y1 - 44, ym = y1 + 22;
-        return `<line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" stroke="var(--fg)" stroke-width="2"/><rect x="${x - 12}" y="${ym}" width="24" height="${h}" rx="6" fill="#e8d3a9" stroke="var(--fg)" stroke-width="1.5"/>`
-          + bd.map((b, i) => `<rect x="${x - 12}" y="${ym + 10 + i * (h - 28) / 3 + (i === 3 ? 8 : 0)}" width="24" height="7" fill="${COL[b]}"/>`).join("")
-          + `<text x="${x + 18}" y="${(y1 + y2) / 2 + 4}" font-size="13" font-weight="600" fill="var(--fg)" font-family="Fira Sans,Arial">${k === "X" ? "X" : label(k)}</text>`;
+      const F = 'font-family="Fira Sans,Arial"', FM = 'font-family="Fira Mono,monospace"';
+      // dessin de chaque appareil, centré sur (0,0)
+      const resSVG = k => {
+        if (!k) return `<line x1="0" y1="-72" x2="0" y2="-52" stroke="var(--line)" stroke-width="2"/><line x1="0" y1="52" x2="0" y2="72" stroke="var(--line)" stroke-width="2"/><rect x="-15" y="-52" width="30" height="104" rx="5" fill="var(--plot-bg)" stroke="var(--line)" stroke-dasharray="5 4"/><text x="0" y="4" text-anchor="middle" font-size="11" fill="var(--muted)" ${F}>vide</text>`;
+        const bd = bands(P[k].nom), h = 100, ym = -50;
+        return `<line x1="0" y1="-72" x2="0" y2="72" stroke="var(--fg)" stroke-width="2"/><rect x="-12" y="${ym}" width="24" height="${h}" rx="6" fill="#e8d3a9" stroke="var(--fg)" stroke-width="1.5"/>`
+          + bd.map((b, i) => `<rect x="-12" y="${ym + 10 + i * (h - 28) / 3 + (i === 3 ? 8 : 0)}" width="24" height="7" fill="${COL[b]}"/>`).join("")
+          + `<text x="18" y="5" font-size="13" font-weight="600" fill="var(--fg)" ${F}>${k === "X" ? "X" : label(k)}</text>`;
       };
-      const meterSVG = (cx, cy, l, val, t1, t2) => `<line x1="${TERM[t1].x}" y1="${TERM[t1].y}" x2="${cx - 26}" y2="${cy}" stroke="var(--fg)" stroke-width="2"/><line x1="${TERM[t2].x}" y1="${TERM[t2].y}" x2="${cx + 26}" y2="${cy}" stroke="var(--fg)" stroke-width="2"/>`
-        + `<circle cx="${cx}" cy="${cy}" r="26" fill="var(--plot-bg)" stroke="var(--fg)" stroke-width="2"/><text x="${cx}" y="${cy + 7}" text-anchor="middle" font-size="20" font-weight="700" fill="var(--fg)" font-family="Fira Sans,Arial">${l}</text>`
-        + `<rect x="${cx - 52}" y="${cy - 62}" width="104" height="26" rx="4" fill="#1d2a1f"/><text x="${cx}" y="${cy - 44}" text-anchor="middle" font-size="14" fill="#9cf29c" font-family="Fira Mono,monospace">${val}</text>`;
+      const meterSVG = (l, val) => `<line x1="-40" y1="0" x2="-26" y2="0" stroke="var(--fg)" stroke-width="2"/><line x1="26" y1="0" x2="40" y2="0" stroke="var(--fg)" stroke-width="2"/>`
+        + `<circle r="26" fill="var(--plot-bg)" stroke="var(--fg)" stroke-width="2"/><text y="7" text-anchor="middle" font-size="20" font-weight="700" fill="var(--fg)" ${F}>${l}</text>`
+        + `<rect x="-52" y="-62" width="104" height="26" rx="4" fill="#1d2a1f"/><text y="-44" text-anchor="middle" font-size="14" fill="#9cf29c" ${FM}>${val}</text>`;
+      const BODY = {
+        G: () => `<line x1="0" y1="-72" x2="0" y2="-42" stroke="var(--fg)" stroke-width="2"/><line x1="0" y1="42" x2="0" y2="72" stroke="var(--fg)" stroke-width="2"/>`
+          + `<rect x="-50" y="-42" width="100" height="84" rx="8" fill="var(--tint)" stroke="var(--fg)" stroke-width="2"/><text y="-10" text-anchor="middle" font-size="15" font-weight="700" fill="var(--fg)" ${F}>Générateur</text><text y="14" text-anchor="middle" font-size="14" fill="var(--fg)" ${FM}>${fr(U, 1)} V</text><text y="32" text-anchor="middle" font-size="11" fill="var(--muted)" ${F}>continu</text>`,
+        K: () => `<rect x="-48" y="-30" width="96" height="52" fill="transparent"/><circle cx="-26" cy="0" r="4" fill="var(--fg)"/><circle cx="26" cy="0" r="4" fill="var(--fg)"/><line x1="-40" y1="0" x2="-26" y2="0" stroke="var(--fg)" stroke-width="2"/><line x1="26" y1="0" x2="40" y2="0" stroke="var(--fg)" stroke-width="2"/>`
+          + (K ? `<line x1="-26" y1="0" x2="26" y2="0" stroke="var(--ok)" stroke-width="3"/>` : `<line x1="-26" y1="0" x2="20" y2="-24" stroke="var(--fg)" stroke-width="3"/>`)
+          + `<text y="-34" text-anchor="middle" font-size="12" fill="var(--muted)" ${F}>K ${K ? "fermé" : "ouvert"}</text>`,
+        A: () => meterSVG("A", fmtI(meas.I) + " mA"),
+        V: () => meterSVG("V", fr(meas.V, 2) + " V"),
+        S1: () => resSVG(SL.S1) + `<text y="96" text-anchor="middle" font-size="11" fill="var(--muted)" ${F}>support 1</text>`,
+        S2: () => resSVG(SL.S2) + `<text y="96" text-anchor="middle" font-size="11" fill="var(--muted)" ${F}>support 2</text>`
+      };
+      const NOMC = { G: "générateur", K: "interrupteur", A: "ampèremètre", V: "voltmètre", S1: "support 1", S2: "support 2" };
       T.draw = () => {
-        const kOpen = !K;
-        let h = `<svg viewBox="0 0 640 400" role="img" aria-label="Paillasse de câblage">`;
-        // fils
+        placer();
+        let h = `<svg viewBox="0 0 640 400" role="img" aria-label="Paillasse de câblage" class="${bouger ? "mv" : ""}">`;
+        if (bouger) h += `<rect x="2" y="2" width="636" height="396" rx="10" fill="none" stroke="var(--saff)" stroke-width="3" stroke-dasharray="8 6"/>`;
+        // fils (sous les appareils)
         W.forEach(([a, b], i) => {
           const A = TERM[a], B = TERM[b], mx = (A.x + B.x) / 2, my = (A.y + B.y) / 2 + Math.min(60, Math.hypot(B.x - A.x, B.y - A.y) * 0.18);
           const d = `M${A.x},${A.y} Q${mx},${my} ${B.x},${B.y}`;
           h += `<g class="wire" data-w="${i}" role="button" tabindex="0" aria-label="Fil entre ${A.nom} et ${B.nom} (toucher pour retirer)"><path d="${d}" stroke="transparent" stroke-width="16" fill="none"/><path class="w" d="${d}" stroke="${COLS[i % COLS.length]}" stroke-width="4" fill="none" stroke-linecap="round"/></g>`;
         });
-        // générateur
-        h += `<line x1="80" y1="128" x2="80" y2="158" stroke="var(--fg)" stroke-width="2"/><line x1="80" y1="242" x2="80" y2="272" stroke="var(--fg)" stroke-width="2"/>`
-          + `<rect x="30" y="158" width="100" height="84" rx="8" fill="var(--tint)" stroke="var(--fg)" stroke-width="2"/><text x="80" y="190" text-anchor="middle" font-size="15" font-weight="700" fill="var(--fg)" font-family="Fira Sans,Arial">Générateur</text><text x="80" y="214" text-anchor="middle" font-size="14" fill="var(--fg)" font-family="Fira Mono,monospace">${fr(U, 1)} V</text><text x="80" y="232" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="Fira Sans,Arial">continu</text>`;
-        // interrupteur
-        h += `<g class="k" id="ohKsvg" role="button" tabindex="0" aria-label="Interrupteur ${kOpen ? "ouvert" : "fermé"}"><rect x="160" y="30" width="96" height="56" fill="transparent"/><circle cx="182" cy="62" r="4" fill="var(--fg)"/><circle cx="234" cy="62" r="4" fill="var(--fg)"/>`
-          + `<line x1="168" y1="62" x2="182" y2="62" stroke="var(--fg)" stroke-width="2"/><line x1="234" y1="62" x2="248" y2="62" stroke="var(--fg)" stroke-width="2"/>`
-          + (kOpen ? `<line x1="182" y1="62" x2="228" y2="38" stroke="var(--fg)" stroke-width="3"/>` : `<line x1="182" y1="62" x2="234" y2="62" stroke="var(--ok)" stroke-width="3"/>`)
-          + `<text x="208" y="24" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="Fira Sans,Arial">K ${kOpen ? "ouvert" : "fermé"}</text></g>`;
         // appareils
-        h += meterSVG(340, 104, "A", fmtI(meas.I) + " mA", "A+", "A-") + meterSVG(340, 332, "V", fr(meas.V, 2) + " V", "V+", "V-");
-        // supports
-        h += resSVG(480, 108, 252, SL.S1) + resSVG(576, 108, 252, SL.S2)
-          + `<text x="480" y="284" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="Fira Sans,Arial">support 1</text><text x="576" y="284" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="Fira Sans,Arial">support 2</text>`;
-        if (state && state.chaud) h += `<circle cx="528" cy="180" r="70" fill="rgba(230,80,40,.18)"/><text x="528" y="100" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ko)" font-family="Fira Sans,Arial">surchauffe !</text>`;
+        Object.keys(BODY).forEach(c => {
+          const [x, y] = POS[c], [bw, bh] = BOX[c];
+          h += `<g class="comp${drag && drag.c === c ? " drag" : ""}" data-c="${c}" transform="translate(${x},${y})"${c === "K" ? ` id="ohKsvg" role="button" tabindex="0" aria-label="Interrupteur ${K ? "fermé" : "ouvert"}"` : ` aria-label="${NOMC[c]}"`}>`
+            + (bouger ? `<rect class="grip" x="${-bw}" y="${-bh}" width="${2 * bw}" height="${2 * bh}" rx="8" fill="var(--saff)" fill-opacity=".08" stroke="var(--saff)" stroke-width="1.5"/>` : "")
+            + BODY[c]() + `</g>`;
+        });
+        if (state && state.chaud) { const s = SL.S1 && state.chaud ? POS.S1 : POS.S2; h += `<circle cx="${s[0]}" cy="${s[1]}" r="62" fill="rgba(230,80,40,.18)"/><text x="${s[0]}" y="${s[1] - 92}" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ko)" ${F}>surchauffe !</text>`; }
         // bornes
         Object.entries(TERM).forEach(([id, t]) => {
           h += `<g class="term${pick === id ? " sel" : ""}" data-t="${id}" role="button" tabindex="0" aria-label="${t.nom}"><circle cx="${t.x}" cy="${t.y}" r="24" fill="transparent"/><circle class="ring" cx="${t.x}" cy="${t.y}" r="9" fill="${t.rouge ? "#c62828" : "#222"}" stroke="var(--plot-bg)" stroke-width="2"/>`
-            + (t.t ? `<text x="${id[0] === "G" ? t.x - 20 : t.x}" y="${id[0] === "G" ? t.y + 5 : t.y + (id[0] === "V" ? 26 : -15)}" text-anchor="middle" font-size="11" font-weight="700" fill="var(--fg)" font-family="Fira Sans,Arial">${t.t}</text>` : "") + `</g>`;
+            + (t.t ? `<text x="${t.c === "G" ? t.x - 20 : t.x}" y="${t.c === "G" ? t.y + 5 : t.y + (t.c === "V" ? 26 : -15)}" text-anchor="middle" font-size="11" font-weight="700" fill="var(--fg)" ${F}>${t.t}</text>` : "") + `</g>`;
         });
-        h += `<text x="320" y="392" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="Fira Sans,Arial">${pick ? "Touche une autre borne pour poser le fil (ou la même borne pour annuler)." : W.length ? W.length + " fil" + (W.length > 1 ? "s" : "") + " posé" + (W.length > 1 ? "s" : "") + "." : "Aucun fil : commence le câblage par la borne + du générateur."}</text></svg>`;
+        const info = bouger ? "Mode déplacement : fais glisser un appareil pour le placer où tu veux. Les fils suivent."
+          : pick ? "Touche une autre borne pour poser le fil (ou la même borne pour annuler)."
+          : W.length ? W.length + " fil" + (W.length > 1 ? "s" : "") + " posé" + (W.length > 1 ? "s" : "") + "." : "Aucun fil : commence le câblage par la borne + du générateur.";
+        h += `<text x="320" y="392" text-anchor="middle" font-size="12" fill="${bouger ? "var(--warm)" : "var(--muted)"}" ${F}>${info}</text></svg>`;
         box.innerHTML = h;
       };
 
-      /* ---------- interactions ---------- */
+      /* ---------- interactions : câblage (toucher) et déplacement des appareils (glisser) ---------- */
       const toucherBorne = id => {
         if (!pick) { pick = id; T.draw(); return; }
         if (pick === id) { pick = null; T.draw(); return; }
@@ -220,13 +294,36 @@
         W.push([a, b]); save(); T.msg(""); measure();
       };
       const action = e => {
+        if (bouger || (drag && drag.moved)) return;
         const t = e.target.closest("[data-t]"), w = e.target.closest("[data-w]"), k = e.target.closest("#ohKsvg");
         if (t) toucherBorne(t.dataset.t);
         else if (w) { W.splice(+w.dataset.w, 1); save(); T.msg(""); measure(); }
         else if (k) { K = !K; T.msg(""); measure(); }
       };
+      const pt = e => { const sv = box.querySelector("svg"), m = sv.getScreenCTM().inverse(), q = sv.createSVGPoint(); q.x = e.clientX; q.y = e.clientY; const r = q.matrixTransform(m); return [r.x, r.y]; };
+      box.addEventListener("pointerdown", e => {
+        const g = e.target.closest("[data-c]");
+        if (!g || e.target.closest("[data-t]") || e.target.closest("[data-w]")) return;
+        if (!bouger && e.pointerType !== "mouse") return;      // au doigt : glisser seulement en mode déplacement (sinon la page ne défile plus)
+        const c = g.dataset.c, [x, y] = pt(e);
+        drag = { c, dx: x - POS[c][0], dy: y - POS[c][1], x0: x, y0: y, moved: false, id: e.pointerId };
+        try { box.setPointerCapture(e.pointerId); } catch (err) {}
+      });
+      box.addEventListener("pointermove", e => {
+        if (!drag || e.pointerId !== drag.id) return;
+        const [x, y] = pt(e);
+        if (!drag.moved && Math.hypot(x - drag.x0, y - drag.y0) < 6) return;
+        drag.moved = true; e.preventDefault();
+        const [bw, bh] = BOX[drag.c];
+        POS[drag.c] = [Math.round(Math.min(640 - bw, Math.max(bw, x - drag.dx))), Math.round(Math.min(378 - bh, Math.max(bh + 4, y - drag.dy)))];
+        T.draw();
+      });
+      const fin = e => { if (!drag || e.pointerId !== drag.id) return; const mv = drag.moved; if (mv) save(); setTimeout(() => { drag = null; if (mv) T.draw(); }, 0); };
+      box.addEventListener("pointerup", fin); box.addEventListener("pointercancel", fin);
       box.addEventListener("click", action);
       box.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); action(e); } });
+      $("#ohMove").onclick = () => { bouger = !bouger; pick = null; $("#ohMove").setAttribute("aria-pressed", bouger); $("#ohMove").textContent = bouger ? "Terminer le déplacement" : "Déplacer les appareils"; T.draw(); };
+      $("#ohReset").onclick = () => { POS = Object.assign({}, POS0); save(); T.draw(); };
       const opts = cur => `<option value="">— vide —</option>` + Object.keys(NOMS).map(k => `<option value="${k}"${cur === k ? " selected" : ""}>${NOMS[k]}</option>`).join("");
       const fillSel = () => { $("#ohS1").innerHTML = opts(SL.S1); $("#ohS2").innerHTML = opts(SL.S2); };
       ["S1", "S2"].forEach(s => $("#oh" + s).onchange = e => {
