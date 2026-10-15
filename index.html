@@ -264,6 +264,7 @@ const COURSES=[
 ];
 
 const $=s=>document.querySelector(s);
+var PDF_CACHE="pdf-v1";
 const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const norm=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
 let current="meca";
@@ -432,7 +433,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-pdf]");if(
 })();
 
 /* ---------- hors connexion ---------- */
-var PDF_CACHE="pdf-v1";
+
 var pdfPath=f=>(f.includes("/")?f:"docs/"+f)+".pdf";
 var absPath=u=>new URL(u,location.href).pathname;
 function allDocs(){const d=[],s=[];COURSES.forEach(c=>{c.chapters.forEach(ch=>{d.push(pdfPath(ch.key));if(ch.td){d.push(pdfPath(ch.td.e),pdfPath(ch.td.c))}if(ch.slides)s.push(pdfPath("slides/"+ch.key+"_diapo"))});(c.series||[]).forEach(x=>d.push(pdfPath(x.e),pdfPath(x.c)))});d.push(pdfPath("Fascicule_TP_Physique_L1"));return{d:[...new Set(d)],s}}

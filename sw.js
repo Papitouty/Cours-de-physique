@@ -1,11 +1,14 @@
-/* Service worker : consultation hors connexion de la plateforme de cours.
-   - pages et ressources du site : réseau d'abord, copie locale si pas de connexion
-   - documents PDF : copie locale d'abord (un document ouvert une fois reste disponible)
-   - bibliothèques et polices externes : copie locale, rafraîchie en arrière-plan */
-const VERSION = "v40";
+/* Service worker : consultation hors connexion et ouverture rapide de la plateforme.
+   - pages et ressources du site : servies immédiatement depuis la copie locale de la version installée ;
+     une nouvelle version (VERSION ci-dessous) est téléchargée en arrière-plan — seuls les fichiers modifiés
+     sont retransférés — puis la page se recharge une fois toute seule (sauf la page des TP).
+     ⚠ Toute modification du site doit s'accompagner d'un changement de VERSION.
+   - documents PDF : copie locale d'abord, rafraîchie en arrière-plan
+   - bibliothèques externes (KaTeX) : copie locale permanente */
+const VERSION = "v41";
 const SHELL = "shell-" + VERSION;
 const PDFS = "pdf-v1";          // nom stable : les documents enregistrés survivent aux mises à jour du site
-const EXT = "ext-" + VERSION;
+const EXT = "ext-v1";           // KaTeX ne change pas : inutile de le retélécharger à chaque version
 
 const SHELL_FILES = [
   "./", "index.html", "quiz.html", "simulations.html", "entrainement.html", "calendrier.html", "questions.html", "videos.html", "tp.html",
@@ -45,21 +48,34 @@ const EXT_FILES = [
   "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
 ];
 
+const scope = () => new URL(self.registration.scope);
+const path = u => new URL(u, self.registration.scope).pathname;
+
 self.addEventListener("install", e => {
   e.waitUntil((async () => {
     const s = await caches.open(SHELL);
-    await Promise.all(SHELL_FILES.map(u => s.add(new Request(u, { cache: "reload" })).catch(() => {})));
-    const d = await caches.open(PDFS);
-    await Promise.all(DOC_FILES.map(async u => {
-      const key = new URL(u, self.registration.scope).pathname;
-      if (await d.match(key)) return;
-      try { const r = await fetch(u, { cache: "reload" }); if (r.ok) await d.put(key, r); } catch (e) {}
+    // « no-cache » : le navigateur demande au serveur si le fichier a changé ; s'il n'a pas changé (réponse 304),
+    // il réutilise sa copie sans retélécharger. Seuls les fichiers modifiés transitent donc sur le réseau.
+    await Promise.all(SHELL_FILES.map(async u => {
+      try { const r = await fetch(new Request(u, { cache: "no-cache" })); if (r.ok) await s.put(u, r); } catch (err) {}
     }));
-    const x = await caches.open(EXT);
-    await Promise.all(EXT_FILES.map(u => x.add(new Request(u, { mode: "cors" })).catch(() => {})));
     self.skipWaiting();
   })());
 });
+
+/* documents et bibliothèques : téléchargés en arrière-plan, sans retarder la mise à jour du site */
+async function prechargerDocs() {
+  try {
+    const d = await caches.open(PDFS);
+    for (const u of DOC_FILES) {
+      const key = path(u);
+      if (await d.match(key)) continue;
+      try { const r = await fetch(u); if (r.ok) await d.put(key, r); } catch (err) {}
+    }
+    const x = await caches.open(EXT);
+    for (const u of EXT_FILES) { if (!(await x.match(u))) { try { await x.add(new Request(u, { mode: "cors" })); } catch (err) {} } }
+  } catch (err) {}
+}
 
 self.addEventListener("activate", e => {
   e.waitUntil((async () => {
@@ -67,11 +83,12 @@ self.addEventListener("activate", e => {
     for (const k of await caches.keys()) if (!keep.includes(k)) await caches.delete(k);
     await self.clients.claim();
   })());
+  prechargerDocs();
 });
 
-const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), ms))]);
 const isPdf = url => url.pathname.endsWith(".pdf");
 const isExt = url => /(^|\.)cdnjs\.cloudflare\.com$|fonts\.googleapis\.com$|fonts\.gstatic\.com$/.test(url.hostname);
+const legere = url => /\.(html|js|css|json|webmanifest|png|jpg|jpeg|svg|ico|woff2?)$/i.test(url.pathname) || url.pathname.endsWith("/");
 
 self.addEventListener("fetch", e => {
   const req = e.request;
@@ -94,23 +111,24 @@ self.addEventListener("fetch", e => {
     e.respondWith((async () => {
       const c = await caches.open(EXT);
       const hit = await c.match(req, { ignoreVary: true }) || await caches.match(req.url, { ignoreVary: true });
-      const net = fetch(req).then(res => { if (res.ok || res.type === "opaque") c.put(req, res.clone()); return res; }).catch(() => null);
-      return hit || (await net) || Response.error();
+      if (hit) return hit;
+      try { const res = await fetch(req); if (res.ok || res.type === "opaque") c.put(req, res.clone()); return res; } catch (err) { return Response.error(); }
     })());
     return;
   }
 
   if (url.origin === location.origin) {
+    if (url.pathname.endsWith("/reparer.html")) return;            // page de réparation : toujours depuis le réseau
     e.respondWith((async () => {
       const c = await caches.open(SHELL);
-      // "no-cache" : on redemande toujours la dernière version au serveur (sinon le navigateur peut garder une copie de 10 min)
-      const netP = fetch(req, { cache: "no-cache" }).then(res => { if (res.ok) c.put(req, res.clone()); return res; });
+      // version installée : réponse immédiate, même sur une connexion lente
+      const hit = await c.match(req, { ignoreSearch: true }) || (req.mode === "navigate" && url.pathname === scope().pathname ? await c.match("index.html") : null);
+      if (hit) return hit;
       try {
-        return await withTimeout(netP, 12000);           // réseau lent ou absent : on passe à la copie locale
+        const res = await fetch(req);
+        if (res.ok && legere(url)) c.put(req, res.clone());
+        return res;
       } catch (err) {
-        const hit = await c.match(req, { ignoreSearch: true });
-        if (hit) return hit;
-        try { return await netP; } catch (e2) {}         // pas de copie locale : on attend le réseau
         if (req.mode === "navigate") return (await c.match("index.html")) || Response.error();
         return Response.error();
       }
