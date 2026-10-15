@@ -15,9 +15,13 @@
      detail : consignes (facultatif)
    ===================================================================== */
 window.ANNONCES = [
-  { date: "2026-10-14", important: true,
+  { date: "2026-10-15", important: true,
+    titre: "TP 4 : câble toi-même ton circuit",
+    texte: "Dans le TP de la loi d'Ohm, c'est maintenant toi qui réalises le montage : place les résistors, relie les bornes du générateur, de l'interrupteur, de l'ampèremètre et du voltmètre. Attention aux erreurs comme en salle : ampèremètre en dérivation (court-circuit), appareil branché à l'envers…",
+    lien: "tp.html#ohm" },
+  { date: "2026-10-14",
     titre: "Nouveau : le fascicule de travaux pratiques",
-    texte: "Les 8 TP réunis dans un PDF de 50 pages : rappels théoriques avec démonstrations, schémas de montage, protocoles, tableaux de mesures à remplir et questions d'exploitation. À lire avant chaque séance.",
+    texte: "Les 8 TP réunis dans un PDF de 51 pages : rappels théoriques avec démonstrations, schémas de montage, protocoles, tableaux de mesures à remplir et questions d'exploitation. À lire avant chaque séance.",
     lien: "docs/Fascicule_TP_Physique_L1.pdf" },
   { date: "2026-10-14",
     titre: "Tous les diaporamas sont en ligne, aussi en PowerPoint",

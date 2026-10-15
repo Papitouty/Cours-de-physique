@@ -329,12 +329,12 @@ function render(){
       <div class="chap-body">
         <div class="chap-num">TRAVAUX PRATIQUES</div>
         <h3>Fascicule de travaux pratiques</h3>
-        <div class="meta">8 TP • 50 pages • mécanique, électricité, optique</div>
+        <div class="meta">8 TP • 51 pages • mécanique, électricité, optique</div>
         <details${q?" open":""}><summary>Contenu du fascicule</summary><ol class="toc">${FTP.map((t,i)=>`<li data-n="${i+1}.">${esc(t)}</li>`).join("")}</ol></details>
         <p class="meta" style="margin-top:6px">Rappels théoriques et démonstrations, schémas de montage, protocoles, tableaux de mesures et exploitation. À lire avant chaque séance.</p>
       </div>
       <div class="res">
-        ${pdfBtn("Fascicule_TP_Physique_L1","Fascicule de TP",50,"pdf",true)}
+        ${pdfBtn("Fascicule_TP_Physique_L1","Fascicule de TP",51,"pdf",true)}
         <a class="btn" href="tp.html"><span class="k k-sim">TP</span><span class="lbl">Faire les TP en ligne</span></a>
       </div></article>`;
   }
