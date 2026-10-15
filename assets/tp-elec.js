@@ -11,39 +11,55 @@
 
 
   /* ---------- schémas de principe des montages amont (longue dérivation) et aval (courte dérivation) ---------- */
-  function schema(type) {
+  function schema(type, dip) {
+    dip = dip || "R";
     const F = 'font-family="Fira Sans,Arial"', fg = "var(--fg)", acc = "var(--saff)", cur = "var(--rouge)", bleu = "var(--accent)";
     const fl = (x, y, dir, c) => { const p = { r: `${x},${y} ${x - 8},${y - 4.5} ${x - 8},${y + 4.5}`, d: `${x},${y} ${x - 4.5},${y - 8} ${x + 4.5},${y - 8}`, u: `${x},${y} ${x - 4.5},${y + 8} ${x + 4.5},${y + 8}`, l: `${x},${y} ${x + 8},${y - 4.5} ${x + 8},${y + 4.5}` }[dir]; return `<polygon points="${p}" fill="${c}"/>`; };
     const dot = (x, y) => `<circle cx="${x}" cy="${y}" r="3.5" fill="${fg}"/>`;
+    const ln = (x1, y1, x2, y2) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${fg}" stroke-width="2"/>`;
+    const res = (x, y1, y2, l, lx, anchor) => `<rect x="${x - 10}" y="${y1}" width="20" height="${y2 - y1}" fill="#e8d3a9" stroke="${fg}" stroke-width="1.5"/><text x="${lx}" y="${(y1 + y2) / 2 + 5}" text-anchor="${anchor || "start"}" font-size="13" font-weight="700" fill="${fg}" ${F}>${l}</text>`;
     const app = (x, y, l, c) => `<circle cx="${x}" cy="${y}" r="16" fill="var(--plot-bg)" stroke="${c || fg}" stroke-width="2"/><text x="${x}" y="${y + 5}" text-anchor="middle" font-size="15" font-weight="700" fill="${c || fg}" ${F}>${l}</text>`;
-    let h = `<svg viewBox="0 0 330 250" role="img" aria-label="Schéma du montage ${type}" style="width:100%;max-width:360px;height:auto">`;
+    const NOM = { X: "R_X", F: "22 Ω", G: "47 kΩ", R: "R" }[dip];
+    let h = `<svg viewBox="0 0 350 250" role="img" aria-label="Schéma du montage ${type}" style="width:100%;max-width:360px;height:auto">`;
     // zone mesurée par le voltmètre
-    if (type === "amont") h += `<rect x="124" y="22" width="140" height="132" rx="10" fill="${acc}" fill-opacity=".10" stroke="${acc}" stroke-dasharray="5 4"/>`;
-    else h += `<rect x="216" y="72" width="48" height="86" rx="10" fill="${acc}" fill-opacity=".10" stroke="${acc}" stroke-dasharray="5 4"/><text x="240" y="232" text-anchor="middle" font-size="11" fill="${acc}" ${F}>V mesure exactement U_R</text>`;
-    // circuit principal
-    h += `<line x1="30" y1="40" x2="30" y2="99" stroke="${fg}" stroke-width="2"/><line x1="30" y1="131" x2="30" y2="190" stroke="${fg}" stroke-width="2"/>`
+    if (type === "amont") h += `<rect x="124" y="22" width="150" height="144" rx="10" fill="${acc}" fill-opacity=".10" stroke="${acc}" stroke-dasharray="5 4"/>`;
+    else h += dip === "P" ? `<rect x="198" y="68" width="80" height="96" rx="10" fill="${acc}" fill-opacity=".10" stroke="${acc}" stroke-dasharray="5 4"/>` : `<rect x="214" y="66" width="52" height="100" rx="10" fill="${acc}" fill-opacity=".10" stroke="${acc}" stroke-dasharray="5 4"/>`;
+    // générateur, interrupteur, ampèremètre
+    h += ln(30, 40, 30, 99) + ln(30, 131, 30, 190)
       + `<circle cx="30" cy="115" r="16" fill="var(--plot-bg)" stroke="${fg}" stroke-width="2"/><text x="30" y="120" text-anchor="middle" font-size="13" font-weight="700" fill="${fg}" ${F}>G</text><text x="44" y="96" font-size="13" font-weight="700" fill="${cur}" ${F}>+</text>`
-      + `<line x1="30" y1="40" x2="62" y2="40" stroke="${fg}" stroke-width="2"/>${dot(62, 40)}${dot(94, 40)}<line x1="62" y1="40" x2="94" y2="40" stroke="${fg}" stroke-width="2.5"/><text x="78" y="32" text-anchor="middle" font-size="11" fill="var(--muted)" ${F}>K</text>`
-      + `<line x1="94" y1="40" x2="139" y2="40" stroke="${fg}" stroke-width="2"/>${app(155, 40, "A", bleu)}<line x1="171" y1="40" x2="240" y2="40" stroke="${fg}" stroke-width="2"/>`
-      + `<line x1="240" y1="40" x2="240" y2="85" stroke="${fg}" stroke-width="2"/><rect x="230" y="85" width="20" height="60" fill="#e8d3a9" stroke="${fg}" stroke-width="1.5"/><text x="258" y="120" font-size="13" font-weight="700" fill="${fg}" ${F}>R</text>`
-      + `<line x1="240" y1="145" x2="240" y2="190" stroke="${fg}" stroke-width="2"/><line x1="240" y1="190" x2="30" y2="190" stroke="${fg}" stroke-width="2"/>`
+      + ln(30, 40, 62, 40) + `${dot(62, 40)}${dot(94, 40)}<line x1="62" y1="40" x2="94" y2="40" stroke="${fg}" stroke-width="2.5"/><text x="78" y="32" text-anchor="middle" font-size="11" fill="var(--muted)" ${F}>K</text>`
+      + ln(94, 40, 139, 40) + app(155, 40, "A", bleu) + ln(171, 40, 240, 40) + ln(240, 190, 30, 190)
       + `${fl(118, 40, "r", cur)}<text x="112" y="58" font-size="12" font-style="italic" fill="${cur}" ${F}>I</text>`;
+    // dipôle étudié
+    if (dip === "S") h += ln(240, 40, 240, 76) + res(240, 76, 114, "R₁", 256) + ln(240, 114, 240, 124) + res(240, 124, 162, "R₂", 256) + ln(240, 162, 240, 190);
+    else if (dip === "P") h += ln(240, 40, 240, 80) + dot(240, 80) + ln(222, 80, 258, 80) + ln(222, 80, 222, 94) + ln(258, 80, 258, 94)
+      + res(222, 94, 140, "R₁", 210, "end") + res(258, 94, 140, "R₂", 272) + ln(222, 140, 222, 154) + ln(258, 140, 258, 154) + ln(222, 154, 258, 154) + dot(240, 154) + ln(240, 154, 240, 190);
+    else h += ln(240, 40, 240, 85) + res(240, 85, 145, NOM, 256) + ln(240, 145, 240, 190);
+    const iD = dip === "S" || dip === "P" ? "I" : "I_R";
     if (type === "aval") {
-      h += `${dot(240, 62)}${dot(240, 170)}<line x1="240" y1="62" x2="296" y2="62" stroke="${fg}" stroke-width="2"/><line x1="296" y1="62" x2="296" y2="99" stroke="${fg}" stroke-width="2"/>${app(296, 115, "V", acc)}<line x1="296" y1="131" x2="296" y2="170" stroke="${fg}" stroke-width="2"/><line x1="296" y1="170" x2="240" y2="170" stroke="${fg}" stroke-width="2"/>`
-        + `${fl(240, 80, "d", cur)}<text x="214" y="80" font-size="11" font-style="italic" fill="${cur}" ${F}>I_R</text>${fl(276, 62, "r", cur)}<text x="262" y="56" font-size="11" font-style="italic" fill="${cur}" ${F}>I_V</text>`
-        + `<text x="165" y="214" text-anchor="middle" font-size="11.5" fill="${fg}" ${F}>A mesure I = I_R + I_V (un peu trop)</text>`;
+      h += `${dot(240, 62)}${dot(240, 170)}` + ln(240, 62, 318, 62) + ln(318, 62, 318, 99) + app(318, 115, "V", acc) + ln(318, 131, 318, 170) + ln(318, 170, 240, 170)
+        + `${fl(240, 74, "d", cur)}<text x="${dip === "P" ? 208 : 214}" y="74" font-size="11" font-style="italic" fill="${cur}" text-anchor="${dip === "P" ? "end" : "start"}" ${F}>${iD}</text>${fl(296, 62, "r", cur)}<text x="282" y="56" font-size="11" font-style="italic" fill="${cur}" ${F}>I_V</text>`
+        + `<text x="175" y="214" text-anchor="middle" font-size="11.5" fill="${fg}" ${F}>A mesure ${iD} + I_V (un peu trop)</text><text x="175" y="232" text-anchor="middle" font-size="11.5" fill="${acc}" ${F}>V mesure exactement la tension aux bornes du dipôle</text>`;
     } else {
-      h += `${dot(110, 40)}${dot(240, 170)}<line x1="110" y1="40" x2="110" y2="10" stroke="${fg}" stroke-width="2"/><line x1="110" y1="10" x2="296" y2="10" stroke="${fg}" stroke-width="2"/><line x1="296" y1="10" x2="296" y2="99" stroke="${fg}" stroke-width="2"/>${app(296, 115, "V", acc)}<line x1="296" y1="131" x2="296" y2="170" stroke="${fg}" stroke-width="2"/><line x1="296" y1="170" x2="240" y2="170" stroke="${fg}" stroke-width="2"/>`
-        + `${fl(240, 80, "d", cur)}<text x="214" y="80" font-size="11" font-style="italic" fill="${cur}" ${F}>I</text>`
-        + `<text x="165" y="214" text-anchor="middle" font-size="11.5" fill="${fg}" ${F}>A mesure exactement le courant I dans R</text><text x="165" y="232" text-anchor="middle" font-size="11.5" fill="${fg}" ${F}>V mesure U_A + U_R (un peu trop)</text>`;
+      h += `${dot(110, 40)}${dot(240, 170)}` + ln(110, 40, 110, 10) + ln(110, 10, 318, 10) + ln(318, 10, 318, 99) + app(318, 115, "V", acc) + ln(318, 131, 318, 170) + ln(318, 170, 240, 170)
+        + `${fl(240, 74, "d", cur)}<text x="${dip === "P" ? 208 : 214}" y="74" font-size="11" font-style="italic" fill="${cur}" text-anchor="${dip === "P" ? "end" : "start"}" ${F}>I</text>`
+        + `<text x="175" y="214" text-anchor="middle" font-size="11.5" fill="${fg}" ${F}>A mesure exactement le courant I du dipôle</text><text x="175" y="232" text-anchor="middle" font-size="11.5" fill="${acc}" ${F}>V mesure U_A + U (un peu trop)</text>`;
     }
-    // indices : « U_A » → U avec A en indice
+    // indices : « U_A », « R_X », « I_V » → lettre en indice
     h = h.replace(/(<text[^>]*>)([^<]*_[A-Z][^<]*)(<\/text>)/g, (m, o, c, e) => { let n = 0; const t = c.replace(/_([A-Z])/g, (q, l) => { n++; return `<tspan dy="3" font-size="8">${l}</tspan><tspan dy="-3">`; }); return o + t + "</tspan>".repeat(n) + e; });
     return h + `</svg>`;
   }
-  const SCHEMAS = `<div class="ohm-schemas">
-      <figure><div>${schema("amont")}</div><figcaption><b>(a) Montage amont — longue dérivation.</b> Le voltmètre est branché <b>avant</b> l'ampèremètre : il mesure la tension aux bornes de l'ensemble ampèremètre + résistor. <b>R<sub>mes</sub> = U/I = R + r<sub>A</sub></b> : erreur faible pour les <b>grandes</b> résistances (R ≫ r<sub>A</sub>).</figcaption></figure>
-      <figure><div>${schema("aval")}</div><figcaption><b>(b) Montage aval — courte dérivation.</b> Le voltmètre est branché <b>directement aux bornes du résistor</b>, après l'ampèremètre : l'ampèremètre mesure aussi le petit courant I<sub>V</sub> qui traverse le voltmètre. <b>1/R<sub>mes</sub> = 1/R + 1/R<sub>V</sub></b> : erreur faible pour les <b>petites</b> résistances (R ≪ R<sub>V</sub>).</figcaption></figure>
+  const fig = (type, dip, cap) => `<figure><div>${schema(type, dip)}</div><figcaption>${cap}</figcaption></figure>`;
+  const SCHEMAS = `<div class="ohm-part">Partie A — Caractéristique du résistor X</div><div class="ohm-schemas">
+      ${fig("aval", "X", "<b>Montage aval avec le résistor X.</b> Le voltmètre est branché directement aux bornes de R<sub>X</sub>. On fait varier la tension du générateur et on relève U et I pour tracer U = f(I) : la pente donne R<sub>X</sub>.")}
+    </div>
+    <div class="ohm-part">Partie B — Montage amont ou aval ? (résistor de 22 Ω, puis de 47 kΩ)</div><div class="ohm-schemas">
+      ${fig("amont", "F", "<b>(a) Montage amont — longue dérivation.</b> Le voltmètre est branché <b>avant</b> l'ampèremètre : il mesure la tension aux bornes de l'ensemble ampèremètre + résistor. <b>R<sub>mes</sub> = U/I = R + r<sub>A</sub></b> : erreur faible pour les <b>grandes</b> résistances (47 kΩ).")}
+      ${fig("aval", "F", "<b>(b) Montage aval — courte dérivation.</b> Le voltmètre est branché <b>directement aux bornes du résistor</b> : l'ampèremètre mesure aussi le petit courant I<sub>V</sub> du voltmètre. <b>1/R<sub>mes</sub> = 1/R + 1/R<sub>V</sub></b> : erreur faible pour les <b>petites</b> résistances (22 Ω).")}
+    </div>
+    <div class="ohm-part">Partie C — Associations de R₁ et R₂ (montage aval)</div><div class="ohm-schemas">
+      ${fig("aval", "S", "<b>R₁ et R₂ en série.</b> Le même courant I traverse R₁ puis R₂ ; le voltmètre est branché aux bornes de l'ensemble. On doit trouver <b>R<sub>éq</sub> = R₁ + R₂</b>.")}
+      ${fig("aval", "P", "<b>R₁ et R₂ en parallèle.</b> Les deux résistors sont branchés entre les deux mêmes points : le courant I se partage entre eux. On doit trouver <b>1/R<sub>éq</sub> = 1/R₁ + 1/R₂</b>.")}
     </div>`;
   const CABLAGE = `<div class="ohm-cablage"><div><b>Câbler le montage aval sur la paillasse</b><ol>
       <li>Borne <b>+</b> du générateur → une borne de l'interrupteur.</li><li>Autre borne de l'interrupteur → borne <b>mA</b> de l'ampèremètre.</li>
@@ -51,12 +67,15 @@
       <li>Voltmètre <b>aux bornes du résistor</b> : borne <b>V</b> → borne haute du support ; <b>COM</b> → borne basse.</li></ol></div>
       <div><b>Passer au montage amont</b><ol><li>Garde les fils 1 à 4.</li><li>Retire le fil de la borne <b>V</b> du voltmètre et relie-la à la borne <b>mA</b> de l'ampèremètre (avant l'ampèremètre).</li>
       <li>La borne <b>COM</b> du voltmètre reste sur la borne basse du support.</li></ol>
-      <p>Le courant entre toujours par la borne <b>mA</b> de l'ampèremètre ; la borne <b>V</b> du voltmètre est du côté du <b>+</b>.</p></div></div>`;
+      <p>Le courant entre toujours par la borne <b>mA</b> de l'ampèremètre ; la borne <b>V</b> du voltmètre est du côté du <b>+</b>.</p></div>
+      <div><b>Partie C : R₁ (support 1) et R₂ (support 2)</b><ol><li><b>Série</b> : COM de l'ampèremètre → haut du support 1 ; bas du support 1 → haut du support 2 ; bas du support 2 → borne − du générateur. Voltmètre : V → haut du support 1, COM → bas du support 2.</li>
+      <li><b>Parallèle</b> : relie les deux bornes hautes entre elles et les deux bornes basses entre elles ; COM de l'ampèremètre → haut du support 1 ; bas du support 1 → borne − du générateur. Voltmètre : V → haut, COM → bas.</li></ol></div></div>`;
   const SCH_CSS = `.ohm-schemas{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin:8px 0}
 .ohm-schemas figure{margin:0;display:grid;gap:6px;justify-items:center;background:var(--plot-bg);border:1px solid var(--line);border-radius:10px;padding:10px}
 .ohm-schemas figcaption{font-family:var(--f-head);font-size:.84rem;line-height:1.45;color:var(--muted)}
 .ohm-cablage{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;font-size:.92rem}
 .ohm-cablage ol{margin:6px 0 0;padding-left:20px;display:grid;gap:3px}.ohm-cablage p{margin:6px 0 0;font-size:.88rem;color:var(--muted)}
+.ohm-part{font-family:var(--f-head);font-weight:700;font-size:.92rem;color:var(--ink,var(--fg));margin:12px 0 2px}
 .ohm-ref{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}.ohm-ref>summary{font-family:var(--f-head);font-weight:600;cursor:pointer;color:var(--accent)}`;
   if (!document.getElementById("ohm-sch-style")) { const st = document.createElement("style"); st.id = "ohm-sch-style"; st.textContent = SCH_CSS; document.head.appendChild(st); }
 
