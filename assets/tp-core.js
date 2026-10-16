@@ -290,6 +290,21 @@
         <div class="nb-detail"><span>Mesures <b>${fr(R.mesures, 2)}</b> / 2</span><span>Tableaux <b>${fr(R.tableau, 2)}</b> / 6</span><span>Calculs <b>${fr(R.calculs, 2)}</b> / 6</span><span>QCM <b>${fr(R.qcm, 2)}</b> / 6</span></div>
         <p class="hint">Ta copie a été transmise à ton enseignant. Elle ne peut plus être modifiée.</p>`
         : `<div class="nb-main"><span>Un compte rendu a déjà été soumis pour ce TP avec ce numéro de carte.</span><b>Soumis</b></div>`;
+      // phase de test : l'enseignant autorise plusieurs soumissions (réglage MODE_TEST du script)
+      if (ST && ST.essais) {
+        nb.insertAdjacentHTML("beforeend", `<div class="row"><button type="button" class="btn primary" id="${T.id}-redo">Refaire ce TP (nouvel essai)</button></div><p class="msg" id="${T.id}-rmsg"></p>`);
+        $("#" + T.id + "-redo").onclick = async () => {
+          if (!confirm(`Refaire le TP n°${T.num} ? Tes mesures et tes réponses actuelles seront effacées de cet appareil (la copie déjà envoyée reste chez ton enseignant).${ST.duree ? ` Le minuteur de ${ST.duree} min redémarre tout de suite.` : ""}`)) return;
+          const rb = $("#" + T.id + "-redo"), rm = $("#" + T.id + "-rmsg"); rb.disabled = true; rm.textContent = "Préparation du nouvel essai…"; rm.className = "msg";
+          try {
+            const R = await post({ action: "start", tp: T.id, carte: SS.etudiant.carte, code: SS.code, device: device(), nouvelEssai: true }, k => { rm.textContent = waitMsg(k); });
+            if (!R.ok) { rb.disabled = false; rm.textContent = R.error || "Impossible de recommencer."; rm.className = "msg bad"; return; }
+            try { localStorage.removeItem("tp2_" + T.id + "_submitted"); keys.forEach(k => localStorage.removeItem("tp2_" + T.id + "_v2_" + k)); localStorage.removeItem("tp2_" + T.id + "_crv2"); } catch (e) {}
+            const s2 = sess(); if (s2 && s2.tps[T.id]) { Object.assign(s2.tps[T.id], { soumis: null, debutTP: R.debutTP || null, finTP: R.finTP || null }); s2.skew = Date.parse(R.serveur) - Date.now() || 0; store.set("session", s2); }
+            location.hash = T.id; location.reload();
+          } catch (err) { rb.disabled = false; rm.textContent = "Pas de connexion internet : impossible de recommencer pour l'instant."; rm.className = "msg bad"; }
+        };
+      }
       cr.querySelectorAll("input, textarea").forEach(e => e.disabled = true);
       $("#" + T.id + "-sub").querySelector(".chk").hidden = true; $("#" + T.id + "-send").hidden = true; $("#" + T.id + "-clr").hidden = true;
       cr.querySelectorAll("[data-del]").forEach(b => b.remove());
@@ -421,5 +436,5 @@
     const loop = ts => { const dt = last == null ? 0 : Math.min(0.05, (ts - last) / 1000); last = ts; const T = TPS.find(t => t.id === cur); if (T && T.tick && dt > 0) T.tick(dt); requestAnimationFrame(loop); };
     requestAnimationFrame(loop);
   }
-  window.TPCORE = { build: 25, register, start, $, css, esc, fr, gauss, store, fit, txt, linreg, chrono, isCur: id => cur === id };
+  window.TPCORE = { build: 26, register, start, $, css, esc, fr, gauss, store, fit, txt, linreg, chrono, isCur: id => cur === id };
 })();
