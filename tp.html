@@ -91,6 +91,7 @@ th.fillh{color:var(--warm);background:var(--tint2)}
 td.fillc{padding:3px 4px}
 td.fillc input{width:100%;min-width:78px;font-family:var(--f-mono);font-size:.86rem;padding:5px 7px;border:1.5px solid var(--line);border-radius:6px;background:var(--tint2);color:var(--fg);text-align:right}
 td.fillc input:focus,.cin input:focus{outline:none;border-color:var(--accent)}
+td.fillc.susp input{border-color:#c0392b;background:rgba(192,57,43,.08)}
 .crblock{display:grid;gap:10px;border-top:1px solid var(--line);padding-top:12px}
 .calcs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
 .calc{display:grid;gap:5px;align-content:end}
@@ -167,18 +168,18 @@ fieldset.qcm input{width:auto;margin-top:4px;accent-color:var(--accent)}
 <footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré • Les mesures sont simulées avec une incertitude réaliste. Chaque étudiant connecté reçoit son propre matériel : deux étudiants n'obtiennent pas les mêmes valeurs. • <a href="reparer.html?retour=tp.html">Affichage incomplet ? Mettre le site à jour</a></div></footer>
 
 <script>window.__tpErr = []; addEventListener("error", function (e) { window.__tpErr.push((e.message || "erreur") + " (" + String(e.filename || "").split("/").pop() + ":" + (e.lineno || "") + ")"); });</script>
-<script src="assets/config.js?v=23"></script>
-<script src="assets/tp-cr.js?v=23"></script>
-<script src="assets/tp-core.js?v=23"></script>
-<script src="assets/tp-meca.js?v=23"></script>
-<script src="assets/tp-elec.js?v=23"></script>
-<script src="assets/tp-oscillo.js?v=23"></script>
-<script src="assets/tp-optique.js?v=23"></script>
+<script src="assets/config.js?v=24"></script>
+<script src="assets/tp-cr.js?v=24"></script>
+<script src="assets/tp-core.js?v=24"></script>
+<script src="assets/tp-meca.js?v=24"></script>
+<script src="assets/tp-elec.js?v=24"></script>
+<script src="assets/tp-oscillo.js?v=24"></script>
+<script src="assets/tp-optique.js?v=24"></script>
 <script>
 /* Vérifie que tous les fichiers de la page sont de la même version ; sinon (copie ancienne gardée par le
    navigateur après une connexion lente), propose une remise à jour en un clic au lieu d'une page vide. */
 (function () {
-  var BUILD = 23;
+  var BUILD = 24;
   function repair(why) {
     var b = document.getElementById("tpLogin"); if (!b) return;
     var det = (window.__tpErr || []).concat(why ? [why] : []).join(" ; ");

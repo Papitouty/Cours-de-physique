@@ -7,9 +7,9 @@
 window.TPCR = {
   pendule: {
     parts: {
-      A: { min: 5, fill: [{ k: "T", h: "T = t/n (s)" }], plot: { x: (r, f) => r.A, y: (r, f) => f.T, xl: "θ₀ (°)", yl: "T (s)" } },
-      B: { min: 3, fill: [{ k: "T", h: "T = t/n (s)" }] },
-      C: { min: 5, fill: [{ k: "T", h: "T = t/n (s)" }, { k: "T2", h: "T² (s²)" }], plot: { x: (r, f) => r.L, y: (r, f) => f.T2, xl: "L (m)", yl: "T² (s²)" } }
+      A: { min: 5, fill: [{ k: "T", h: "T = t/n (s)", ref: r => r.t / r.n, warn: "Attention : T est la durée d'UNE oscillation, T = t / n (et non t)." }], plot: { x: (r, f) => (r.A * Math.PI / 180) ** 2, y: (r, f) => f.T, xl: "θ₀² (rad²)", yl: "T (s)", xmin: 0, fit: true, eq: R => "T = " + R.a.toFixed(4).replace(".", ",") + " θ₀² + " + R.b.toFixed(3).replace(".", ","), mark0: R => "T₀ = " + R.b.toFixed(3).replace(".", ",") + " s (θ₀ = 0)" } },
+      B: { min: 3, fill: [{ k: "T", h: "T = t/n (s)", ref: r => r.t / r.n, warn: "Attention : T est la durée d'UNE oscillation, T = t / n (et non t)." }] },
+      C: { min: 5, fill: [{ k: "T", h: "T = t/n (s)", ref: r => r.t / r.n, warn: "Attention : T est la durée d'UNE oscillation, T = t / n (et non t)." }, { k: "T2", h: "T² (s²)" }], plot: { x: (r, f) => r.L, y: (r, f) => f.T2, xl: "L (m)", yl: "T² (s²)" } }
     },
     calc: [
       { k: "varA", h: "Partie A : variation relative de T entre la plus petite et la plus grande amplitude", u: "%" },
@@ -172,7 +172,7 @@ window.TPCR = {
   const s4 = x => (x == null || !isFinite(x)) ? "—" : String(+(+x).toPrecision(4)).replace(".", ",");
   const RAW = {
     pendule: {
-      A: { cols: ["n°", "L (cm)", "θ₀ (°)", "n", "t (s)"], cells: (r, i) => [i + 1, fr(r.L * 100, 1), r.A, r.n, fr(r.t, 2)], r: { L: 3, t: 2 }, titre: "Isochronisme des petites oscillations" },
+      A: { cols: ["n°", "L (cm)", "θ₀ (°)", "θ₀² (rad²)", "n", "t (s)"], cells: (r, i) => [i + 1, fr(r.L * 100, 1), r.A, fr((r.A * Math.PI / 180) ** 2, 4), r.n, fr(r.t, 2)], r: { L: 3, t: 2 }, titre: "Isochronisme des petites oscillations" },
       B: { cols: ["n°", "m (g)", "L (cm)", "θ₀ (°)", "n", "t (s)"], cells: (r, i) => [i + 1, r.m, fr(r.L * 100, 1), r.A, r.n, fr(r.t, 2)], r: { L: 3, t: 2 }, titre: "Influence de la masse" },
       C: { cols: ["n°", "L (m)", "θ₀ (°)", "n", "t (s)"], cells: (r, i) => [i + 1, fr(r.L, 3), r.A, r.n, fr(r.t, 2)], r: { L: 3, t: 2 }, titre: "Influence de la longueur — mesure de g" }
     },

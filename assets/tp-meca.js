@@ -22,13 +22,20 @@
       <div class="formula">θ̈ + ω₀² θ = 0   avec   ω₀ = √(g/L)    ⟹    T₀ = 2π √(L/g)</div>
       <p>La période ne dépend alors ni de la masse, ni de l'amplitude θ₀ : c'est l'<b>isochronisme des petites oscillations</b>. Pour une amplitude plus grande, la période augmente légèrement (formule de Borda) :</p>
       <div class="formula">T ≈ T₀ (1 + θ₀²/16)    (θ₀ en radians)</div>
-      <h4>Exploitation</h4><div class="formula">T² = (4π²/g) · L</div><p>Le graphe T² = f(L) est une droite passant par l'origine, de pente a = 4π²/g, d'où <b>g = 4π²/a</b>.</p>`,
+      <h4>Linéarisation (Partie A)</h4><p>La courbe T = f(θ₀) n'est pas une droite. En développant la formule de Borda :</p>
+      <div class="formula">T ≈ T₀ + (T₀/16) · θ₀²</div>
+      <p>Le graphe <b>T = f(θ₀²)</b>, avec θ₀ en <b>radians</b>, est donc une <b>droite</b> :</p>
+      <ul><li>son <b>ordonnée à l'origine</b> est T₀, la période des petites oscillations (valeur extrapolée pour θ₀ → 0) ;</li>
+      <li>sa <b>pente</b> vaut T₀/16 : le rapport pente / T₀ doit être proche de 1/16 = 0,0625.</li></ul>
+      <p>On ne peut pas mesurer directement T pour θ₀ = 0 (le pendule ne bouge pas) : T₀ s'obtient par <b>extrapolation</b> de la droite.</p>
+      <h4>Exploitation (Partie C)</h4><div class="formula">T² = (4π²/g) · L</div><p>Le graphe T² = f(L) est une droite passant par l'origine, de pente a = 4π²/g, d'où <b>g = 4π²/a</b>.</p>`,
     protocole: `<h4>Partie A — Isochronisme des petites oscillations</h4><ol>
         <li>Choisis une longueur L = 80 cm et la masse de 100 g.</li>
         <li>Écarte le pendule d'un angle θ₀ = 5° et lâche-le <b>sans vitesse initiale</b>.</li>
         <li>Chronomètre 10 oscillations complètes : démarre au passage par une position extrême et arrête au 10<sup>e</sup> retour à cette même position. Choisis « Partie A » puis enregistre.</li>
         <li>Recommence pour θ₀ = 10°, 15°, 20°, 30°, 40°, 50° et 60°.</li>
-        <li>Observe à partir de quelle amplitude la période augmente nettement.</li></ol>
+        <li>Utilise de préférence le <b>capteur automatique</b> : l'effet de l'amplitude est faible (moins de 2 % jusqu'à 30°) et l'erreur de réaction du chronométrage manuel peut le masquer.</li>
+        <li>Le graphe <b>T = f(θ₀²)</b> (θ₀ en rad) se trace automatiquement : c'est une droite. Lis T₀ à l'ordonnée à l'origine et compare-le à la valeur théorique 2π√(L/g) affichée dans le panneau.</li></ol>
       <h4>Partie B — Influence de la masse</h4><ol>
         <li>Garde L = 80 cm et θ₀ = 10°.</li>
         <li>Mesure la période pour les masses 50 g, 100 g et 200 g (Partie B).</li></ol>
@@ -45,17 +52,26 @@
     hint: "Le pendule oscille en temps réel. En mode manuel, c'est toi qui chronomètres, comme en salle de TP.",
     controls: `<h3>Pendule</h3>
       <div class="ctl"><label for="pdL">Longueur L <b id="pdLv"></b></label><input id="pdL" type="range" min="20" max="150" step="1" value="80"></div>
-      <div class="ctl"><label for="pdA">Amplitude θ₀ <b id="pdAv"></b></label><input id="pdA" type="range" min="2" max="70" step="1" value="10"></div>
+      <div class="ctl"><label for="pdA">Amplitude θ₀ <b id="pdAv"></b></label><input id="pdA" type="range" min="0" max="70" step="1" value="10"></div>
+      <dl class="lcd"><dt>T₀ théorique = 2π√(L/g)</dt><dd id="pdT0"></dd></dl>
       <div class="ctl"><label for="pdM">Masse</label><select id="pdM"><option value="50">50 g</option><option value="100" selected>100 g</option><option value="200">200 g</option></select></div>
       <div class="row"><button type="button" class="btn primary sm" id="pdGo">Lâcher le pendule</button><button type="button" class="btn sm" id="pdSt">Arrêter le pendule</button></div>
       __CHRONO__
       ${partSelect("pd", [["A", "Partie A — amplitude"], ["B", "Partie B — masse"], ["C", "Partie C — longueur"]])}
       <button type="button" class="btn primary sm" id="pdRec">Enregistrer la mesure</button>`,
     parts: [
-      { key: "A", titre: "Isochronisme des petites oscillations", cols: ["n°", "L (cm)", "θ₀ (°)", "n", "t (s)", "T (s)"],
-        cells: (r, i) => [i + 1, fr(r.L * 100, 0), r.A, r.n, fr(r.t, 2), fr(r.t / r.n, 3)],
-        point: r => [r.A, r.t / r.n], axes: { xl: "θ₀ (°)", yl: "T (s)", xmin: 0, noFit: true },
-        fit: (R, rows) => { if (rows.length < 2) return "Mesure la période pour plusieurs amplitudes à longueur fixée."; const s = [...rows].sort((a, b) => a.A - b.A), t0 = s[0].t / s[0].n, t1 = s[s.length - 1].t / s[s.length - 1].n; return `Entre θ₀ = ${s[0].A}° et θ₀ = ${s[s.length - 1].A}°, la période passe de ${fr(t0, 3)} s à ${fr(t1, 3)} s (variation de ${fr((t1 / t0 - 1) * 100, 1)} %).`; } },
+      { key: "A", titre: "Isochronisme des petites oscillations", cols: ["n°", "L (cm)", "θ₀ (°)", "θ₀² (rad²)", "n", "t (s)", "T (s)"],
+        cells: (r, i) => [i + 1, fr(r.L * 100, 0), r.A, fr((r.A * Math.PI / 180) ** 2, 4), r.n, fr(r.t, 2), fr(r.t / r.n, 3)],
+        point: r => [(r.A * Math.PI / 180) ** 2, r.t / r.n], axes: { xl: "θ₀² (rad²)", yl: "T (s)", xmin: 0 },
+        fit: (R, rows) => {
+          if (rows.length < 2) return "Mesure la période pour plusieurs amplitudes à longueur fixée : le graphe T = f(θ₀²) est une droite.";
+          const s = [...rows].sort((a, b) => a.A - b.A), t0 = s[0].t / s[0].n, t1 = s[s.length - 1].t / s[s.length - 1].n;
+          const Ls = [...new Set(rows.map(r => Math.round(r.L * 100)))], T0th = 2 * Math.PI * Math.sqrt(rows[0].L / G);
+          let out = `Entre θ₀ = ${s[0].A}° et θ₀ = ${s[s.length - 1].A}°, la période passe de ${fr(t0, 3)} s à ${fr(t1, 3)} s (variation de ${fr((t1 / t0 - 1) * 100, 1)} %).`;
+          if (R) out += `<br>Droite : T = ${fr(R.a, 4)} · θ₀² + ${fr(R.b, 4)}  (r = ${fr(R.r, 4)})   ⟹   T₀ (ordonnée à l'origine) = ${fr(R.b, 3)} s ;  pente / T₀ = ${fr(R.a / R.b, 3)} (Borda : 1/16 = 0,0625).`;
+          out += Ls.length > 1 ? `<br>Attention : toutes les mesures de la partie A doivent être faites avec la même longueur L (ici ${Ls.join(", ")} cm).` : `<br>T₀ théorique pour L = ${Ls[0]} cm : 2π√(L/g) = ${fr(T0th, 3)} s.`;
+          return out;
+        } },
       { key: "B", titre: "Influence de la masse", cols: ["n°", "m (g)", "L (cm)", "θ₀ (°)", "n", "t (s)", "T (s)"],
         cells: (r, i) => [i + 1, r.m, fr(r.L * 100, 0), r.A, r.n, fr(r.t, 2), fr(r.t / r.n, 3)],
         fit: (R, rows) => { if (!rows.length) return "Mesure la période pour les trois masses, à L et θ₀ fixés."; const T = rows.map(r => r.t / r.n), mx = Math.max(...T), mn = Math.min(...T); return `Périodes mesurées : de ${fr(mn, 3)} s à ${fr(mx, 3)} s, soit un écart de ${fr((mx - mn) / mn * 100, 1)} % entre les masses.`; } },
@@ -64,15 +80,15 @@
         point: r => [r.L, (r.t / r.n) ** 2], axes: { xl: "L (m)", yl: "T² (s²)", xmin: 0, ymin: 0 },
         fit: R => R ? `T² = ${fr(R.a, 3)} · L ${R.b < 0 ? "−" : "+"} ${fr(Math.abs(R.b), 3)}  (r = ${fr(R.r, 4)})   ⟹   g = 4π²/pente = ${fr(PI2 / R.a, 2)} m/s²` : "Au moins 2 mesures sont nécessaires pour la droite de régression." }
     ],
-    questions: ["Partie A : jusqu'à quelle amplitude peut-on considérer que la période est constante ? Compare avec la formule de Borda.", "Partie B : la période dépend-elle de la masse ? Justifie à partir de l'équation du mouvement.", "Partie C : le graphe T² = f(L) est-il une droite passant par l'origine ? Que vaut g ?", "Compare ta valeur de g à la valeur de référence au Sénégal (g ≈ 9,78 m/s²) : calcule l'écart relatif.", "Estime l'incertitude sur g. Quelle mesure limite la précision ?"],
+    questions: ["Partie A : le graphe T = f(θ₀²) est-il une droite ? Lis T₀ à l'ordonnée à l'origine et compare-le à 2π√(L/g). Le rapport pente / T₀ est-il proche de 1/16 (formule de Borda) ?", "Partie A : jusqu'à quelle amplitude peut-on considérer que la période est constante (écart inférieur à 1 %) ?", "Partie B : la période dépend-elle de la masse ? Justifie à partir de l'équation du mouvement.", "Partie C : le graphe T² = f(L) est-il une droite passant par l'origine ? Que vaut g ?", "Compare ta valeur de g à la valeur de référence au Sénégal (g ≈ 9,78 m/s²) : calcule l'écart relatif.", "Estime l'incertitude sur g. Quelle mesure limite la précision ?"],
     init(T) {
       const ch = chrono("pdc");
       const panel = $("#" + T.id + " .panel"); panel.innerHTML = panel.innerHTML.replace("__CHRONO__", ch.html); ch.bind();
       let L = 0.8, A = 10, m = 100, th = 0, om = 0, run = false, prev = 0;
-      const set = () => { L = +$("#pdL").value / 100; A = +$("#pdA").value; m = +$("#pdM").value; $("#pdLv").textContent = fr(L * 100, 0) + " cm"; $("#pdAv").textContent = A + "°"; };
+      const set = () => { L = +$("#pdL").value / 100; A = +$("#pdA").value; m = +$("#pdM").value; $("#pdLv").textContent = fr(L * 100, 0) + " cm"; $("#pdAv").textContent = A + "°"; $("#pdT0").textContent = fr(2 * Math.PI * Math.sqrt(L / G), 3) + " s"; };
       const reset = () => { th = A * Math.PI / 180; om = 0; prev = 0; };
       ["#pdL", "#pdA", "#pdM"].forEach(s => $(s).addEventListener("input", () => { set(); if (!run) reset(); T.draw(); }));
-      $("#pdGo").onclick = () => { set(); reset(); run = true; T.msg("Pendule lâché : démarre le chronomètre au passage par une position extrême."); };
+      $("#pdGo").onclick = () => { set(); reset(); if (A === 0) { run = false; T.draw(); T.msg("Avec θ₀ = 0°, le pendule est à l'équilibre : il ne bouge pas. T₀ s'obtient par extrapolation de la droite T = f(θ₀²) (Partie A).", "bad"); return; } run = true; T.msg("Pendule lâché : démarre le chronomètre au passage par une position extrême."); };
       $("#pdSt").onclick = () => { run = false; reset(); T.draw(); };
       $("#pdRec").onclick = () => {
         const { t, n, man } = ch.S.reading();
@@ -89,8 +105,9 @@
         const { c, w, h } = fit($("#pendule-cv"), innerWidth < 600 ? 0.95 : 0.58); c.fillStyle = css("--plot-bg"); c.fillRect(0, 0, w, h);
         const fg = css("--fg"), mu = css("--muted"), px = w * 0.38, py = 28, sc = (h - 70) / 1.55;
         support(c, px, py, 150);
-        c.setLineDash([3, 4]); c.strokeStyle = css("--grid"); c.lineWidth = 1; c.beginPath(); c.moveTo(px, py); c.lineTo(px, py + L * sc + 24); c.stroke();
-        const a0 = A * Math.PI / 180; [1, -1].forEach(s => { c.beginPath(); c.moveTo(px, py); c.lineTo(px + Math.sin(s * a0) * L * sc, py + Math.cos(a0) * L * sc); c.stroke(); }); c.setLineDash([]);
+        c.setLineDash([7, 5]); c.strokeStyle = css("--accent"); c.lineWidth = 2; c.beginPath(); c.moveTo(px, py); c.lineTo(px, py + L * sc + 30); c.stroke();
+        txt(c, "verticale (θ = 0)", px + 6, Math.min(h - 6, py + L * sc + 44), css("--accent"), "center", "alphabetic", "600 12px 'Fira Sans'");
+        const a0 = A * Math.PI / 180; c.setLineDash([3, 4]); c.strokeStyle = mu; c.lineWidth = 1; [1, -1].forEach(s => { c.beginPath(); c.moveTo(px, py); c.lineTo(px + Math.sin(s * a0) * L * sc, py + Math.cos(a0) * L * sc); c.stroke(); }); c.setLineDash([]);
         c.strokeStyle = mu; c.beginPath(); c.arc(px, py, 34, Math.PI / 2 - a0, Math.PI / 2, false); c.stroke(); txt(c, "θ₀ = " + A + "°", px + 36 * Math.sin(a0 / 2) + 4, py + 46, mu);
         const bx = px + Math.sin(th) * L * sc, by = py + Math.cos(th) * L * sc, r = 7 + Math.cbrt(m) * 1.3;
         c.strokeStyle = fg; c.lineWidth = 1.5; c.beginPath(); c.moveTo(px, py); c.lineTo(bx, by); c.stroke();

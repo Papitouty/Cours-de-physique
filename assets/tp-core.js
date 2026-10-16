@@ -33,6 +33,7 @@
     const m = { l: 54, r: 14, t: 18, b: 40 }, W = w - m.l - m.r, H = h - m.t - m.b;
     if (!P.length) { txt(c, "Le graphe se trace dès la première mesure.", w / 2, h / 2, css("--muted"), "center", "middle", "13px 'Fira Sans',Arial"); return null; }
     const xs = P.map(p => p[0]), ys = P.map(p => p[1]);
+    const R0 = o.noFit ? null : linreg(P); if (R0 && o.xmin != null) ys.push(R0.a * o.xmin + R0.b);   // la droite prolongée reste visible
     let x0 = o.xmin != null ? Math.min(o.xmin, ...xs) : Math.min(...xs), x1 = Math.max(...xs), y0 = o.ymin != null ? Math.min(o.ymin, ...ys) : Math.min(...ys), y1 = Math.max(...ys);
     const px = (x1 - x0) || Math.abs(x1) || 1, py = (y1 - y0) || Math.abs(y1) || 1;
     x1 += px * 0.08; y1 += py * 0.12; if (o.xmin == null) x0 -= px * 0.08; if (o.ymin == null) y0 -= py * 0.1;
@@ -46,9 +47,20 @@
     c.save(); c.beginPath(); c.rect(m.l, m.t, W, H); c.clip();
     if (o.curve) { c.strokeStyle = css("--muted"); c.setLineDash([5, 4]); c.lineWidth = 1.4; c.beginPath(); for (let i = 0; i <= 200; i++) { const x = x0 + (x1 - x0) * i / 200, y = o.curve(x); i ? c.lineTo(X(x), Y(y)) : c.moveTo(X(x), Y(y)); } c.stroke(); c.setLineDash([]); }
     const R = o.noFit ? null : linreg(P);
-    if (R) { c.strokeStyle = css("--saff"); c.lineWidth = 2; c.beginPath(); c.moveTo(X(x0), Y(R.a * x0 + R.b)); c.lineTo(X(x1), Y(R.a * x1 + R.b)); c.stroke(); }
+    if (R) {
+      const xa = o.xmin != null ? Math.min(...xs) : x0;   // partie mesurée en trait plein, prolongement jusqu'à x = xmin en pointillés
+      c.strokeStyle = css("--saff"); c.lineWidth = 2; c.beginPath(); c.moveTo(X(xa), Y(R.a * xa + R.b)); c.lineTo(X(x1), Y(R.a * x1 + R.b)); c.stroke();
+      if (xa > x0) { c.setLineDash([6, 5]); c.beginPath(); c.moveTo(X(x0), Y(R.a * x0 + R.b)); c.lineTo(X(xa), Y(R.a * xa + R.b)); c.stroke(); c.setLineDash([]); }
+    }
     c.restore();
+    if (R && o.mark0 && o.xmin === 0 && P.length >= 2) {   // ordonnée à l'origine (ex. T₀ du pendule)
+      const yb = Y(R.b); c.fillStyle = css("--bad") || "#c0392b"; c.beginPath(); c.arc(X(0), yb, 6, 0, 7); c.fill();
+      c.strokeStyle = c.fillStyle; c.setLineDash([3, 3]); c.beginPath(); c.moveTo(m.l, yb); c.lineTo(X(0) + 30, yb); c.stroke(); c.setLineDash([]);
+      txt(c, o.mark0(R), m.l + 10, m.t + 40, c.fillStyle, "left", "alphabetic", "700 14px 'Fira Sans',Arial");
+    }
+    if (R && o.eq && P.length >= 2) txt(c, o.eq(R), m.l + W - 6, m.t + 14, css("--saff"), "right", "alphabetic", "600 13px 'Fira Sans',Arial");
     c.fillStyle = css("--accent"); P.forEach(([x, y]) => { c.beginPath(); c.arc(X(x), Y(y), 4.5, 0, 7); c.fill(); });
+    if (o.note) txt(c, o.note, m.l + 10, m.t + 62, "#c0392b", "left", "alphabetic", "600 12px 'Fira Sans',Arial");
     return R;
   }
 
@@ -233,15 +245,19 @@
     let refused = false;   // mesure refusée : on ne laisse pas le message « enregistrée » du montage la recouvrir
     const refuse = (s) => { T.msg(s, "bad"); refused = true; Promise.resolve().then(() => { refused = false; }); };
     T.msg = (s, kind) => { if (refused && kind === "ok") return; const e = $("#" + T.id + "-msg"); e.textContent = s || ""; e.className = "msg" + (kind ? " " + kind : ""); };
+    const suspect = (c, r, raw) => { if (!c.ref) return false; const v = parseNum(raw), e = c.ref(r); return isFinite(v) && isFinite(e) && e !== 0 && Math.abs(v / e - 1) > (c.tol || 0.5); };
     const plotPart = k => {
       const p = CR.parts[k]; if (!p.plot) return;
-      const P = T.rows[k].map((r, i) => { const f = {}; p.fill.forEach(c => f[c.k] = parseNum((S.fill[k][i] || {})[c.k])); return [p.plot.x(r, f), p.plot.y(r, f)]; }).filter(q => isFinite(q[0]) && isFinite(q[1]));
-      scatter($("#" + T.id + "-gr-" + k), P, { xl: p.plot.xl, yl: p.plot.yl, noFit: true });
+      const bad = [];   // valeurs saisies très éloignées de la valeur attendue (ex. t au lieu de T = t/n) : écartées du graphe
+      const P = T.rows[k].map((r, i) => { const f = {}; p.fill.forEach(c => f[c.k] = parseNum((S.fill[k][i] || {})[c.k])); if (p.fill.some(c => suspect(c, r, (S.fill[k][i] || {})[c.k]))) { bad.push(i + 1); return [NaN, NaN]; } return [p.plot.x(r, f), p.plot.y(r, f)]; }).filter(q => isFinite(q[0]) && isFinite(q[1]));
+      scatter($("#" + T.id + "-gr-" + k), P, { xl: p.plot.xl, yl: p.plot.yl, noFit: !(p.plot.fit && P.length >= 2), xmin: p.plot.xmin, ymin: p.plot.ymin, eq: p.plot.eq, mark0: p.plot.mark0,
+        note: bad.length ? `Ligne${bad.length > 1 ? "s" : ""} ${bad.join(", ")} écartée${bad.length > 1 ? "s" : ""} : valeur à vérifier (case rouge)` : "" });
     };
     T.renderPart = k => {
       const p = CR.parts[k], rows = T.rows[k], tb = $("#" + T.id + "-tb-" + k), lock = !!SUB;
       while (S.fill[k].length < rows.length) S.fill[k].push({}); S.fill[k].length = rows.length;
-      tb.innerHTML = rows.length ? rows.map((r, i) => `<tr>${p.cells(r, i).map(v => `<td>${v}</td>`).join("")}${p.fill.map(c => `<td class="fillc"><input data-f="${k}:${i}:${c.k}" value="${esc((S.fill[k][i] || {})[c.k] ?? "")}" inputmode="decimal" aria-label="${esc(c.h)}, ligne ${i + 1}"${lock ? " disabled" : ""}></td>`).join("")}<td class="x noprint">${lock ? "" : `<button type="button" data-del="${k}:${i}" aria-label="Supprimer la mesure ${i + 1}">×</button>`}</td></tr>`).join("")
+      const susp = (c, r, i) => suspect(c, r, (S.fill[k][i] || {})[c.k]);
+      tb.innerHTML = rows.length ? rows.map((r, i) => `<tr>${p.cells(r, i).map(v => `<td>${v}</td>`).join("")}${p.fill.map(c => `<td class="fillc${susp(c, r, i) ? " susp" : ""}"${susp(c, r, i) ? ` title="${esc(c.warn || "Valeur très éloignée : vérifie ton calcul.")}"` : ""}><input data-f="${k}:${i}:${c.k}" value="${esc((S.fill[k][i] || {})[c.k] ?? "")}" inputmode="decimal" aria-label="${esc(c.h)}, ligne ${i + 1}"${lock ? " disabled" : ""}></td>`).join("")}<td class="x noprint">${lock ? "" : `<button type="button" data-del="${k}:${i}" aria-label="Supprimer la mesure ${i + 1}">×</button>`}</td></tr>`).join("")
         : `<tr class="empty"><td colspan="${p.cols.length + p.fill.length + 1}">Aucune mesure : fais les mesures sur la paillasse ci-dessus.</td></tr>`;
       const m = $("#" + T.id + "-min-" + k); m.textContent = `${rows.length} mesure${rows.length > 1 ? "s" : ""} / ${p.min} minimum`; m.className = "minm" + (rows.length >= p.min ? " ok" : "");
       plotPart(k); save();
@@ -254,7 +270,7 @@
     cr.addEventListener("click", e => { const b = e.target.closest("[data-del]"); if (!b || SUB) return; const [k, i] = b.dataset.del.split(":"); T.rows[k].splice(+i, 1); S.fill[k].splice(+i, 1); T.renderPart(k); });
     cr.addEventListener("input", e => {
       const t = e.target; if (SUB) return;
-      if (t.dataset.f) { const [k, i, c] = t.dataset.f.split(":"); S.fill[k][+i] = S.fill[k][+i] || {}; S.fill[k][+i][c] = t.value; plotPart(k); save(); }
+      if (t.dataset.f) { const [k, i, c] = t.dataset.f.split(":"); S.fill[k][+i] = S.fill[k][+i] || {}; S.fill[k][+i][c] = t.value; const fc = CR.parts[k].fill.find(x => x.k === c), td = t.parentElement; if (fc && td) { const bad = suspect(fc, T.rows[k][+i], t.value); td.classList.toggle("susp", bad); if (bad) td.title = fc.warn || "Valeur très éloignée : vérifie ton calcul."; else td.removeAttribute("title"); } plotPart(k); save(); }
       else if (t.dataset.calc) { S.calc[t.dataset.calc] = t.value; save(); }
       else if (t.dataset.id) { S.id[t.dataset.id] = t.value; save(); }
     });
@@ -400,5 +416,5 @@
     const loop = ts => { const dt = last == null ? 0 : Math.min(0.05, (ts - last) / 1000); last = ts; const T = TPS.find(t => t.id === cur); if (T && T.tick && dt > 0) T.tick(dt); requestAnimationFrame(loop); };
     requestAnimationFrame(loop);
   }
-  window.TPCORE = { build: 23, register, start, $, css, esc, fr, gauss, store, fit, txt, linreg, chrono, isCur: id => cur === id };
+  window.TPCORE = { build: 24, register, start, $, css, esc, fr, gauss, store, fit, txt, linreg, chrono, isCur: id => cur === id };
 })();
