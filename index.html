@@ -265,7 +265,7 @@ const COURSES=[
 
 const $=s=>document.querySelector(s);
 var PDF_CACHE="pdf-v1";
-const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const norm=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
 let current="meca";
 try{const t=localStorage.getItem("tab");if(t&&COURSES.some(c=>c.id===t))current=t}catch(e){}
@@ -311,7 +311,7 @@ function render(){
         ${ch.td?pdfBtn(ch.td.e,"TD "+(ch.td.n||ch.n)+" — énoncés",ch.td.ep,"pdf")+pdfBtn(ch.td.c,"TD "+(ch.td.n||ch.n)+" — corrigé détaillé",ch.td.cp,"cor"):""}
         <a class="btn" href="entrainement.html#${c.id}${ch.n}"><span class="k k-quiz">EXOS</span><span class="lbl">Exercices d'entraînement</span></a>
         <a class="btn" href="quiz.html#${c.id}${ch.n}"><span class="k k-quiz">QUIZ</span><span class="lbl">Quiz d'auto-évaluation</span><span class="n">10 q.</span></a>
-        ${((window.VIDEOS||{})[c.id+ch.n]||[]).map(v=>`<a class="btn" href="${esc(v.url)}" target="_blank" rel="noopener"><span class="k k-vid">VIDÉO</span><span class="lbl">${esc(v.titre)}</span>${v.duree?`<span class="n">${esc(v.duree)}</span>`:""}</a>`).join("")}
+        ${((window.VIDEOS||{})[c.id+ch.n]||[]).map(v=>`<a class="btn" href="${esc(v.url||v.fichier)}" target="_blank" rel="noopener"><span class="k k-vid">${v.type==="3d"?"3D":"VIDÉO"}</span><span class="lbl">${esc(v.titre)}</span>${v.duree?`<span class="n">${esc(v.duree)}</span>`:""}</a>`).join("")}
         ${(SIMS[c.id+ch.n]||[]).map(([id,t])=>`<a class="btn" href="simulations.html#${id}"><span class="k k-sim">SIMU</span><span class="lbl">${esc(t)}</span></a>`).join("")}
       </div></article>`;
   });
