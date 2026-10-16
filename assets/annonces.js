@@ -16,6 +16,10 @@
    ===================================================================== */
 window.ANNONCES = [
   { date: "2026-10-16", important: true,
+    titre: "Optique géométrique — chapitre 4 en ligne",
+    texte: "Miroirs et dioptres sphériques : relations de conjugaison (sommet, centre, Newton), foyers, vergence, grandissement et construction des images. Support de cours, diaporama (en ligne et PowerPoint) et série de TD n°4 avec corrigé détaillé.",
+    lien: "./#opt" },
+  { date: "2026-10-16", important: true,
     titre: "Optique géométrique — chapitre 3 en ligne",
     texte: "Prisme et lame à faces parallèles : formules du prisme, conditions d'émergence, minimum de déviation et mesure d'un indice, dispersion, lame à faces parallèles. Support de cours, diaporama (en ligne et PowerPoint) et série de TD n°3 avec corrigé détaillé.",
     lien: "./#opt" },
