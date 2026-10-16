@@ -15,7 +15,11 @@
      detail : consignes (facultatif)
    ===================================================================== */
 window.ANNONCES = [
-  { date: "2026-10-15", important: true,
+  { date: "2026-10-16", important: true,
+    titre: "Nouveau cours : Optique géométrique — chapitre 1",
+    texte: "Lois fondamentales de l'optique géométrique : nature de la lumière, indice, principe de Fermat, lois de Snell-Descartes démontrées pas à pas, réflexion totale et fibre optique. Support de cours, diaporama (en ligne et PowerPoint) et série de TD n°1 avec corrigé détaillé.",
+    lien: "./#opt" },
+  { date: "2026-10-15",
     titre: "TP 4 : câble toi-même ton circuit",
     texte: "Dans le TP de la loi d'Ohm, c'est maintenant toi qui réalises le montage : place les résistors, relie les bornes du générateur, de l'interrupteur, de l'ampèremètre et du voltmètre. Attention aux erreurs comme en salle : ampèremètre en dérivation (court-circuit), appareil branché à l'envers…",
     lien: "tp.html#ohm" },
