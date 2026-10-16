@@ -53,7 +53,7 @@
     controls: `<h3>Pendule</h3>
       <div class="ctl"><label for="pdL">Longueur L <b id="pdLv"></b></label><input id="pdL" type="range" min="20" max="150" step="1" value="80"></div>
       <div class="ctl"><label for="pdA">Amplitude θ₀ <b id="pdAv"></b></label><input id="pdA" type="range" min="0" max="70" step="1" value="10"></div>
-      <dl class="lcd"><dt>T₀ théorique = 2π√(L/g)</dt><dd id="pdT0"></dd></dl>
+      <dl class="lcd"><dt id="pdT0l">T₀ théorique = 2π√(L/g)</dt><dd id="pdT0"></dd></dl>
       <div class="ctl"><label for="pdM">Masse</label><select id="pdM"><option value="50">50 g</option><option value="100" selected>100 g</option><option value="200">200 g</option></select></div>
       <div class="row"><button type="button" class="btn primary sm" id="pdGo">Lâcher le pendule</button><button type="button" class="btn sm" id="pdSt">Arrêter le pendule</button></div>
       __CHRONO__
@@ -85,7 +85,7 @@
       const ch = chrono("pdc");
       const panel = $("#" + T.id + " .panel"); panel.innerHTML = panel.innerHTML.replace("__CHRONO__", ch.html); ch.bind();
       let L = 0.8, A = 10, m = 100, th = 0, om = 0, run = false, prev = 0;
-      const set = () => { L = +$("#pdL").value / 100; A = +$("#pdA").value; m = +$("#pdM").value; $("#pdLv").textContent = fr(L * 100, 0) + " cm"; $("#pdAv").textContent = A + "°"; $("#pdT0").textContent = fr(2 * Math.PI * Math.sqrt(L / G), 3) + " s"; };
+      const set = () => { L = +$("#pdL").value / 100; A = +$("#pdA").value; m = +$("#pdM").value; $("#pdLv").textContent = fr(L * 100, 0) + " cm"; $("#pdAv").textContent = A + "°"; $("#pdT0").textContent = fr(2 * Math.PI * Math.sqrt(L / G), 3) + " s"; $("#pdT0l").textContent = "T₀ théorique pour L = " + fr(L * 100, 0) + " cm : 2π√(L/g)"; };
       const reset = () => { th = A * Math.PI / 180; om = 0; prev = 0; };
       ["#pdL", "#pdA", "#pdM"].forEach(s => $(s).addEventListener("input", () => { set(); if (!run) reset(); T.draw(); }));
       $("#pdGo").onclick = () => { set(); reset(); if (A === 0) { run = false; T.draw(); T.msg("Avec θ₀ = 0°, le pendule est à l'équilibre : il ne bouge pas. T₀ s'obtient par extrapolation de la droite T = f(θ₀²) (Partie A).", "bad"); return; } run = true; T.msg("Pendule lâché : démarre le chronomètre au passage par une position extrême."); };
