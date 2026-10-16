@@ -224,9 +224,12 @@
         ${CR.calc.map(c => `<div class="calc"><label for="${T.id}-c-${c.k}">${c.h}</label><div class="cin"><input id="${T.id}-c-${c.k}" data-calc="${c.k}" inputmode="decimal"><span>${esc(c.u)}</span></div></div>`).join("")}
       </div></div>
       <div class="crblock"><h4>Questions (QCM)</h4>
+        <p class="hint qcm-wait" id="${T.id}-qwait" hidden><b>Les questions apparaîtront quand tu auras cliqué sur « Commencer le TP »</b> (en haut de la paillasse).</p>
+        <div id="${T.id}-qbox">
         ${QS.length ? QS.map(([qi, ord], i) => { const q = CR.qcm[qi]; return `<fieldset class="qcm"><legend><b>${i + 1}.</b> ${q.q}</legend>${ord.map(j => `<label><input type="radio" name="${T.id}-q${qi}" value="${j}"> ${q.o[j]}</label>`).join("")}</fieldset>`; }).join("")
           : SS ? `<p class="hint"><b>Questions non disponibles pour ce TP.</b> Le correcteur de l'enseignant ne connaît pas encore ce TP (il doit installer la dernière version du script), puis clique sur « Actualiser » en haut de la page.</p>`
           : `<p class="hint">Les questions te seront attribuées après connexion (chaque étudiant reçoit ses propres questions).</p>`}
+        </div>
       </div>
       <div class="crblock"><h4>Remarques <span class="opt">(facultatif, non noté)</span></h4><textarea id="${T.id}-rem" data-id="rem"></textarea></div>
       <div class="submit noprint" id="${T.id}-sub">
@@ -324,7 +327,9 @@
     const timed = () => !(ST && ST.duree) || SUB ? "" : !ST.finTP ? "avant" : left() <= 0 ? "fini" : "en cours";
     const tbox = $("#" + T.id + "-timer");
     let autoDone = false;
+    const qVis = () => { const avant = timed() === "avant", qb = $("#" + T.id + "-qbox"), qw = $("#" + T.id + "-qwait"); if (qb) qb.hidden = avant; if (qw) qw.hidden = !avant; };
     const drawTimer = () => {
+      qVis();
       if (!tbox) return;
       if (SUB) { tbox.hidden = true; return; }
       const st = timed();
@@ -357,7 +362,7 @@
         setTimeout(() => doSend(true), Math.random() * 90000);
       }
     };
-    if (tbox) { TIMERS.push(drawTimer); drawTimer(); }
+    if (tbox) { TIMERS.push(drawTimer); drawTimer(); } else qVis();
     $("#" + T.id + "-dl").onclick = () => {
       const val = f => ($("#" + T.id + "-" + f) || {}).value || "";
       const tables = keys.map((k, i) => { const p = CR.parts[k]; const cv = p.plot ? $("#" + T.id + "-gr-" + k) : null;
@@ -416,5 +421,5 @@
     const loop = ts => { const dt = last == null ? 0 : Math.min(0.05, (ts - last) / 1000); last = ts; const T = TPS.find(t => t.id === cur); if (T && T.tick && dt > 0) T.tick(dt); requestAnimationFrame(loop); };
     requestAnimationFrame(loop);
   }
-  window.TPCORE = { build: 24, register, start, $, css, esc, fr, gauss, store, fit, txt, linreg, chrono, isCur: id => cur === id };
+  window.TPCORE = { build: 25, register, start, $, css, esc, fr, gauss, store, fit, txt, linreg, chrono, isCur: id => cur === id };
 })();
