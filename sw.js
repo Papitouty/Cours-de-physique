@@ -5,7 +5,7 @@
      ⚠ Toute modification du site doit s'accompagner d'un changement de VERSION.
    - documents PDF : copie locale d'abord, rafraîchie en arrière-plan
    - bibliothèques externes (KaTeX) : copie locale permanente */
-const VERSION = "v49";
+const VERSION = "v50";
 const SHELL = "shell-" + VERSION;
 const PDFS = "pdf-v1";          // nom stable : les documents enregistrés survivent aux mises à jour du site
 const EXT = "ext-v1";           // KaTeX ne change pas : inutile de le retélécharger à chaque version
@@ -94,6 +94,8 @@ self.addEventListener("fetch", e => {
   const req = e.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
+
+  if (/\.(mp4|webm)$/i.test(url.pathname)) return;   // vidéos : lecture directe par le navigateur (requêtes partielles), jamais mises en cache
 
   if (url.origin === location.origin && isPdf(url)) {
     // copie locale immédiate, puis mise à jour en arrière-plan si internet est disponible

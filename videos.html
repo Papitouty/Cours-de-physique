@@ -33,6 +33,9 @@ h2{font-family:var(--f-head);font-size:1.15rem;margin:0 0 12px}
 .meta small{font-family:var(--f-head);font-size:.78rem;color:var(--accent)}
 .empty{background:var(--surface);border:1px dashed var(--line);border-radius:12px;padding:20px;color:var(--muted);font-family:var(--f-head)}
 .note{font-family:var(--f-head);font-size:.86rem;color:var(--muted);margin:0}
+.vid.loc{cursor:default}
+.vid.loc video{width:100%;aspect-ratio:1920/880;display:block;background:#fff}
+.vid .tag{justify-self:start;font-family:var(--f-head);font-size:.72rem;font-weight:600;color:#fff;background:var(--accent);border-radius:999px;padding:1px 8px}
 </style>
 </head>
 <body>
@@ -40,19 +43,22 @@ h2{font-family:var(--f-head);font-size:1.15rem;margin:0 0 12px}
   <a class="back" href="./">← Retour aux cours</a>
   <div class="uni">UNIVERSITÉ SOULEYMANE NIANG DE MATAM • PHYSIQUE L1</div>
   <h1>Vidéos</h1>
-  <p>Des vidéos pour revoir les notions du cours. Elles s'ouvrent dans YouTube (connexion internet nécessaire).</p>
+  <p>Des vidéos pour revoir les notions du cours : simulations 3D de chaque chapitre (lecture directe sur la plateforme) et vidéos YouTube.</p>
 </div></header>
 <main><div class="wrap" id="list"></div></main>
 <footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré • <a href="reparer.html?retour=videos.html">Affichage incomplet ? Mettre le site à jour</a></div></footer>
 <script src="assets/videos.js"></script>
 <script>
-const NOMS={meca1:"Mécanique — Chapitre 1 : Calcul vectoriel",meca2:"Mécanique — Chapitre 2 : Cinématique",meca3:"Mécanique — Chapitre 3 : Dynamique",meca4:"Mécanique — Chapitre 4 : Travail et énergie",elec1:"Électricité — Chapitre 1 : Généralités sur l'électrostatique",elec2:"Électricité — Chapitre 2 : Champ et potentiel"};
+const NOMS={meca1:"Mécanique — Chapitre 1 : Calcul vectoriel",meca2:"Mécanique — Chapitre 2 : Cinématique",meca3:"Mécanique — Chapitre 3 : Dynamique",meca4:"Mécanique — Chapitre 4 : Travail et énergie",elec1:"Électricité — Chapitre 1 : Généralités sur l'électrostatique",elec2:"Électricité — Chapitre 2 : Champ et potentiel",elec3:"Électricité — Chapitre 3 : Le dipôle électrostatique"};
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function ytId(u){try{const x=new URL(u);if(x.hostname.includes("youtu.be"))return x.pathname.slice(1);if(x.searchParams.get("v"))return x.searchParams.get("v");const m=x.pathname.match(/\/(embed|shorts|live)\/([^/?]+)/);return m?m[2]:""}catch(e){return""}}
 const V=window.VIDEOS||{};
-const parts=Object.keys(NOMS).filter(k=>(V[k]||[]).length).map(k=>`<section><h2>${esc(NOMS[k])}</h2><div class="grid">${V[k].map(v=>{const id=ytId(v.url);
+const nf=s=>esc(s).replace(/_([A-Za-zρµ0-9\/]+)/g,"<sub>$1</sub>");   // indices : u_ρ → u<sub>ρ</sub>
+const parts=Object.keys(NOMS).filter(k=>(V[k]||[]).length).map(k=>`<section><h2>${esc(NOMS[k])}</h2><div class="grid">${V[k].map(v=>{
+  if(v.fichier) return `<div class="vid loc"><video controls preload="none" playsinline${v.image?` poster="${esc(v.image)}"`:""} src="${esc(v.fichier)}" aria-label="${esc(v.titre)}"></video><div class="meta">${v.type==="3d"?`<span class="tag">Simulation 3D${v.duree?" • "+esc(v.duree):""}</span>`:""}<b>${esc(v.titre)}</b>${v.note?`<span>${nf(v.note)}</span>`:""}</div></div>`;
+  const id=ytId(v.url);
   return `<a class="vid" href="${esc(v.url)}" target="_blank" rel="noopener"><div class="th">${id?`<img src="https://i.ytimg.com/vi/${esc(id)}/mqdefault.jpg" alt="" loading="lazy" onerror="this.remove()">`:""}<div class="play"><span></span></div>${v.duree?`<span class="dur">${esc(v.duree)}</span>`:""}</div><div class="meta"><b>${esc(v.titre)}</b>${v.note?`<span>${esc(v.note)}</span>`:""}<small>Ouvrir dans YouTube ↗</small></div></a>`}).join("")}</div></section>`);
-document.getElementById("list").innerHTML=parts.length?parts.join("")+`<p class="note">Les vidéos ne sont pas disponibles hors connexion.</p>`:`<div class="empty">Les vidéos du cours seront ajoutées ici prochainement.</div>`;
+document.getElementById("list").innerHTML=parts.length?parts.join("")+`<p class="note">Les vidéos se lisent avec une connexion internet (environ 2 Mo par simulation 3D).</p>`:`<div class="empty">Les vidéos du cours seront ajoutées ici prochainement.</div>`;
 </script>
 <script>
 if("serviceWorker" in navigator){const hadSW=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",()=>{/* nouvelle version du site installée : on recharge une fois */try{if(!hadSW||sessionStorage.getItem("swmaj"))return;sessionStorage.setItem("swmaj","1")}catch(e){return}location.reload()});addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
