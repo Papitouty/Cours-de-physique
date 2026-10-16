@@ -16,6 +16,10 @@
    ===================================================================== */
 window.ANNONCES = [
   { date: "2026-10-16", important: true,
+    titre: "Optique géométrique complète : chapitre 5 en ligne",
+    texte: "Les lentilles minces : formule des opticiens, relations de Descartes et de Newton, construction des images (loupe, projecteur), associations (lentilles accolées, microscope, lunette) et aberrations. Le cours d'optique compte désormais 5 chapitres, chacun avec support, diaporama et série de TD corrigée.",
+    lien: "./#opt" },
+  { date: "2026-10-16", important: true,
     titre: "Optique géométrique — chapitre 4 en ligne",
     texte: "Miroirs et dioptres sphériques : relations de conjugaison (sommet, centre, Newton), foyers, vergence, grandissement et construction des images. Support de cours, diaporama (en ligne et PowerPoint) et série de TD n°4 avec corrigé détaillé.",
     lien: "./#opt" },
