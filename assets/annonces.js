@@ -16,6 +16,10 @@
    ===================================================================== */
 window.ANNONCES = [
   { date: "2026-10-16", important: true,
+    titre: "Optique géométrique — chapitre 3 en ligne",
+    texte: "Prisme et lame à faces parallèles : formules du prisme, conditions d'émergence, minimum de déviation et mesure d'un indice, dispersion, lame à faces parallèles. Support de cours, diaporama (en ligne et PowerPoint) et série de TD n°3 avec corrigé détaillé.",
+    lien: "./#opt" },
+  { date: "2026-10-16", important: true,
     titre: "Optique géométrique — chapitre 2 en ligne",
     texte: "Formation des images et systèmes plans : objets et images réels ou virtuels, stigmatisme, conditions de Gauss, foyers, vergence et grandissements, miroir plan et dioptre plan (profondeur apparente). Support de cours, diaporama (en ligne et PowerPoint) et série de TD n°2 avec corrigé détaillé.",
     lien: "./#opt" },
