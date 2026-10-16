@@ -16,6 +16,10 @@
    ===================================================================== */
 window.ANNONCES = [
   { date: "2026-10-16", important: true,
+    titre: "Optique géométrique — chapitre 2 en ligne",
+    texte: "Formation des images et systèmes plans : objets et images réels ou virtuels, stigmatisme, conditions de Gauss, foyers, vergence et grandissements, miroir plan et dioptre plan (profondeur apparente). Support de cours, diaporama (en ligne et PowerPoint) et série de TD n°2 avec corrigé détaillé.",
+    lien: "./#opt" },
+  { date: "2026-10-16", important: true,
     titre: "Nouveau cours : Optique géométrique — chapitre 1",
     texte: "Lois fondamentales de l'optique géométrique : nature de la lumière, indice, principe de Fermat, lois de Snell-Descartes démontrées pas à pas, réflexion totale et fibre optique. Support de cours, diaporama (en ligne et PowerPoint) et série de TD n°1 avec corrigé détaillé.",
     lien: "./#opt" },
