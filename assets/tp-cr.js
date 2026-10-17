@@ -229,7 +229,7 @@ window.TPCR = {
     ressort: [
       { q: "Dans la méthode statique, la raideur k est :", o: ["la pente du graphe F = f(Δℓ)", "l'ordonnée à l'origine du graphe F = f(Δℓ)", "l'inverse de la pente du graphe F = f(Δℓ)", "la pente du graphe T₀² = f(m)"] },
       { q: "L'unité de la raideur k est :", o: ["le newton (N)", "le newton-mètre (N·m)", "le newton par mètre (N/m)", "le kilogramme par seconde (kg/s)"] },
-      { q: "Une masse de 200 g allonge un ressort de 8,0 cm (g = 9,78 m/s²). Sa raideur vaut environ :", o: ["2,4 N/m", "24 N/m", "0,24 N/m", "245 N/m"] },
+      { q: "Une masse de 200 g allonge un ressort de 8,0 cm (g = 9,78 m/s²). Sa raideur vaut environ :", o: ["2,4 N/m", "24 N/m", "0,24 N/m", "24 450 N/m"] },
       { q: "Pour le ressort vertical, le poids décale la position d'équilibre, mais la période :", o: ["dépend de g", "reste T₀ = 2π√(m/k), comme pour un ressort horizontal", "est doublée", "dépend de l'écart initial imposé"] },
       { q: "La pente du graphe T₀² = f(m) vaut :", o: ["k/4π²", "4π²/k", "2π/k", "4π²k"] },
       { q: "Avec un ressort deux fois plus raide (même masse), la période est :", o: ["multipliée par 2", "divisée par 2", "divisée par √2", "multipliée par √2"] },
