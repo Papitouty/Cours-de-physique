@@ -16,6 +16,10 @@
    ===================================================================== */
 window.ANNONCES = [
   { date: "2026-10-17", important: true,
+    titre: "Optique : exercices et quiz avec schémas",
+    texte: "15 nouvelles questions de quiz s'appuient sur un schéma (rayon réfracté, réflexion totale, miroirs, prisme, lame, lentilles). En entraînement, 14 exercices d'optique sont désormais illustrés (repère ◩) : lecture d'angles, cuve d'eau, deux miroirs plans, minimum de déviation, constructions sur quadrillage pour le miroir concave et la lentille mince.",
+    lien: "entrainement.html" },
+  { date: "2026-10-17", important: true,
     titre: "Optique : quiz, exercices d'entraînement et simulations",
     texte: "Pour chacun des 5 chapitres d'optique : un quiz de 10 questions corrigées et 3 exercices d'entraînement à valeurs aléatoires avec correction détaillée. Quatre nouvelles simulations : réfraction et réflexion totale, prisme et dispersion, lentille mince, miroir sphérique.",
     lien: "simulations.html#refrac" },

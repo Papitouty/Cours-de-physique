@@ -31,6 +31,9 @@ main .wrap{padding-block:24px 20px;display:grid;gap:22px}
 .bar{height:6px;background:var(--tint);border-radius:3px;overflow:hidden}
 .bar span{display:block;height:100%;background:var(--accent);transition:width .25s}
 .question{font-size:1.12rem;line-height:1.5}
+.qfig{margin:0;display:grid;gap:6px;justify-items:center}
+.qfig>svg{width:100%;max-width:470px;height:auto;background:var(--plot-bg);border:1px solid var(--line);border-radius:10px}
+.qfig figcaption{font-family:var(--f-head);font-size:.86rem;line-height:1.45;color:var(--muted);text-align:center;max-width:560px}
 .choices{display:grid;gap:8px}
 .choice{display:flex;gap:12px;align-items:center;text-align:left;width:100%;font:inherit;color:var(--fg);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;cursor:pointer}
 .choice:hover:not(:disabled){border-color:var(--accent)}
@@ -71,6 +74,8 @@ main .wrap{padding-block:24px 20px;display:grid;gap:22px}
 <footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré • <a href="reparer.html?retour=quiz.html">Affichage incomplet ? Mettre le site à jour</a></div></footer>
 
 <script src="assets/quiz-data.js"></script>
+<script src="assets/optique-svg.js"></script>
+<script src="assets/quiz-optique-fig.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
 <script>
@@ -102,7 +107,7 @@ function show(){
   const q=st.qs[st.i],n=st.qs.length;
   $("#card").innerHTML=`<div class="qhead"><h2>${QZ[key].title}</h2><span class="count">Question ${st.i+1} / ${n}</span></div>
    <div class="bar"><span style="width:${st.i/n*100}%"></span></div>
-   <div class="question">${q.q}</div>
+   <div class="question">${q.q}</div>${q.fig?`<figure class="qfig">${q.fig}${q.figcap?`<figcaption>${q.figcap}</figcaption>`:""}</figure>`:""}
    <div class="choices">${q.c.map((c,i)=>`<button type="button" class="choice" data-i="${i}"><span class="l">${"ABCD"[i]}</span><span class="t">${c}</span></button>`).join("")}</div>
    <div id="fb"></div>
    <div class="actions"><button type="button" class="btn primary" id="next" disabled>${st.i+1<n?"Question suivante":"Voir mon score"}</button></div>`;

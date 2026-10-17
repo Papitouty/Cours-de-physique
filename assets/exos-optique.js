@@ -1,12 +1,14 @@
 /* Exercices d'entraînement d'optique géométrique (valeurs aléatoires, corrections détaillées).
    Même format que exos.js : titre, enonce, reponses [{nom, unite, val, tol|abs}], correction [étapes], figureCor facultative. */
 (function () {
-  const T = window.EXO_OUTILS, EX = window.EXOS;
-  if (!T || !EX) return;
+  const T = window.EXO_OUTILS, EX = window.EXOS, OS = window.OPT_SVG;
+  if (!T || !EX || !OS) return;
+  const { Scene, G, lentille, miroirSph, prisme } = OS;
   const { R, rnd, pick, N } = T;
   const deg = r => r * 180 / Math.PI, rad = d => d * Math.PI / 180;
   const asinD = x => deg(Math.asin(x)), sinD = d => Math.sin(rad(d)), tanD = d => Math.tan(rad(d)), cosD = d => Math.cos(rad(d));
   const s = x => (x < 0 ? "(" + N(x) + ")" : N(x));
+  const Np = x => N(x).replace("{,}", ",");   // nombre pour un texte SVG (hors KaTeX)
 
   /* ---------- schéma de construction (lentille mince ou miroir) dans les conditions de Gauss ---------- */
   function svgLentille(fp, OA, AB, OAp, ApBp) {
@@ -52,6 +54,7 @@
       const milieu = n2 === 1 ? "l'air" : "l'eau";
       return { titre: "Réfraction et angle critique",
         enonce: R`Un rayon lumineux se propage dans un verre d'indice $n_1=${N(n1)}$ et arrive sur la surface de séparation avec ${milieu} ($n_2=${N(n2)}$) sous l'incidence $i_1=${i1}^\circ$. Calculer l'angle de réfraction $i_2$, puis l'angle critique $\lambda$ au-delà duquel il y a réflexion totale.`,
+        figure: { svg: svgDioptre({ n1: n1.toFixed(2), n2: n2.toFixed(2), i1, i2 }), legende: "Rayon passant du verre (milieu 1) vers le milieu 2 : rayons incident, réfléchi et réfracté." },
         reponses: [{ nom: "i_2", unite: "°", val: i2, abs: 0.3 }, { nom: R`\lambda`, unite: "°", val: lam, abs: 0.3 }],
         correction: [
           R`Loi de Snell-Descartes : $n_1\sin i_1=n_2\sin i_2$, d'où $\sin i_2=\dfrac{${N(n1)}\times\sin${i1}^\circ}{${N(n2)}}\approx${N(n1 * sinD(i1) / n2)}$ et $i_2\approx${N(i2)}^\circ$.`,
@@ -76,6 +79,7 @@
       const d = rnd(0.5, 4, 0.1), dl = rnd(0.1, 1.0, 0.05), H = rnd(1.50, 1.95, 0.01);
       return { titre: "Miroir plan",
         enonce: R`Une personne de taille $H=${N(H)}$ m se tient debout à $d=${N(d)}$ m d'un miroir plan vertical. (1) Quelle est la distance entre la personne et son image ? (2) On recule le miroir de $\delta=${N(dl)}$ m : de combien l'image se déplace-t-elle ? (3) Quelle hauteur minimale doit avoir le miroir pour qu'elle s'y voie en entier ?`,
+        figure: { svg: svgMiroirPlan(H, d), legende: "Rayons issus des pieds et du sommet de la tête, réfléchis vers l'œil. Seule la partie h du miroir est utile." },
         reponses: [{ nom: "D", unite: "m", val: 2 * d }, { nom: R`\Delta x`, unite: "m", val: 2 * dl }, { nom: "h_{\\min}", unite: "m", val: H / 2 }],
         correction: [
           R`L'image est le symétrique de l'objet par rapport au miroir : $\overline{HA'}=-\overline{HA}$. Elle est à $${N(d)}$ m derrière le miroir, donc à $D=2d=${N(2 * d)}$ m de la personne.`,
@@ -86,6 +90,7 @@
       const n = pick([1.33, 1.36, 1.47, 1.50]), h = rnd(0.30, 3.00, 0.05), liq = { 1.33: "d'eau", 1.36: "d'alcool", 1.47: "de glycérine", 1.50: "d'huile" }[n], hp = h / n;
       return { titre: "Profondeur apparente",
         enonce: R`Un objet repose au fond d'un bac rempli ${liq} ($n=${N(n)}$) sur une hauteur $h=${N(h)}$ m. On l'observe de l'air, presque à la verticale. Calculer la profondeur apparente $h'$ et la distance $\Delta h$ dont l'objet semble remonté.`,
+        figure: { svg: svgProfondeur(h, n), legende: "Les rayons réfractés s'écartent de la normale ; leurs prolongements (pointillés) se coupent en A′ (schéma non à l'échelle angulaire)." },
         reponses: [{ nom: "h'", unite: "m", val: hp }, { nom: R`\Delta h`, unite: "m", val: h - hp }],
         correction: [
           R`Dioptre plan dans les conditions de Gauss (axe orienté du liquide vers l'air) : $\dfrac{\overline{HA'}}{n_2}=\dfrac{\overline{HA}}{n_1}$ avec $n_1=${N(n)}$, $n_2=1$.`,
@@ -112,6 +117,7 @@
       const D = i + ip - A;
       return { titre: "Marche d'un rayon dans un prisme",
         enonce: R`Un prisme d'angle $A=${A}^\circ$ et d'indice $n=${N(n)}$ reçoit un rayon sous l'incidence $i=${i}^\circ$. Calculer $r$, $r'$, l'angle d'émergence $i'$ et la déviation $D$.`,
+        figure: { svg: prisme({ A, n, i, full: false }).svg, legende: "Prisme d'angle A ; rayon incident sur la première face (normale en pointillés)." }, figureCor: { svg: prisme({ A, n, i, showD: true }).svg, legende: "Marche complète : le rayon est dévié vers la base ; D est l'angle entre les directions incidente et émergente." },
         reponses: [{ nom: "r", unite: "°", val: r, abs: 0.2 }, { nom: "r'", unite: "°", val: rp, abs: 0.2 }, { nom: "i'", unite: "°", val: ip, abs: 0.3 }, { nom: "D", unite: "°", val: D, abs: 0.3 }],
         correction: [
           R`Entrée : $\sin r=\dfrac{\sin i}{n}=\dfrac{\sin${i}^\circ}{${N(n)}}$, d'où $r\approx${N(r)}^\circ$.`,
@@ -134,6 +140,7 @@
       const e = rnd(2, 20, 0.5), n = rnd(1.45, 1.70, 0.01), i = rnd(20, 70, 5), r = asinD(sinD(i) / n), d = e * sinD(i - r) / cosD(r), AA = e * (1 - 1 / n);
       return { titre: "Lame à faces parallèles",
         enonce: R`Une lame de verre d'épaisseur $e=${N(e)}$ mm et d'indice $n=${N(n)}$ est placée dans l'air. (1) Un rayon l'atteint sous l'incidence $i=${i}^\circ$ : calculer le déplacement latéral $d$ du rayon émergent. (2) Dans les conditions de Gauss, de combien l'image d'un point vu à travers la lame est-elle rapprochée ?`,
+        figure: { svg: svgLame(e, n, i), legende: "Le rayon émergent est parallèle au rayon incident (prolongé en pointillés), décalé de d." },
         reponses: [{ nom: "d", unite: "mm", val: d }, { nom: R`\overline{AA'}`, unite: "mm", val: AA }],
         correction: [
           R`Réfraction à l'entrée : $\sin r=\dfrac{\sin${i}^\circ}{${N(n)}}$, d'où $r\approx${N(r)}^\circ$. Le rayon émergent est parallèle au rayon incident.`,
@@ -150,6 +157,7 @@
       const SAp = 1 / (2 / SC - 1 / SA), g = -SAp / SA;
       return { titre: "Miroir sphérique concave",
         enonce: R`Un miroir concave a un rayon de courbure $|R|=${Rr}$ cm. Un objet $AB$ est placé à $${-SA}$ cm du sommet ($\overline{SA}=${SA}$ cm). Calculer $\overline{SF}$, la position $\overline{SA'}$ de l'image et le grandissement $\gamma$.`,
+        ...(Math.abs(SAp) < 3 * Rr && Math.abs(g) < 3.5 ? { figureCor: { svg: miroirSph({ SC, SA, AB: 1, SAp, ApBp: g }), legende: "Construction (objet de hauteur arbitraire) : orange, rayon parallèle à l'axe ; vert, rayon passant par S." } } : {}),
         reponses: [{ nom: R`\overline{SF}`, unite: "cm", val: SF, abs: 0.05 }, { nom: R`\overline{SA'}`, unite: "cm", val: SAp, abs: 0.1 }, { nom: R`\gamma`, unite: "", val: g, abs: 0.02 }],
         correction: [
           R`Miroir concave : $\overline{SC}=${SC}$ cm et $\overline{SF}=\dfrac{\overline{SC}}2=${N(SF)}$ cm.`,
@@ -219,6 +227,7 @@
       const g1 = O1A1 / OA, O2Ap = 1 / (1 / f2 + 1 / O2A1), g2 = O2Ap / O2A1;
       return { titre: "Association de deux lentilles",
         enonce: R`Deux lentilles convergentes $L_1$ ($f'_1=${f1}$ cm) et $L_2$ ($f'_2=${f2}$ cm) sont distantes de $e=${e}$ cm. Un objet est placé à $\overline{O_1A}=${OA}$ cm. Calculer la position $\overline{O_1A_1}$ de l'image intermédiaire, la position $\overline{O_2A'}$ de l'image finale et le grandissement total $\gamma$.`,
+        figure: { svg: svgDeuxLentilles(f1, f2, e, OA), legende: "Position des deux lentilles et de l'objet (échelle horizontale respectée)." }, figureCor: { svg: svgDeuxLentilles(f1, f2, e, OA, O1A1, O2Ap, g1, g1 * g2), legende: "Image intermédiaire A₁B₁ (bleu) donnée par L₁, qui sert d'objet pour L₂ ; image finale A′B′ (rouge)." },
         reponses: [{ nom: R`\overline{O_1A_1}`, unite: "cm", val: O1A1, abs: 0.1 }, { nom: R`\overline{O_2A'}`, unite: "cm", val: O2Ap, abs: 0.1 }, { nom: R`\gamma`, unite: "", val: g1 * g2, abs: 0.02 }],
         correction: [
           R`Lentille $L_1$ : $\dfrac1{\overline{O_1A_1}}=\dfrac1{${f1}}+\dfrac1{${OA}}$, d'où $\overline{O_1A_1}\approx${N(O1A1)}$ cm et $\gamma_1\approx${N(g1)}$.`,
@@ -227,6 +236,203 @@
           R`Grandissement total : $\gamma=\gamma_1\gamma_2\approx${N(g1 * g2)}$.`] };
     }
   ];
+
+  /* ===================== EXERCICES AVEC SCHÉMA (lecture et construction) ===================== */
+    const fig = f => (f.fig = true, f);
+    const dirD = a => [cosD(a), sinD(a)];
+
+    function svgMiroirPlan(H, d) {
+      const ye = H - 0.1, m1 = ye / 2, m2 = (H + ye) / 2;
+      const S = Scene({ W: 460, H: 270, x0: -d - 0.6, x1: d + 0.6, y0: -0.25, y1: H + 0.25, eq: true });
+      S.line(-d - 0.6, 0, d + 0.6, 0, "mu", 1).line(0, 0, 0, H + 0.2, "mu", 1, "3 4").mirror(0, m1, 0, m2, 1, 0);
+      S.vec(-d, 0, -d, H, "ac", "").vec(d, 0, d, H, "ac", "", true);
+      S.raw(`<circle cx="${S.X(-d)}" cy="${S.Y(ye)}" r="4" style="fill:var(--accent)"/>`).text(-d, ye, "œil", "ac", { a: "end", dx: -8, dy: 4 });
+      S.ray([[-d, 0], [0, m1], [-d, ye]], "o", { w: 1.6 }).ray([[-d, H], [0, m2], [-d, ye]], "o", { w: 1.6 });
+      S.line(0, m1, d, 0, "o", 1, true).line(0, m2, d, H, "o", 1, true);
+      S.text(d, H / 2, "image", "ac", { a: "start", dx: 6 }).text(-d, H / 2, "personne", "ac", { a: "end", dx: -6 });
+      S.text(0, (m1 + m2) / 2, "h", "r", { a: "start", dx: 10, b: true, it: true }).line(0.12, m1, 0.12, m2, "r", 1.4);
+      return S.svg("Personne devant un miroir plan : rayons extrêmes");
+    }
+    function svgProfondeur(h, n) {
+      const hp = h / n, S = Scene({ W: 440, H: 270, x0: -1.6 * h, x1: 1.6 * h, y0: -h * 1.15, y1: h * 0.95, eq: true });
+      S.rect(-1.6 * h, 0, 1.6 * h, -h * 1.15, "b", 0.16).line(-1.6 * h, 0, 1.6 * h, 0, "fg", 1.6);
+      const A = [0, -h];
+      [-0.32, 0.32].forEach(t => { const I = [t * h, 0], d = [t * h, hp], l = Math.hypot(...d), E = [I[0] + d[0] / l * 0.85 * h, d[1] / l * 0.85 * h]; S.ray([A, I], "o", { w: 1.6 }).ray([I, E], "o", { w: 1.6 }).line(I[0], 0, 0, -hp, "o", 1, true); });
+      S.pt(0, -h, "A (objet)", "ac", 16).pt(0, -hp, "A′", "r", -8, 14);
+      S.line(-1.1 * h, 0, -1.1 * h, -h, "ac", 1.3).text(-1.1 * h, -h / 2, "h", "ac", { a: "end", dx: -6, it: true, b: true });
+      S.line(1.1 * h, 0, 1.1 * h, -hp, "r", 1.3).text(1.1 * h, -hp / 2, "h′", "r", { a: "start", dx: 6, it: true, b: true });
+      return S.svg("Profondeur apparente d'un objet immergé");
+    }
+    function svgLame(e, n, i) {
+      const r = asinD(sinD(i) / n), t = 1, I = [-0.5, 0], J = [I[0] + t * tanD(r), -t], d = [sinD(i), -cosD(i)];
+      const S = Scene({ W: 460, H: 260, x0: -1.9, x1: 2.1, y0: -2.0, y1: 1.15, eq: true });
+      S.rect(-1.9, 0, 2.1, -t, "ac", 0.15).line(-1.9, 0, 2.1, 0, "fg", 1.4).line(-1.9, -t, 2.1, -t, "fg", 1.4);
+      const P = [I[0] - 1.1 * d[0], -1.1 * d[1]];
+      S.line(I[0], 0.9, I[0], -t, "mu", 1, "4 3").ray([P, I], "o").ray([I, J], "o").ray([J, [J[0] + d[0] * 1.2, -t + d[1] * 1.2]], "o");
+      S.line(I[0], 0, I[0] + d[0] * 2.0, d[1] * 2.0, "mu", 1, "5 4");
+      const k = (J[0] - I[0]) * d[0] + (J[1] - I[1]) * d[1], H = [I[0] + k * d[0], I[1] + k * d[1]];
+      S.line(J[0], J[1], H[0], H[1], "r", 1.8).text((J[0] + H[0]) / 2, (J[1] + H[1]) / 2, "d", "r", { a: "start", dx: 6, dy: 10, it: true, b: true });
+      S.arc(I[0], 0, 90, 90 + i, 28, "i", "o", 42).arc(I[0], 0, 270, 270 + r, 34, "r", "o", 46);
+      S.line(1.85, 0, 1.85, -t, "ac", 1.3).text(1.85, -t / 2, "e", "ac", { a: "end", dx: -6, it: true, b: true });
+      return S.svg("Déplacement latéral d'un rayon par une lame à faces parallèles");
+    }
+    function svgDeuxLentilles(f1, f2, e, OA, A1, Ap, g1, g) {
+      const pts = [OA, 0, e, f1, e + f2, e - f2].concat(A1 == null ? [] : [A1, e + Ap]);
+      const x0 = Math.min(...pts) - 4, x1 = Math.max(...pts) + 4;
+      const hs = [1].concat(A1 == null ? [] : [Math.abs(g1), Math.abs(g)]), ym = Math.min(Math.max(...hs), 4) * 1.25 + 0.3;
+      const cl = v => Math.max(-ym * 0.9, Math.min(ym * 0.9, v));
+      const S = Scene({ W: 470, H: 230, x0, x1, y0: -ym, y1: ym });
+      S.axis(x0, x1).lens(0, ym * 0.9, true, "L₁").lens(e, ym * 0.9, true, "L₂");
+      S.pt(0, 0, "O₁", "fg", 16, -10).pt(e, 0, "O₂", "fg", 16, -10).pt(f1, 0, "F′₁", "fg", -8).pt(e - f2, 0, "F₂", "fg", -8).pt(e + f2, 0, "F′₂", "fg", -8);
+      S.vec(OA, 0, OA, 1, "ac", "B").text(OA, 0, "A", "ac", { dy: 15, dx: -6, b: true });
+      if (A1 != null) {
+        S.vec(A1, 0, A1, cl(g1), "b", "B₁", A1 > e).text(A1, 0, "A₁", "b", { dy: g1 > 0 ? 15 : -6, dx: -8, b: true });
+        S.vec(e + Ap, 0, e + Ap, cl(g), "r", "B′", Ap < 0).text(e + Ap, 0, "A′", "r", { dy: g > 0 ? 15 : -6, dx: -8, b: true });
+      }
+      return S.svg("Système de deux lentilles minces");
+    }
+
+    /* schéma dioptre plan horizontal : milieu 1 en haut, milieu 2 en bas */
+    function svgDioptre(o) {
+      const { n1, n2, i1, i2, alpha, cor } = o;
+      const S = Scene({ W: 460, H: 270, x0: -2.4, x1: 2.4, y0: -1.3, y1: 1.3, eq: true });
+      S.rect(-2.4, 0, 2.4, -1.3, "b", 0.13).line(-2.4, 0, 2.4, 0, "fg", 1.6).line(0, 1.2, 0, -1.2, "mu", 1, "5 4");
+      S.text(-2.3, 0.12, `milieu 1 (n₁ = ${String(n1).replace(".", ",")})`, "fg", { a: "start", dy: -4 }).text(-2.3, -1.15, `milieu 2 (n₂ = ${String(n2).replace(".", ",")})`, "fg", { a: "start" });
+      const L = 1.25, P = [-L * sinD(i1), L * cosD(i1)];
+      S.ray([P, [0, 0]], "o").text(P[0], P[1], "incident", "o", { a: "end", dx: 2, dy: -6 });
+      S.ray([[0, 0], [L * sinD(i1), L * cosD(i1)]], "g", { w: 1.6 }).text(L * sinD(i1), L * cosD(i1), "réfléchi", "g", { a: "start", dx: -2, dy: -6 });
+      if (isFinite(i2)) S.ray([[0, 0], [L * sinD(i2), -L * cosD(i2)]], "r", { w: 1.8 }).text(L * sinD(i2), -L * cosD(i2), "réfracté", "r", { a: "start", dx: 6, dy: 4 });
+      if (alpha != null) S.arc(0, 0, 180 - alpha, 180, 62, `${Np(alpha)}°`, "ac");
+      if (cor) {
+        const lab = (a, rr, t, col) => S.text(rr * cosD(a), rr * sinD(a), t, col, { it: true, dy: 4, a: cosD(a) > 0.1 ? "start" : cosD(a) < -0.1 ? "end" : "middle" });
+        S.arc(0, 0, 90, 90 + i1, 36, "", "o").arc(0, 0, 90 - i1, 90, 44, "", "g");
+        lab(90 + i1 + 16, 0.62, `i₁ = ${Np(i1)}°`, "o"); lab(90 - i1 - 16, 0.62, `i′₁ = ${Np(i1)}°`, "g");
+        if (isFinite(i2)) { S.arc(0, 0, 270, 270 + i2, 40, "", "r"); lab(270 + i2 + 18, 0.66, `i₂ = ${Np(i2)}°`, "r"); }
+      } else if (isFinite(i2)) S.text(0.5 * sinD(i2) + 0.12, -0.55, "i₂ ?", "r", { a: "start", it: true });
+      if (!cor && alpha == null) S.arc(0, 0, 90, 90 + i1, 36, `i₁ = ${Np(i1)}°`, "o", 58);
+      return S.svg("Réflexion et réfraction sur un dioptre plan");
+    }
+
+    EX.opt1.push(fig(function () {
+      const n2 = pick([1.33, 1.50, 1.60]), al = rnd(20, 70, 5), i1 = 90 - al, i2 = asinD(sinD(i1) / n2), th = 180 - i1 - i2;
+      return { titre: "Réflexion et réfraction : lecture d'un schéma",
+        enonce: R`Un rayon lumineux arrive de l'air ($n_1=1{,}00$) sur la surface plane d'un milieu d'indice $n_2=${N(n2)}$. Sur le schéma, l'angle indiqué ($${al}^\circ$) est mesuré entre le rayon incident et la <b>surface</b>. Calculer l'angle d'incidence $i_1$, l'angle de réflexion $i_1'$, l'angle de réfraction $i_2$ puis l'angle $\theta$ entre le rayon réfléchi et le rayon réfracté.`,
+        figure: { svg: svgDioptre({ n1: "1.00", n2: n2.toFixed(2), i1, i2, alpha: al }), legende: "Rayons incident (orange), réfléchi (vert) et réfracté (rouge). L'angle marqué est pris par rapport à la surface." },
+        reponses: [{ nom: "i_1", unite: "°", val: i1, abs: 0.2 }, { nom: "i_1'", unite: "°", val: i1, abs: 0.2 }, { nom: "i_2", unite: "°", val: i2, abs: 0.3 }, { nom: R`\theta`, unite: "°", val: th, abs: 0.4 }],
+        correction: [
+          R`Les angles se mesurent par rapport à la <b>normale</b> : $i_1=90^\circ-${al}^\circ=${i1}^\circ$.`,
+          R`Loi de la réflexion : $i_1'=i_1=${i1}^\circ$.`,
+          R`Loi de la réfraction : $\sin i_2=\dfrac{n_1\sin i_1}{n_2}=\dfrac{\sin${i1}^\circ}{${N(n2)}}\approx${N(sinD(i1) / n2)}$, d'où $i_2\approx${N(i2)}^\circ$ (le rayon se rapproche de la normale).`,
+          R`Le rayon réfléchi fait l'angle $90^\circ-i_1$ avec la surface (au-dessus) et le rayon réfracté l'angle $90^\circ-i_2$ (au-dessous) : $\theta=(90^\circ-i_1)+(90^\circ-i_2)=180^\circ-i_1-i_2\approx${N(th)}^\circ$.`],
+        figureCor: { svg: svgDioptre({ n1: "1.00", n2: n2.toFixed(2), i1, i2, cor: true }), legende: "Angles mesurés par rapport à la normale (pointillés)." } };
+    }));
+
+    EX.opt1.push(fig(function () {
+      const n = pick([1.33, 1.36]), h = rnd(20, 60, 5), i = rnd(25, 70, 5), r = asinD(sinD(i) / n), x = h * tanD(r), x0 = h * tanD(i);
+      const W = Math.max(x0, x) + 15, Sx = -h * 0.9;
+      const S = Scene({ W: 460, H: 280, x0: -h * 0.9 - 5, x1: W, y0: -h - 8, y1: h * 0.75, eq: true });
+      S.rect(-h * 0.9 - 2, 0, W - 3, -h, "b", 0.16).line(-h * 0.9 - 2, 0, W - 3, 0, "fg", 1.4).line(-h * 0.9 - 2, -h, W - 3, -h, "fg", 2.2).line(-h * 0.9 - 2, -h, -h * 0.9 - 2, h * 0.3, "fg", 2.2).line(W - 3, -h, W - 3, h * 0.3, "fg", 2.2);
+      const L = h * 0.7, P = [-L * sinD(i), L * cosD(i)];
+      S.line(0, h * 0.6, 0, -h, "mu", 1, "5 4").ray([P, [0, 0]], "o").ray([[0, 0], [x, -h]], "o").arc(0, 0, 90, 90 + i, 30, `i = ${i}°`, "o", 50);
+      S.pt(0, 0, "I", "fg", -6, 9).pt(x, -h, "P", "r", 16).text(Sx + 2, -h / 2, `h = ${N(h)} cm`, "ac", { a: "start" });
+      S.line(0, -h - 3.5, x, -h - 3.5, "r", 1.2).text(x / 2, -h - 3.5, "x ?", "r", { dy: 15, it: true });
+      return { titre: "Rayon dans une cuve d'eau",
+        enonce: R`Une cuve contient un liquide d'indice $n=${N(n)}$ sur une hauteur $h=${N(h)}$ cm. Un rayon laser frappe la surface en $I$ sous l'incidence $i=${i}^\circ$ (schéma). Calculer l'angle de réfraction $r$, puis la distance horizontale $x$ entre la verticale de $I$ et le point $P$ où le rayon atteint le fond. Sans liquide, où arriverait le rayon ?`,
+        figure: { svg: S.svg("Rayon laser entrant dans une cuve"), legende: "Le rayon se réfracte en I et atteint le fond en P." },
+        reponses: [{ nom: "r", unite: "°", val: r, abs: 0.2 }, { nom: "x", unite: "cm", val: x }, { nom: "x_0", unite: "cm", val: x0 }],
+        correction: [
+          R`En $I$ : $\sin i=n\sin r$, d'où $\sin r=\dfrac{\sin${i}^\circ}{${N(n)}}\approx${N(sinD(i) / n)}$ et $r\approx${N(r)}^\circ$.`,
+          R`Dans le triangle rectangle formé par $I$, sa projection au fond et $P$ : $\tan r=\dfrac xh$, d'où $x=h\tan r=${N(h)}\times\tan${N(r)}^\circ\approx${N(x)}$ cm.`,
+          R`Sans liquide, le rayon ne serait pas dévié : $x_0=h\tan i=${N(h)}\times\tan${i}^\circ\approx${N(x0)}$ cm. Le liquide « ramène » le rayon vers la verticale.`] };
+    }));
+
+    /* ---- deux miroirs plans ---- */
+    function deuxMiroirs(al, i1, cor) {
+      const a = 3, I1 = [a, 0], dr = [-sinD(i1), cosD(i1)], din = [-sinD(i1), -cosD(i1)];
+      const Src = [a - din[0] * 2.4, -din[1] * 2.4], I2 = G.inter(I1, dr, [0, 0], dirD(al)), nM = [-sinD(al), cosD(al)];
+      const dout = G.refl(dr, nM), Out = [I2[0] + dout[0] * 2.6, I2[1] + dout[1] * 2.6];
+      const ip = G.deg(Math.acos(Math.abs(dr[0] * nM[0] + dr[1] * nM[1])));
+      const L2 = Math.max(Math.hypot(...I2) * 1.25, 3), E2 = [L2 * cosD(al), L2 * sinD(al)];
+      const xs = [0, 4.2, Src[0], Out[0], E2[0], I2[0]], ys = [0, Src[1], Out[1], E2[1], I2[1]];
+      const S = Scene({ W: 460, H: 280, x0: Math.min(...xs) - 0.6, x1: Math.max(...xs) + 0.6, y0: Math.min(...ys) - 0.6, y1: Math.max(...ys) + 0.5, eq: true });
+      S.mirror(0, 0, 4.2, 0, 0, -1).mirror(0, 0, E2[0], E2[1], -sinD(al), cosD(al)).arc(0, 0, 0, al, 24, `α = ${al}°`, "ac", 44);
+      S.text(4.2, 0, "M₁", "fg", { dy: 20, a: "end" }).text(E2[0], E2[1], "M₂", "fg", { dx: 14 });
+      S.line(a, 0, a, 1.4, "mu", 1, "4 3").ray([Src, I1], "o").ray([I1, I2], "o").ray([I2, Out], "r");
+      S.arc(a, 0, 90 - i1, 90, 30, `${Np(i1)}°`, "o", 46);
+      S.pt(a, 0, "I₁", "fg", 18).pt(I2[0], I2[1], "I₂", "fg", -10, -12);
+      const nx = nM[0], ny = nM[1];
+      S.line(I2[0] - nx * 1.0, I2[1] - ny * 1.0, I2[0] + nx * 0.25, I2[1] + ny * 0.25, "mu", 1, "4 3");
+      if (cor) { const an = G.deg(Math.atan2(-ny, -nx)), ar = G.deg(Math.atan2(-dr[1], -dr[0])); S.arc(I2[0], I2[1], Math.min(an, ar), Math.max(an, ar), 30, `${Np(ip)}°`, "r", 48); }
+      return { svg: S.svg("Rayon réfléchi successivement par deux miroirs plans"), ip };
+    }
+    EX.opt2.push(fig(function () {
+      const al = pick([50, 60, 70, 75, 80, 90, 100, 110, 120]), i1 = rnd(Math.max(10, al - 75), al - 15, 5), i2 = al - i1, D = 360 - 2 * al;
+      return { titre: "Rayon réfléchi par deux miroirs plans",
+        enonce: R`Deux miroirs plans $M_1$ et $M_2$ forment un angle $\alpha=${al}^\circ$. Un rayon se réfléchit en $I_1$ sur $M_1$ sous l'incidence $i_1=${i1}^\circ$, puis en $I_2$ sur $M_2$ (schéma). Calculer l'angle d'incidence $i_2$ sur $M_2$, puis la déviation totale $D$ (angle dont le rayon a tourné au cours des deux réflexions). Dépend-elle de $i_1$ ?`,
+        figure: { svg: deuxMiroirs(al, i1, false).svg, legende: "Deux miroirs plans formant un angle α ; normales en pointillés." },
+        reponses: [{ nom: "i_2", unite: "°", val: i2, abs: 0.3 }, { nom: "D", unite: "°", val: D, abs: 0.3 }],
+        correction: [
+          R`Après la réflexion en $I_1$, le rayon fait l'angle $90^\circ-i_1=${90 - i1}^\circ$ avec $M_1$.`,
+          R`Dans le triangle $O I_1 I_2$ ($O$ : arête des miroirs), la somme des angles vaut $180^\circ$ : l'angle en $I_2$ entre le rayon et $M_2$ vaut $180^\circ-\alpha-(90^\circ-i_1)=${180 - al - 90 + i1}^\circ$.`,
+          R`D'où $i_2=90^\circ-${180 - al - 90 + i1}^\circ=\alpha-i_1=${i2}^\circ$.`,
+          R`Chaque réflexion fait tourner le rayon de $180^\circ-2i$ : $D=(180^\circ-2i_1)+(180^\circ-2i_2)=360^\circ-2(i_1+i_2)=360^\circ-2\alpha=${D}^\circ$, <b>indépendant de $i_1$</b>. Pour $\alpha=90^\circ$, le rayon repart parallèlement à lui-même (catadioptre).`],
+        figureCor: { svg: deuxMiroirs(al, i1, true).svg, legende: R`Incidence sur $M_2$ : $i_2=\alpha-i_1$.` } };
+    }));
+
+    /* ---- prisme : indice par le minimum de déviation ---- */
+    EX.opt3.push(fig(function () {
+      let A, Dm, n;
+      do { A = pick([45, 50, 60]); Dm = rnd(25, 55, 0.5); n = sinD((A + Dm) / 2) / sinD(A / 2); } while (n < 1.42 || n > 1.78);
+      const im = (A + Dm) / 2;
+      const p = prisme({ A, n, i: im, showD: true });
+      return { titre: "Mesurer un indice au minimum de déviation",
+        enonce: R`Au goniomètre, on règle un prisme d'angle $A=${A}^\circ$ au minimum de déviation et on mesure $D_m=${N(Dm)}^\circ$ (schéma). Calculer l'incidence $i_m$, l'angle $r$ à l'intérieur du prisme et l'indice $n$ du verre.`,
+        figure: { svg: p.svg, legende: "Au minimum de déviation, la marche du rayon est symétrique par rapport au plan bissecteur du prisme." },
+        reponses: [{ nom: "i_m", unite: "°", val: im, abs: 0.2 }, { nom: "r", unite: "°", val: A / 2, abs: 0.1 }, { nom: "n", unite: "", val: n, abs: 0.005 }],
+        correction: [
+          R`Marche symétrique : $i=i'=i_m$ et $r=r'=\dfrac A2=${N(A / 2)}^\circ$.`,
+          R`$D_m=2i_m-A$, d'où $i_m=\dfrac{A+D_m}2=\dfrac{${A}+${N(Dm)}}2=${N(im)}^\circ$.`,
+          R`$\sin i_m=n\sin r$ : $n=\dfrac{\sin\frac{A+D_m}2}{\sin\frac A2}=\dfrac{\sin${N(im)}^\circ}{\sin${N(A / 2)}^\circ}\approx${N(n, 4)}$.`] };
+    }));
+
+    /* ---- miroir concave sur quadrillage ---- */
+    EX.opt4.push(fig(function () {
+      let p, k, SA, AB, SAp, g;
+      do { p = pick([1, 2, 5]); k = pick([4, 6, 8]); SA = -rnd(2, 12); AB = pick([1, 1.5, 2]); SAp = 1 / (2 / -k - 1 / SA); g = -SAp / SA; }
+      while (Math.abs(SA + k / 2) < 1 || !isFinite(SAp) || Math.abs(SAp) > 16 || Math.abs(g) > 3.2);
+      const SC = -k * p, SAc = SA * p, SApc = SAp * p, ABc = AB * p;
+      return { titre: "Miroir concave : construction sur quadrillage",
+        enonce: R`Sur le schéma (1 carreau $=${p}$ cm), le miroir concave a son centre en $C$ et son foyer en $F$. Relever $\overline{SC}$ et $\overline{SA}$, puis calculer la position $\overline{SA'}$ de l'image, le grandissement $\gamma$ et la taille algébrique $\overline{A'B'}$. Vérifier par la construction.`,
+        figure: { svg: miroirSph({ SC: -k, SA, AB, SAp, ApBp: g * AB, rays: false, grid: 1 }), legende: R`Quadrillage : 1 carreau $=${p}$ cm.` },
+        reponses: [{ nom: R`\overline{SA'}`, unite: "cm", val: SApc, abs: 0.05 * p + 0.05 }, { nom: R`\gamma`, unite: "", val: g, abs: 0.02 }, { nom: R`\overline{A'B'}`, unite: "cm", val: g * ABc, abs: 0.05 }],
+        correction: [
+          R`Lecture : $\overline{SC}=-${k}$ carreaux $=${SC}$ cm, $\overline{SF}=${SC / 2}$ cm, $\overline{SA}=${SA}$ carreaux $=${SAc}$ cm, $\overline{AB}=${N(ABc)}$ cm.`,
+          R`Conjugaison : $\dfrac1{\overline{SA'}}=\dfrac2{\overline{SC}}-\dfrac1{\overline{SA}}=\dfrac2{${SC}}-\dfrac1{${SAc}}$, d'où $\overline{SA'}\approx${N(SApc)}$ cm.`,
+          R`$\gamma=-\dfrac{\overline{SA'}}{\overline{SA}}\approx${N(g)}$ et $\overline{A'B'}=\gamma\,\overline{AB}\approx${N(g * ABc)}$ cm : image ${SAp < 0 ? "réelle" : "virtuelle"}, ${g > 0 ? "droite" : "renversée"}, ${Math.abs(g) > 1 ? "agrandie" : "réduite"}.`,
+          R`Construction : le rayon parallèle à l'axe se réfléchit en passant par $F$ ; le rayon arrivant en $S$ repart symétriquement par rapport à l'axe.`],
+        figureCor: { svg: miroirSph({ SC: -k, SA, AB, SAp, ApBp: g * AB, grid: 1 }), legende: "Orange : rayon parallèle à l'axe ; vert : rayon passant par S ; pointillés : prolongements." } };
+    }));
+
+    /* ---- lentille sur quadrillage ---- */
+    EX.opt5.push(fig(function () {
+      let p, k, OA, AB, OAp, g;
+      do { p = pick([1, 2, 5]); k = pick([2, 3, 4, -2, -3, -4]); OA = -rnd(2, 10); AB = pick([1, 1.5, 2]); OAp = 1 / (1 / k + 1 / OA); g = OAp / OA; }
+      while (Math.abs(OA + k) < 1 || !isFinite(OAp) || Math.abs(OAp) > 14 || Math.abs(g) > 3.2);
+      const fpc = k * p, OAc = OA * p, OApc = OAp * p, ABc = AB * p;
+      return { titre: "Lentille mince : construction sur quadrillage",
+        enonce: R`Sur le schéma (1 carreau $=${p}$ cm), on a placé une lentille mince ${k > 0 ? "convergente" : "divergente"}, ses foyers $F$, $F'$ et un objet $AB$. Relever $f'$ et $\overline{OA}$, puis calculer $\overline{OA'}$, le grandissement $\gamma$ et $\overline{A'B'}$. Construire l'image pour vérifier.`,
+        figure: { svg: lentille({ fp: k, OA, AB, OAp, ApBp: g * AB, rays: false, grid: 1 }), legende: R`Quadrillage : 1 carreau $=${p}$ cm.` },
+        reponses: [{ nom: "f'", unite: "cm", val: fpc, abs: 0.01 }, { nom: R`\overline{OA'}`, unite: "cm", val: OApc, abs: 0.05 * p + 0.05 }, { nom: R`\gamma`, unite: "", val: g, abs: 0.02 }, { nom: R`\overline{A'B'}`, unite: "cm", val: g * ABc, abs: 0.05 }],
+        correction: [
+          R`Lecture : $f'=\overline{OF'}=${k}$ carreaux $=${fpc}$ cm ; $\overline{OA}=${OA}$ carreaux $=${OAc}$ cm ; $\overline{AB}=${N(ABc)}$ cm.`,
+          R`Descartes : $\dfrac1{\overline{OA'}}=\dfrac1{f'}+\dfrac1{\overline{OA}}=\dfrac1{${fpc}}+\dfrac1{${OAc}}$, d'où $\overline{OA'}\approx${N(OApc)}$ cm.`,
+          R`$\gamma=\dfrac{\overline{OA'}}{\overline{OA}}\approx${N(g)}$ ; $\overline{A'B'}=\gamma\,\overline{AB}\approx${N(g * ABc)}$ cm : image ${OAp > 0 ? "réelle" : "virtuelle"}, ${g > 0 ? "droite" : "renversée"}, ${Math.abs(g) > 1 ? "agrandie" : "réduite"}.`,
+          R`Construction : trois rayons issus de $B$ — parallèle à l'axe (émerge par $F'$), passant par $O$ (non dévié), passant par $F$ (émerge parallèle à l'axe).`],
+        figureCor: { svg: lentille({ fp: k, OA, AB, OAp, ApBp: g * AB, grid: 1 }), legende: "Orange : parallèle à l'axe ; vert : par le centre O ; bleu : par le foyer objet F ; pointillés : prolongements." } };
+    }));
+
+  /* exercices toujours accompagnés d'un schéma */
+  [EX.opt1[1], EX.opt5[0], EX.opt2[0], EX.opt2[1], EX.opt3[0], EX.opt3[2], EX.opt5[2]].forEach(f => { f.fig = true; });
 
   Object.assign(window.EXO_TITRES, {
     opt1: "Chapitre 1 — Lois fondamentales", opt2: "Chapitre 2 — Formation des images", opt3: "Chapitre 3 — Prisme et lame",
