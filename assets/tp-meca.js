@@ -98,8 +98,9 @@
       };
       T.tick = dt => {
         let extreme = false;
-        if (run) { const k = 30, h = dt / k; for (let i = 0; i < k; i++) { om += -(G / L) * Math.sin(th) * h; th += om * h; } if (prev > 0 && om <= 0) extreme = true; prev = om; }
-        ch.S.step(dt, extreme); T.draw();
+        let frac = 0;
+        if (run) { const k = Math.max(10, Math.ceil(dt / 0.002)), h = dt / k; for (let i = 0; i < k; i++) { om += -(G / L) * Math.sin(th) * h; th += om * h; if (prev > 0 && om <= 0) { extreme = true; frac = (k - 1 - i) * h; } prev = om; } }
+        ch.S.step(dt, extreme, frac); T.draw();
       };
       T.draw = () => {
         const { c, w, h } = fit($("#pendule-cv"), innerWidth < 600 ? 0.95 : 0.58); c.fillStyle = css("--plot-bg"); c.fillRect(0, 0, w, h);
@@ -193,8 +194,9 @@
       $("#rsNew").onclick = () => { if (T.locked()) { T.msg("Compte rendu déjà soumis : le matériel ne peut plus être changé.", "bad"); return; } newSpring(); T.clearRows(); set(); T.draw(); T.msg("Nouveau ressort : refais les mesures."); };
       T.tick = dt => {
         let extreme = false;
-        if (run) { const meff = m + P.mr / 3, k = 20, h = dt / k; for (let i = 0; i < k; i++) { v += -(P.k / meff) * x * h; x += v * h; } if (prev > 0 && v <= 0) extreme = true; prev = v; }
-        ch.S.step(dt, extreme); T.draw();
+        let frac = 0;
+        if (run) { const meff = m + P.mr / 3, k = Math.max(10, Math.ceil(dt / 0.001)), h = dt / k; for (let i = 0; i < k; i++) { v += -(P.k / meff) * x * h; x += v * h; if (prev > 0 && v <= 0) { extreme = true; frac = (k - 1 - i) * h; } prev = v; } }
+        ch.S.step(dt, extreme, frac); T.draw();
       };
       T.draw = () => {
         const { c, w, h } = fit($("#ressort-cv"), innerWidth < 600 ? 1.0 : 0.6); c.fillStyle = css("--plot-bg"); c.fillRect(0, 0, w, h);
@@ -287,7 +289,7 @@
       $("#toSt").onclick = () => { run = false; th = 0; om = 0; T.draw(); };
       $("#toRec").onclick = () => { const { t, n } = ch.S.reading(); if (ch.S.on || ch.S.armed) { T.msg("Arrête d'abord le chronomètre.", "bad"); return; } if (t < 1) { T.msg("Chronomètre d'abord les oscillations.", "bad"); return; } const p = $("#to-part").value; T.add(p, { L, d: d * 100, n, t }); T.msg(`Mesure enregistrée (partie ${p}) : T = ${fr(t / n, 3)} s.`, "ok"); };
       $("#toNew").onclick = () => { if (T.locked()) { T.msg("Compte rendu déjà soumis : le matériel ne peut plus être changé.", "bad"); return; } newWire(); T.clearRows(); T.msg("Nouveau fil : refais les mesures."); };
-      T.tick = dt => { let extreme = false; if (run) { const k = 10, h = dt / k, w2 = C() / J(); for (let i = 0; i < k; i++) { om += -w2 * th * h; th += om * h; } if (prev > 0 && om <= 0) extreme = true; prev = om; } ch.S.step(dt, extreme); T.draw(); };
+      T.tick = dt => { let extreme = false, frac = 0; if (run) { const k = Math.max(10, Math.ceil(dt / 0.002)), h = dt / k, w2 = C() / J(); for (let i = 0; i < k; i++) { om += -w2 * th * h; th += om * h; if (prev > 0 && om <= 0) { extreme = true; frac = (k - 1 - i) * h; } prev = om; } } ch.S.step(dt, extreme, frac); T.draw(); };
       T.draw = () => {
         const { c, w, h } = fit($("#torsion-cv"), innerWidth < 600 ? 1.0 : 0.58); c.fillStyle = css("--plot-bg"); c.fillRect(0, 0, w, h);
         const fg = css("--fg"), mu = css("--muted"), cx = w * 0.3, top = 26, wireLen = (h - 110) * L / 80, by = top + wireLen, half = w * 0.17;

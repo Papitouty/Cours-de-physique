@@ -4,7 +4,7 @@
 (function () {
   "use strict";
   /* page de début de chaque TP dans le fascicule (docs/Fascicule_TP_Physique_L1.pdf, numéro de page du fichier) */
-  const FASC = { 1: 11, 2: 16, 3: 21, 4: 25, 5: 31, 6: 37, 7: 43, 8: 49 };
+  const FASC = { 1: 11, 2: 17, 3: 22, 4: 27, 5: 33, 6: 39, 7: 45, 8: 51 };
   const $ = s => document.querySelector(s);
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -33,10 +33,10 @@
     const m = { l: 54, r: 14, t: 18, b: 40 }, W = w - m.l - m.r, H = h - m.t - m.b;
     if (!P.length) { txt(c, "Le graphe se trace dès la première mesure.", w / 2, h / 2, css("--muted"), "center", "middle", "13px 'Fira Sans',Arial"); return null; }
     const xs = P.map(p => p[0]), ys = P.map(p => p[1]);
-    const R0 = o.noFit ? null : linreg(P); if (R0 && o.xmin != null) ys.push(R0.a * o.xmin + R0.b);   // la droite prolongée reste visible
-    let x0 = o.xmin != null ? Math.min(o.xmin, ...xs) : Math.min(...xs), x1 = Math.max(...xs), y0 = o.ymin != null ? Math.min(o.ymin, ...ys) : Math.min(...ys), y1 = Math.max(...ys);
+    const R0 = o.noFit ? null : linreg(P); if (R0 && o.xmin != null) ys.push(R0.a * o.xmin + R0.b); if (R0 && o.xmax != null) ys.push(R0.a * o.xmax + R0.b);   // la droite prolongée reste visible
+    let x0 = o.xmin != null ? Math.min(o.xmin, ...xs) : Math.min(...xs), x1 = o.xmax != null ? Math.max(o.xmax, ...xs) : Math.max(...xs), y0 = o.ymin != null ? Math.min(o.ymin, ...ys) : Math.min(...ys), y1 = Math.max(...ys);
     const px = (x1 - x0) || Math.abs(x1) || 1, py = (y1 - y0) || Math.abs(y1) || 1;
-    x1 += px * 0.08; y1 += py * 0.12; if (o.xmin == null) x0 -= px * 0.08; if (o.ymin == null) y0 -= py * 0.1;
+    if (o.xmax == null) x1 += px * 0.08; else x1 += px * 0.04; y1 += py * 0.12; if (o.xmin == null) x0 -= px * 0.08; if (o.ymin == null) y0 -= py * 0.1;
     const X = x => m.l + (x - x0) / (x1 - x0) * W, Y = y => m.t + H - (y - y0) / (y1 - y0) * H;
     const ticks = (a, b) => { const s = Math.pow(10, Math.floor(Math.log10((b - a) / 4))); const st = [1, 2, 5, 10].map(k => k * s).find(k => (b - a) / k <= 6); const out = []; for (let t = Math.ceil(a / st) * st; t <= b + 1e-12; t += st) out.push(+t.toPrecision(8)); return out; };
     c.strokeStyle = css("--grid"); c.lineWidth = 1;
@@ -48,17 +48,20 @@
     if (o.curve) { c.strokeStyle = css("--muted"); c.setLineDash([5, 4]); c.lineWidth = 1.4; c.beginPath(); for (let i = 0; i <= 200; i++) { const x = x0 + (x1 - x0) * i / 200, y = o.curve(x); i ? c.lineTo(X(x), Y(y)) : c.moveTo(X(x), Y(y)); } c.stroke(); c.setLineDash([]); }
     const R = o.noFit ? null : linreg(P);
     if (R) {
-      const xa = o.xmin != null ? Math.min(...xs) : x0;   // partie mesurée en trait plein, prolongement jusqu'à x = xmin en pointillés
-      c.strokeStyle = css("--saff"); c.lineWidth = 2; c.beginPath(); c.moveTo(X(xa), Y(R.a * xa + R.b)); c.lineTo(X(x1), Y(R.a * x1 + R.b)); c.stroke();
-      if (xa > x0) { c.setLineDash([6, 5]); c.beginPath(); c.moveTo(X(x0), Y(R.a * x0 + R.b)); c.lineTo(X(xa), Y(R.a * xa + R.b)); c.stroke(); c.setLineDash([]); }
+      const xa = o.xmin != null ? Math.min(...xs) : x0, xb = o.xmax != null ? Math.max(...xs) : x1;   // partie mesurée en trait plein, prolongements (jusqu'à x = 0) en pointillés
+      c.strokeStyle = css("--saff"); c.lineWidth = 2; c.beginPath(); c.moveTo(X(xa), Y(R.a * xa + R.b)); c.lineTo(X(xb), Y(R.a * xb + R.b)); c.stroke();
+      c.setLineDash([6, 5]);
+      if (xa > x0) { c.beginPath(); c.moveTo(X(x0), Y(R.a * x0 + R.b)); c.lineTo(X(xa), Y(R.a * xa + R.b)); c.stroke(); }
+      if (xb < x1) { c.beginPath(); c.moveTo(X(xb), Y(R.a * xb + R.b)); c.lineTo(X(x1), Y(R.a * x1 + R.b)); c.stroke(); }
+      c.setLineDash([]);
     }
     c.restore();
-    if (R && o.mark0 && o.xmin === 0 && P.length >= 2) {   // ordonnée à l'origine (ex. T₀ du pendule)
+    if (R && o.mark0 && x0 <= 0 && x1 >= 0 && P.length >= 2) {   // ordonnée à l'origine (ex. T₀ du pendule, vergence V)
       const yb = Y(R.b); c.fillStyle = css("--bad") || "#c0392b"; c.beginPath(); c.arc(X(0), yb, 6, 0, 7); c.fill();
       c.strokeStyle = c.fillStyle; c.setLineDash([3, 3]); c.beginPath(); c.moveTo(m.l, yb); c.lineTo(X(0) + 30, yb); c.stroke(); c.setLineDash([]);
       txt(c, o.mark0(R), m.l + 10, m.t + 40, c.fillStyle, "left", "alphabetic", "700 14px 'Fira Sans',Arial");
     }
-    if (R && o.eq && P.length >= 2) txt(c, o.eq(R), m.l + W - 6, m.t + 14, css("--saff"), "right", "alphabetic", "600 13px 'Fira Sans',Arial");
+    if (R && o.eq && P.length >= 2) txt(c, o.eq(R), m.l + W - 6, R.a >= 0 ? m.t + H - 10 : m.t + 14, css("--saff"), "right", "alphabetic", "600 13px 'Fira Sans',Arial");
     c.fillStyle = css("--accent"); P.forEach(([x, y]) => { c.beginPath(); c.arc(X(x), Y(y), 4.5, 0, 7); c.fill(); });
     if (o.note) txt(c, o.note, m.l + 10, m.t + 62, "#c0392b", "left", "alphabetic", "600 12px 'Fira Sans',Arial");
     return R;
@@ -79,20 +82,23 @@
       $("#" + id + "-mAut").onclick = () => { S.auto = true; $("#" + id + "-mAut").setAttribute("aria-pressed", "true"); $("#" + id + "-mMan").setAttribute("aria-pressed", "false"); show(); };
       $("#" + id + "-go").onclick = () => {
         S.target = Math.max(1, Math.round(+$("#" + id + "-nb").value || 10));
-        if (S.on || S.armed) { S.on = false; S.armed = false; }
+        const now = performance.now();
+        if (S.on || S.armed) { if (S.on && !S.auto && S.t0 != null) S.t = (now - S.t0) / 1000; S.on = false; S.armed = false; S.t0 = null; }
         else if (S.auto) { S.t = 0; S.n = 0; S.done = false; S.armed = true; }
-        else { S.t = 0; S.n = 0; S.done = false; S.on = true; }
+        else { S.t = 0; S.n = 0; S.done = false; S.on = true; S.t0 = now; }   // manuel : temps réel exact entre les deux clics
         show();
       };
       $("#" + id + "-rz").onclick = () => { S.on = false; S.armed = false; S.t = 0; S.n = 0; S.done = false; show(); };
       show();
     }
-    // appelé à chaque image ; extreme=true quand l'oscillateur passe par une position extrême (début de période)
-    S.step = (dt, extreme) => {
-      if (S.armed && extreme) { S.armed = false; S.on = true; S.t = 0; S.n = 0; }
+    // appelé à chaque image ; extreme=true quand l'oscillateur passe par une position extrême (début de période) ;
+    // frac = temps écoulé depuis ce passage jusqu'à la fin de l'image (le capteur date le passage exactement, sans retard d'affichage)
+    S.step = (dt, extreme, frac) => {
+      frac = Math.min(dt, Math.max(0, frac || 0));
+      if (S.armed && extreme) { S.armed = false; S.on = true; S.t = frac; S.n = 0; }
       else if (S.on) {
-        S.t += dt;
-        if (extreme) { S.n++; if (S.auto && S.n >= S.target) { S.on = false; S.done = true; S.t += gauss() * 0.004; } }
+        if (!S.auto && S.t0 != null) S.t = (performance.now() - S.t0) / 1000; else S.t += dt;
+        if (extreme) { S.n++; if (S.auto && S.n >= S.target) { S.on = false; S.done = true; S.t = Math.max(0, S.t - frac) + gauss() * 0.002; } }
       }
       if (S.show) S.show();
     };
@@ -253,7 +259,7 @@
       const p = CR.parts[k]; if (!p.plot) return;
       const bad = [];   // valeurs saisies très éloignées de la valeur attendue (ex. t au lieu de T = t/n) : écartées du graphe
       const P = T.rows[k].map((r, i) => { const f = {}; p.fill.forEach(c => f[c.k] = parseNum((S.fill[k][i] || {})[c.k])); if (p.fill.some(c => suspect(c, r, (S.fill[k][i] || {})[c.k]))) { bad.push(i + 1); return [NaN, NaN]; } return [p.plot.x(r, f), p.plot.y(r, f)]; }).filter(q => isFinite(q[0]) && isFinite(q[1]));
-      scatter($("#" + T.id + "-gr-" + k), P, { xl: p.plot.xl, yl: p.plot.yl, noFit: !(p.plot.fit && P.length >= 2), xmin: p.plot.xmin, ymin: p.plot.ymin, eq: p.plot.eq, mark0: p.plot.mark0,
+      scatter($("#" + T.id + "-gr-" + k), P, { xl: p.plot.xl, yl: p.plot.yl, noFit: !(p.plot.fit && P.length >= 2), xmin: p.plot.xmin, xmax: p.plot.xmax, ymin: p.plot.ymin, eq: p.plot.eq, mark0: p.plot.mark0,
         note: bad.length ? `Ligne${bad.length > 1 ? "s" : ""} ${bad.join(", ")} écartée${bad.length > 1 ? "s" : ""} : valeur à vérifier (case rouge)` : "" });
     };
     T.renderPart = k => {
@@ -433,8 +439,9 @@
     const h = location.hash.slice(1); go(TPS.some(t => t.id === h) ? h : TPS[0].id, true);
     // boucle d'animation unique : seul le TP affiché avance
     let last = null;
-    const loop = ts => { const dt = last == null ? 0 : Math.min(0.05, (ts - last) / 1000); last = ts; const T = TPS.find(t => t.id === cur); if (T && T.tick && dt > 0) T.tick(dt); requestAnimationFrame(loop); };
+    const loop = ts => { let dt = last == null ? 0 : (ts - last) / 1000; last = ts; if (dt > 0.5) dt = 0;   // temps réel (pause seulement si l'onglet a été quitté)
+      const T = TPS.find(t => t.id === cur); if (T && T.tick && dt > 0) T.tick(dt); requestAnimationFrame(loop); };
     requestAnimationFrame(loop);
   }
-  window.TPCORE = { build: 33, register, start, $, css, esc, fr, gauss, store, fit, txt, linreg, chrono, isCur: id => cur === id };
+  window.TPCORE = { build: 35, register, start, $, css, esc, fr, gauss, store, fit, txt, linreg, chrono, isCur: id => cur === id };
 })();
