@@ -5,7 +5,7 @@
      ⚠ Toute modification du site doit s'accompagner d'un changement de VERSION.
    - documents PDF : copie locale d'abord, rafraîchie en arrière-plan
    - bibliothèques externes (KaTeX) : copie locale permanente */
-const VERSION = "v61";
+const VERSION = "v62";
 const SHELL = "shell-" + VERSION;
 const PDFS = "pdf-v1";          // nom stable : les documents enregistrés survivent aux mises à jour du site
 const EXT = "ext-v1";           // KaTeX ne change pas : inutile de le retélécharger à chaque version
@@ -57,6 +57,8 @@ const DOC_FILES = [
   "docs/TD_Electricite_2_corrige.pdf",
   "docs/TD_Electricite_2_enonces.pdf"
 ];
+/* documents modifiés : augmenter le numéro force le remplacement de la copie enregistrée sur les appareils */
+const DOC_REV = { "docs/Fascicule_TP_Physique_L1.pdf": 2 };
 const EXT_FILES = [
   "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css",
   "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js",
@@ -82,10 +84,14 @@ self.addEventListener("install", e => {
 async function prechargerDocs() {
   try {
     const d = await caches.open(PDFS);
+    // remplacement des documents mis à jour (copie enregistrée périmée)
+    let rev = {}; try { const r0 = await d.match("/__docrev"); if (r0) rev = await r0.json(); } catch (err) {}
+    for (const u of Object.keys(DOC_REV)) if (rev[u] !== DOC_REV[u]) { await d.delete(path(u)); rev[u] = DOC_REV[u]; }
+    await d.put("/__docrev", new Response(JSON.stringify(rev), { headers: { "Content-Type": "application/json" } }));
     for (const u of DOC_FILES) {
       const key = path(u);
       if (await d.match(key)) continue;
-      try { const r = await fetch(u); if (r.ok) await d.put(key, r); } catch (err) {}
+      try { const r = await fetch(u, { cache: "no-cache" }); if (r.ok) await d.put(key, r); } catch (err) {}
     }
     const x = await caches.open(EXT);
     for (const u of EXT_FILES) { if (!(await x.match(u))) { try { await x.add(new Request(u, { mode: "cors" })); } catch (err) {} } }
