@@ -340,7 +340,7 @@ function render(){
     h+=`<section class="td-card"><div><div class="eyebrow">Travaux dirigés</div><h3>${esc(s.title)}</h3><p><b>${esc(s.sub)}.</b> ${esc(s.text)}</p></div>
       <div class="res">${pdfBtn(s.e,"Énoncés",s.ep,"pdf",true)}${pdfBtn(s.c,"Corrigé détaillé",s.cp,"cor")}</div></section>`;
   });
-  const FTP=["Pendule simple","Oscillateur harmonique (masse-ressort)","Pendule de torsion","Loi d'Ohm et mesures de résistances","L'oscilloscope cathodique","Réfraction : lois de Descartes","Lentilles : distance focale","Le microscope"];
+  const FTP=["Pendule simple","Oscillateur harmonique (masse-ressort)","Pendule de torsion","Loi d'Ohm et mesures de résistances","L'oscilloscope cathodique","Mesures électriques : le multimètre","Lentilles : distance focale","Le microscope"];
   const tpShow=!q||norm("travaux pratiques tp fascicule "+FTP.join(" ")).includes(q);
   if(tpShow){
     h+=`<article class="chap fasc-card">

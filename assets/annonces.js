@@ -15,6 +15,10 @@
      detail : consignes (facultatif)
    ===================================================================== */
 window.ANNONCES = [
+  { date: "2026-10-17", important: true,
+    titre: "TP n°6 : Mesures électriques (multimètre)",
+    texte: "Le TP n°6 devient « Mesures électriques : utilisation du multimètre » : voltmètre, ampèremètre et ohmmètre, choix du calibre, branchement et incertitudes. Le fascicule de TP a été mis à jour.",
+    lien: "tp.html#mesures" },
   { date: "2026-10-16", important: true,
     titre: "Optique géométrique complète : chapitre 5 en ligne",
     texte: "Les lentilles minces : formule des opticiens, relations de Descartes et de Newton, construction des images (loupe, projecteur), associations (lentilles accolées, microscope, lunette) et aberrations. Le cours d'optique compte désormais 5 chapitres, chacun avec support, diaporama et série de TD corrigée.",
@@ -61,7 +65,7 @@ window.ANNONCES = [
     lien: "tp.html" },
   { date: "2026-10-13",
     titre: "Travaux pratiques : 8 TP simulés",
-    texte: "Pendule simple, oscillateur harmonique, pendule de torsion, mesures de résistances, oscilloscope cathodique, réfraction, lentilles et microscope : protocole détaillé, mesures simulées et compte rendu à remplir en ligne.",
+    texte: "Pendule simple, oscillateur harmonique, pendule de torsion, mesures de résistances, oscilloscope cathodique, mesures électriques (multimètre), lentilles et microscope : protocole détaillé, mesures simulées et compte rendu à remplir en ligne.",
     lien: "tp.html" },
   { date: "2026-10-13",
     titre: "Exercices d'entraînement en ligne",

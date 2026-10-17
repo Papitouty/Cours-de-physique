@@ -104,24 +104,26 @@ window.TPCR = {
       { q: "Pour une tension sinusoïdale, la valeur efficace vaut :", o: ["U_eff = U_m/√2", "U_eff = U_m·√2", "U_eff = U_m/2", "U_eff = 2U_m"] }
     ]
   },
-  refraction: {
+  mesures: {
     parts: {
-      A: { min: 6, fill: [{ k: "si", h: "sin i" }, { k: "sr", h: "sin r" }], plot: { x: (r, f) => f.sr, y: (r, f) => f.si, xl: "sin r", yl: "sin i" } },
-      B: { min: 5, fill: [{ k: "si", h: "sin i" }, { k: "sr", h: "sin r" }], plot: { x: (r, f) => f.si, y: (r, f) => f.sr, xl: "sin i", yl: "sin r" } },
-      C: { min: 3, fill: [{ k: "n", h: "n = 1/sin λ" }] }
+      A: { min: 6, fill: [{ k: "D", h: "Résolution D (V)", ref: r => window.TP_MES.CAL.V[r.c].d, warn: "La résolution D est la valeur du dernier chiffre affiché sur ce calibre (calibre / 2000), en volts." }, { k: "dU", h: "ΔU = 0,5 %·U + 2 D (V)" }, { k: "rel", h: "ΔU/U (%)" }] },
+      B: { min: 3, fill: [{ k: "D", h: "Résolution D (mA)", ref: r => window.TP_MES.CAL.A[r.c].d, warn: "La résolution D est la valeur du dernier chiffre affiché sur ce calibre, en milliampères." }, { k: "dI", h: "ΔI = 1 %·I + 2 D (mA) ; calibre 10 A : 2 %·I + 5 D" }, { k: "rel", h: "ΔI/I (%)" }] },
+      C: { min: 4, fill: [{ k: "nom", h: "R nominale, code des couleurs (Ω)" }, { k: "D", h: "Résolution D (Ω)", ref: r => window.TP_MES.CAL.O[r.c].d, warn: "La résolution D est la valeur du dernier chiffre affiché sur ce calibre, en ohms." }, { k: "dR", h: "ΔR = 0,8 %·R + 3 D (Ω)" }, { k: "ecart", h: "Écart à la valeur nominale (%)" }] }
     },
     calc: [
-      { k: "nA", h: "Indice n déduit de la partie A (pente de sin i = f(sin r))", u: "" },
-      { k: "nB", h: "Indice n déduit de la partie B (pente de sin r = f(sin i))", u: "" },
-      { k: "lam", h: "Angle limite moyen λ", u: "°" },
-      { k: "nC", h: "Indice n déduit de l'angle limite moyen", u: "" }
+      { k: "E1", h: "Partie A : tension de la pile 1,5 V mesurée sur le meilleur calibre", u: "V" },
+      { k: "dE1", h: "Incertitude ΔE₁ sur ce calibre", u: "V" },
+      { k: "I", h: "Partie B : intensité I mesurée sur le meilleur calibre", u: "mA" },
+      { k: "R2", h: "Partie C : résistance R₂ mesurée sur le meilleur calibre", u: "Ω" },
+      { k: "Ical", h: "Intensité calculée I = E₂/R₂ (E₂ : pile 9 V mesurée en partie A)", u: "mA" },
+      { k: "ecart", h: "Écart relatif entre I calculée et I mesurée", u: "%" }
     ],
     qcm: [
-      { q: "La loi de Snell-Descartes pour la réfraction s'écrit :", o: ["n₁ cos i₁ = n₂ cos i₂", "n₁ sin i₁ = n₂ sin i₂", "n₁ i₁ = n₂ i₂", "sin i₁ = sin i₂"] },
-      { q: "Le rayon n'est pas dévié en traversant la face courbe du demi-cylindre car :", o: ["il arrive selon un rayon du cercle, donc selon la normale", "le plexiglas est transparent", "l'indice de l'air vaut 1", "la face courbe est polie"] },
-      { q: "La réflexion totale est possible quand la lumière passe :", o: ["de l'air au plexiglas", "du plexiglas à l'air", "dans les deux sens", "jamais"] },
-      { q: "L'angle limite λ vérifie :", o: ["sin λ = n", "sin λ = 1/n", "cos λ = 1/n", "λ = 90°"] },
-      { q: "Quand l'angle d'incidence approche l'angle limite, le rayon réfracté :", o: ["devient plus lumineux", "faiblit et rase la surface", "se rapproche de la normale", "n'est pas modifié"] }
+      { q: "Le voltmètre se branche :", o: ["en série avec le dipôle", "en dérivation, aux bornes du dipôle", "à la place du dipôle", "entre les bornes COM et 10 A"] },
+      { q: "L'ampèremètre se branche :", o: ["en série, dans la branche où circule le courant", "en dérivation aux bornes du dipôle", "aux bornes de la pile", "indifféremment"] },
+      { q: "Le multimètre affiche « OL » (ou un « 1 » seul à gauche) :", o: ["la mesure est nulle", "la pile du multimètre est neuve", "la valeur mesurée dépasse le calibre choisi", "les pointes sont inversées"] },
+      { q: "Pour obtenir la mesure la plus précise, on choisit :", o: ["le plus grand calibre", "le plus petit calibre qui ne donne pas de dépassement", "toujours le calibre 20", "le calibre 10 A"] },
+      { q: "Sur le calibre 20 V d'un multimètre 2000 points, la résolution vaut :", o: ["1 V", "0,1 V", "0,01 V", "0,001 V"] }
     ]
   },
   lentilles: {
@@ -194,10 +196,10 @@ window.TPCR = {
       B: { cols: ["n°", "f affichée (Hz)", "S (V/div)", "Crête à crête (div)", "B (ms/div)", "Période (div)", "Voltmètre (V)"], cells: (r, i) => [i + 1, r.fa, String(r.S).replace(".", ","), fr(r.ypp, 1), String(r.B).replace(".", ","), fr(r.x, 1), fr(r.V, 2)], r: { ypp: 2, x: 2, V: 2 }, titre: "Tension sinusoïdale du GBF" },
       C: { cols: ["n°", "f affichée (Hz)", "B (ms/div)", "τ (div)", "Période (div)"], cells: (r, i) => [i + 1, r.fa, String(r.B).replace(".", ","), fr(r.tau, 1), fr(r.Tdiv, 1)], r: { tau: 2, Tdiv: 2 }, titre: "Déphasage dans le circuit RC" }
     },
-    refraction: {
-      A: { cols: ["n°", "i (°)", "r (°)"], cells: (r, i) => [i + 1, fr(r.i, 1), fr(r.r, 1)], r: { i: 1, r: 1 }, titre: "Air → plexiglas" },
-      B: { cols: ["n°", "i (°)", "r (°)"], cells: (r, i) => [i + 1, fr(r.i, 1), fr(r.r, 1)], r: { i: 1, r: 1 }, titre: "Plexiglas → air" },
-      C: { cols: ["n°", "λ (°)"], cells: (r, i) => [i + 1, fr(r.l, 1)], r: { l: 1 }, titre: "Angle limite" }
+    mesures: {
+      A: { cols: ["n°", "Source", "Calibre", "Lecture U"], cells: (r, i) => [i + 1, window.TP_MES.SRC[r.s], window.TP_MES.CAL.V[r.c].n, window.TP_MES.fmtL("V", r.c, r.L)], r: { L: 4 }, titre: "Mesure de tensions (voltmètre)" },
+      B: { cols: ["n°", "Calibre", "Lecture I"], cells: (r, i) => [i + 1, window.TP_MES.CAL.A[r.c].n, window.TP_MES.fmtL("A", r.c, r.L)], r: { L: 4 }, titre: "Mesure d'une intensité (ampèremètre)" },
+      C: { cols: ["n°", "Résistor", "Calibre", "Lecture R"], cells: (r, i) => [i + 1, window.TP_MES.RES[r.k], window.TP_MES.CAL.O[r.c].n, window.TP_MES.fmtL("O", r.c, r.L)], r: { L: 4 }, titre: "Mesure de résistances (ohmmètre)" }
     },
     lentilles: {
       A: { cols: ["n°", "Objet (cm)", "Lentille (cm)"], cells: (r, i) => [i + 1, "5,0", fr(r.xl, 1)], r: { xl: 1 }, titre: "Autocollimation" },
@@ -210,7 +212,7 @@ window.TPCR = {
     }
   };
   Object.keys(RAW).forEach(k => Object.keys(RAW[k]).forEach(p => Object.assign(window.TPCR[k].parts[p], RAW[k][p])));
-  window.TPCR_PARAMS = { ressort: "ressort_par", torsion: "torsion_par", ohm: "ohm_par", oscillo: "osc_par", refraction: "refr_par", lentilles: "lent_par", microscope: "micro_par" };
+  window.TPCR_PARAMS = { ressort: "ressort_par", torsion: "torsion_par", ohm: "ohm_par", oscillo: "osc_par", mesures: "mes_par", lentilles: "lent_par", microscope: "micro_par" };
 })();
 
 /* Banque de questions : 12 par TP. Chaque étudiant connecté reçoit 5 questions tirées
@@ -262,14 +264,14 @@ window.TPCR = {
       { q: "Dans un circuit RC série, tan φ vaut :", o: ["RCω", "1/(RCω)", "R/C", "ω/(RC)"] },
       { q: "Pour mesurer une période avec le plus de précision, on choisit la base de temps telle que la période occupe :", o: ["moins d'une division", "le plus de divisions possible sans dépasser 10", "exactement 1 division", "plus de 10 divisions"] }
     ],
-    refraction: [
-      { q: "Quand la lumière passe de l'air (n = 1) au plexiglas (n ≈ 1,5), le rayon réfracté :", o: ["s'écarte de la normale", "se rapproche de la normale", "n'est jamais dévié", "disparaît"] },
-      { q: "Les angles d'incidence et de réfraction se mesurent par rapport :", o: ["à la surface de séparation", "à la normale à la surface", "au rayon réfléchi", "au bord de la table"] },
-      { q: "Pour un plexiglas d'indice n = 1,50, l'angle limite vaut environ :", o: ["30°", "42°", "48°", "56°"] },
-      { q: "La loi de la réflexion indique que :", o: ["l'angle de réflexion est égal à l'angle d'incidence", "l'angle de réflexion est le double de l'angle d'incidence", "le rayon réfléchi est perpendiculaire au rayon incident", "le rayon réfléchi suit la normale"] },
-      { q: "Le graphe sin i = f(sin r) (air → plexiglas) est une droite de pente :", o: ["1/n", "n", "1", "n²"] },
-      { q: "Pour i = 30° dans l'air et n = 1,50, l'angle de réfraction vaut environ :", o: ["19,5°", "30°", "45°", "48,6°"] },
-      { q: "Le principe de la fibre optique repose sur :", o: ["la réfraction air → verre", "la réflexion totale à l'intérieur de la fibre", "la diffusion de la lumière", "l'absorption de la lumière"] }
+    mesures: [
+      { q: "Précision ±(0,5 % + 2 D) ; on lit 9.27 sur le calibre 20 V. L'incertitude ΔU vaut environ :", o: ["0,07 V", "0,02 V", "0,5 V", "0,007 V"] },
+      { q: "On mesure U = 1,523 V avec ΔU = 0,010 V. Le résultat s'écrit :", o: ["U = 1,523 V ± 1 %", "U = (1,52 ± 0,01) V", "U = (1,5 ± 0,01) V", "U = (1,5230 ± 0,01) V"] },
+      { q: "En voltmètre, l'appareil affiche « −4.52 » :", o: ["il est en panne", "le calibre est trop petit", "les pointes sont inversées : la borne COM est du côté du +", "il faut changer de fonction"] },
+      { q: "Avant de mesurer une résistance à l'ohmmètre, il faut :", o: ["alimenter le circuit", "choisir le calibre 10 A", "retirer le résistor du circuit (aucune tension à ses bornes)", "mettre la pointe rouge sur la borne mA"] },
+      { q: "Un ampèremètre branché en dérivation aux bornes d'un résistor :", o: ["mesure la tension aux bornes du résistor", "crée un court-circuit et fait fondre le fusible", "ne perturbe pas le circuit", "mesure la résistance"] },
+      { q: "Pour perturber le moins possible le circuit, la résistance interne d'un ampèremètre doit être :", o: ["très grande", "égale à celle du circuit", "infinie", "très petite"] },
+      { q: "Un résistor marron-noir-rouge-or a pour valeur nominale :", o: ["102 Ω", "1 kΩ ± 5 %", "10 kΩ ± 5 %", "120 Ω ± 10 %"] }
     ],
     lentilles: [
       { q: "La vergence d'une lentille de distance focale f′ = 20 cm vaut :", o: ["0,05 δ", "5 δ", "20 δ", "2 δ"] },

@@ -1,4 +1,4 @@
-/* TP d'optique : n°6 réfraction (lois de Descartes), n°7 lentilles minces, n°8 microscope */
+/* TP d'optique : n°7 lentilles minces, n°8 microscope */
 (function () {
   "use strict";
   const { register, $, css, fr, gauss, store, fit, txt } = window.TPCORE;
@@ -7,110 +7,7 @@
   const seg = (id, items, cur) => `<div class="seg" role="group">${items.map(([v, l]) => `<button type="button" data-${id}="${v}" aria-pressed="${v === cur}">${l}</button>`).join("")}</div>`;
   const setSeg = (id, v) => document.querySelectorAll(`[data-${id}]`).forEach(b => b.setAttribute("aria-pressed", b.getAttribute("data-" + id) === v));
 
-  /* ========================= TP 6 : RÉFRACTION ========================= */
-  register({
-    id: "refraction", num: 6, disc: "Optique", court: "Réfraction",
-    titre: "Étude de la réfraction : vérification des lois de Descartes",
-    objectifs: "vérifier les lois de Snell-Descartes pour la réflexion et la réfraction, déterminer l'indice de réfraction n d'un demi-cylindre de plexiglas par deux méthodes, et mettre en évidence la réflexion totale et l'angle limite.",
-    materiel: ["Source laser (ou lanterne à fente)", "Disque gradué (goniomètre)", "Demi-cylindre en plexiglas", "Écran"],
-    theorie: `<p>Un rayon lumineux arrive sur la surface de séparation de deux milieux d'indices n₁ et n₂ avec un angle d'incidence i₁ (mesuré par rapport à la <b>normale</b>).</p>
-      <h4>Lois de Snell-Descartes</h4><ol><li>Les rayons incident, réfléchi et réfracté sont dans le plan d'incidence.</li><li>Réflexion : l'angle de réflexion est égal à l'angle d'incidence.</li><li>Réfraction :</li></ol>
-      <div class="formula">n₁ sin i₁ = n₂ sin i₂</div>
-      <h4>Pourquoi un demi-cylindre ?</h4><p>Le rayon est toujours dirigé vers le centre du disque. Il traverse la face courbe selon un rayon du cercle, donc <b>sans être dévié</b> : seule la face plane réfracte la lumière.</p>
-      <h4>Passage air → plexiglas (n₁ = 1, n₂ = n)</h4><div class="formula">sin i = n · sin r    ⟹    le graphe sin i = f(sin r) est une droite de pente n</div>
-      <h4>Passage plexiglas → air et angle limite</h4><p>Le rayon s'écarte de la normale. Quand l'angle d'incidence atteint l'angle limite λ, le rayon réfracté rase la surface (r = 90°) ; au-delà, il n'y a plus de réfraction : c'est la <b>réflexion totale</b>.</p>
-      <div class="formula">n · sin i = sin r      sin λ = 1/n    ⟹    n = 1 / sin λ</div>`,
-    protocole: `<h4>Partie A — Passage de l'air dans le plexiglas</h4><ol>
-        <li>Place le demi-cylindre sur le disque, face plane sur le diamètre 90°–90°, centre de la face plane au centre du disque.</li>
-        <li>Dirige le rayon laser vers le centre du disque, du côté de la face plane (mode « air → plexiglas »).</li>
-        <li>Pour i = 0°, 10°, 20°… jusqu'à 80°, lis l'angle de réfraction r sur le disque et enregistre (Partie A). Vérifie aussi que l'angle de réflexion est égal à i.</li>
-        <li>Exploite le graphe sin i = f(sin r) : la pente donne n.</li></ol>
-      <h4>Partie B — Passage du plexiglas dans l'air</h4><ol>
-        <li>Fais entrer le rayon par la face courbe (mode « plexiglas → air »), toujours vers le centre.</li>
-        <li>Pour i = 0°, 5°, 10°… lis l'angle r du rayon émergent dans l'air et enregistre (Partie B). Observe que le rayon réfracté faiblit et que le rayon réfléchi devient plus lumineux.</li>
-        <li>Exploite le graphe sin r = f(sin i).</li></ol>
-      <h4>Partie C — Angle limite</h4><ol>
-        <li>Augmente lentement i jusqu'à la disparition du rayon réfracté : note cet angle λ (bouton « Noter l'angle limite »).</li>
-        <li>Recommence 3 fois en approchant par valeurs croissantes, puis calcule n = 1/sin λ.</li></ol>`,
-    precautions: `<ul><li>Ne regarde jamais directement le faisceau laser et évite les réflexions vers les yeux.</li>
-      <li>Le rayon doit toujours passer exactement par le centre du disque, sinon la face courbe dévie aussi le faisceau.</li>
-      <li>La lecture des angles se fait à ±0,5° près. Au voisinage de 90°, sin varie peu : les petits angles et les angles moyens sont les plus fiables.</li>
-      <li>Δn/n ≈ cotan(i)·Δi + cotan(r)·Δr (angles en radians).</li></ul>`,
-    preparation: ["Énonce les lois de Snell-Descartes pour la réflexion et la réfraction.", "Pourquoi le rayon n'est-il pas dévié en traversant la face courbe du demi-cylindre ?", "Pour n = 1,49, calcule r pour i = 30° (air → plexiglas) et l'angle limite λ.", "Dans quel sens de propagation la réflexion totale est-elle possible ? Pourquoi ?"],
-    hint: "Le disque est gradué en degrés à partir de la normale (trait horizontal). Le laser vise toujours le centre.",
-    controls: `<h3>Sens de propagation</h3>${seg("rfm", [["A", "Air → plexiglas"], ["B", "Plexiglas → air"]], "A")}
-      <h3>Laser</h3><div class="ctl"><label for="rfI">Angle d'incidence i <b id="rfIv"></b></label><input id="rfI" type="range" min="0" max="89" step="0.5" value="30"></div>
-      <h3>Lecture sur le disque</h3><dl class="lcd"><dt>Incidence i</dt><dd id="rfLi"></dd><dt>Réflexion i′</dt><dd id="rfLip"></dd><dt>Réfraction r</dt><dd id="rfLr"></dd></dl>
-      <button type="button" class="btn primary sm" id="rfRec">Enregistrer la mesure</button>
-      <button type="button" class="btn sm" id="rfLim">Noter l'angle limite (Partie C)</button>
-      <button type="button" class="btn sm" id="rfNew">Changer de demi-cylindre</button>`,
-    parts: [
-      { key: "A", titre: "Air → plexiglas", cols: ["n°", "i (°)", "r (°)", "sin i", "sin r", "sin i / sin r"],
-        cells: (r, k) => [k + 1, fr(r.i, 1), fr(r.r, 1), fr(Math.sin(r.i * D2R), 3), fr(Math.sin(r.r * D2R), 3), r.i > 0 ? fr(Math.sin(r.i * D2R) / Math.sin(r.r * D2R), 3) : "—"],
-        point: r => [Math.sin(r.r * D2R), Math.sin(r.i * D2R)], axes: { xl: "sin r", yl: "sin i", xmin: 0, ymin: 0 },
-        fit: R => R ? `sin i = ${fr(R.a, 3)} · sin r ${R.b < 0 ? "−" : "+"} ${fr(Math.abs(R.b), 3)}  (r = ${fr(R.r, 5)})   ⟹   n = pente = ${fr(R.a, 3)}` : "Au moins 2 mesures sont nécessaires." },
-      { key: "B", titre: "Plexiglas → air", cols: ["n°", "i (°)", "r (°)", "sin i", "sin r"],
-        cells: (r, k) => [k + 1, fr(r.i, 1), fr(r.r, 1), fr(Math.sin(r.i * D2R), 3), fr(Math.sin(r.r * D2R), 3)],
-        point: r => [Math.sin(r.i * D2R), Math.sin(r.r * D2R)], axes: { xl: "sin i", yl: "sin r", xmin: 0, ymin: 0 },
-        fit: R => R ? `sin r = ${fr(R.a, 3)} · sin i ${R.b < 0 ? "−" : "+"} ${fr(Math.abs(R.b), 3)}  (r = ${fr(R.r, 5)})   ⟹   n = pente = ${fr(R.a, 3)}` : "Au moins 2 mesures sont nécessaires." },
-      { key: "C", titre: "Angle limite", cols: ["n°", "λ (°)", "sin λ", "n = 1/sin λ"],
-        cells: (r, k) => [k + 1, fr(r.l, 1), fr(Math.sin(r.l * D2R), 4), fr(1 / Math.sin(r.l * D2R), 3)],
-        fit: (R, rows) => rows.length ? `Moyenne : λ = ${fr(rows.reduce((s, r) => s + r.l, 0) / rows.length, 1)}° ⟹ n = ${fr(rows.reduce((s, r) => s + 1 / Math.sin(r.l * D2R), 0) / rows.length, 3)}` : "Note l'angle limite au moins 3 fois." }
-    ],
-    questions: ["Les angles d'incidence et de réflexion sont-ils égaux ? Énonce la loi de la réflexion.", "Partie A : le graphe sin i = f(sin r) est-il une droite passant par l'origine ? Donne n.", "Partie B : que devient le rayon réfracté quand i augmente ? Comment varie la luminosité des rayons réfléchi et réfracté ?", "Partie C : donne λ et la valeur de n correspondante. Compare les trois valeurs de n obtenues.", "Cite une application de la réflexion totale (fibre optique, prisme…)."],
-    init(T) {
-      let P = store.get("refr_par", null); const newBlock = () => { P = { n: 1.46 + Math.random() * 0.07 }; store.set("refr_par", P); }; if (!P) newBlock();
-      let mode = "A", i = 30;
-      const read = () => {
-        const n = P.n, si = Math.sin(i * D2R); let r = null;
-        if (mode === "A") r = Math.asin(si / n) * R2D; else if (n * si < 1) r = Math.asin(n * si) * R2D;
-        return { r, lim: Math.asin(1 / n) * R2D };
-      };
-      let lec = { i: 0, ip: 0, r: null };
-      const update = () => { const s = read(); lec = { i: i, ip: round05(i + gauss() * 0.25), r: s.r == null ? null : round05(s.r + gauss() * 0.3) };
-        $("#rfIv").textContent = fr(i, 1) + "°"; $("#rfLi").textContent = fr(i, 1) + "°"; $("#rfLip").textContent = fr(lec.ip, 1) + "°"; $("#rfLr").textContent = lec.r == null ? "pas de rayon réfracté" : fr(lec.r, 1) + "°"; };
-      document.querySelectorAll("[data-rfm]").forEach(b => b.onclick = () => { mode = b.dataset.rfm; setSeg("rfm", mode); update(); T.draw(); });
-      $("#rfI").addEventListener("input", e => { i = +e.target.value; update(); T.draw(); });
-      $("#rfRec").onclick = () => { if (lec.r == null) { T.msg("Réflexion totale : il n'y a pas de rayon réfracté à mesurer.", "bad"); return; } T.add(mode, { i: lec.i, r: lec.r }); T.msg(`Mesure enregistrée (partie ${mode}).`, "ok"); };
-      $("#rfLim").onclick = () => { const { lim } = read(); if (mode !== "B") { T.msg("L'angle limite s'observe dans le sens plexiglas → air.", "bad"); return; } if (i < lim) { T.msg("Le rayon réfracté est encore visible : augmente doucement l'angle.", "bad"); return; } if (i > lim + 1.5) { T.msg("Tu as dépassé l'angle limite de trop : reviens en arrière et approche-le lentement.", "bad"); return; } T.add("C", { l: round05(i + gauss() * 0.2) }); T.msg("Angle limite noté.", "ok"); };
-      $("#rfNew").onclick = () => { if (T.locked()) { T.msg("Compte rendu déjà soumis : le matériel ne peut plus être changé.", "bad"); return; } newBlock(); T.clearRows(); update(); T.draw(); T.msg("Nouveau demi-cylindre : refais les mesures."); };
-      T.draw = () => {
-        const { c, w, h } = fit($("#refraction-cv"), innerWidth < 600 ? 0.95 : 0.62); c.fillStyle = css("--plot-bg"); c.fillRect(0, 0, w, h);
-        const fg = css("--fg"), mu = css("--muted"), cx = w / 2, cy = h / 2, R = Math.min(w, h) * 0.42;
-        // disque gradué : 0° sur la normale (horizontale)
-        c.fillStyle = css("--tint"); c.beginPath(); c.arc(cx, cy, R, 0, 7); c.fill(); c.strokeStyle = mu; c.lineWidth = 1; c.stroke();
-        for (let a = 0; a < 360; a += 1) { const ra = a * D2R, l = a % 10 === 0 ? 12 : a % 5 === 0 ? 7 : 3; c.beginPath(); c.moveTo(cx + Math.cos(ra) * R, cy + Math.sin(ra) * R); c.lineTo(cx + Math.cos(ra) * (R - l), cy + Math.sin(ra) * (R - l)); c.stroke();
-          if (a % 10 === 0 && R > 120) { const lab = a <= 90 ? a : a <= 180 ? 180 - a : a <= 270 ? a - 180 : 360 - a; txt(c, String(lab), cx + Math.cos(ra) * (R - 22), cy + Math.sin(ra) * (R - 22), mu, "center", "middle", "10px 'Fira Mono'"); } }
-        c.setLineDash([5, 4]); c.strokeStyle = mu; c.beginPath(); c.moveTo(cx - R, cy); c.lineTo(cx + R, cy); c.stroke(); c.setLineDash([]); txt(c, "normale", cx - R + 4, cy - 6, mu);
-        // demi-cylindre : face plane verticale au centre, partie courbe à droite
-        c.fillStyle = "rgba(120,170,220,.35)"; c.strokeStyle = "#5f8fc0"; c.lineWidth = 1.5; c.beginPath(); c.moveTo(cx, cy - R * 0.62); c.arc(cx, cy, R * 0.62, -Math.PI / 2, Math.PI / 2); c.closePath(); c.fill(); c.stroke();
-        txt(c, "plexiglas", cx + R * 0.32, cy + R * 0.42, "#3f6f9f", "center");
-        const s = read(), ray = (a, len, alpha, col) => { c.strokeStyle = col; c.globalAlpha = alpha; c.lineWidth = 2.6; c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + Math.cos(a) * len, cy + Math.sin(a) * len); c.stroke(); c.globalAlpha = 1; };
-        const red = "#e53935", L = R * 0.98, ir = i * D2R;
-        // Fresnel (moyenne des polarisations) pour la luminosité
-        const n1 = mode === "A" ? 1 : P.n, n2 = mode === "A" ? P.n : 1; let Rf = 1;
-        if (s.r != null) { const ti = ir, tt = s.r * D2R, rs = ((n1 * Math.cos(ti) - n2 * Math.cos(tt)) / (n1 * Math.cos(ti) + n2 * Math.cos(tt))) ** 2, rp = ((n1 * Math.cos(tt) - n2 * Math.cos(ti)) / (n1 * Math.cos(tt) + n2 * Math.cos(ti))) ** 2; Rf = (rs + rp) / 2; }
-        if (mode === "A") { // incident depuis la gauche (air), en haut à gauche
-          const ai = Math.PI + ir; c.strokeStyle = red; c.lineWidth = 3; c.beginPath(); c.moveTo(cx + Math.cos(ai) * L, cy + Math.sin(ai) * L); c.lineTo(cx, cy); c.stroke();
-          ray(Math.PI - ir, L, 0.25 + 0.75 * Math.min(1, Rf * 6), red);                 // réfléchi (en bas à gauche)
-          ray(s.r * D2R, L, 0.95 - Rf, red);                                          // réfracté (dans le bloc, en bas à droite)
-          c.fillStyle = "#555"; c.save(); c.translate(cx + Math.cos(ai) * (L + 4), cy + Math.sin(ai) * (L + 4)); c.rotate(ai); c.fillRect(-4, -6, 22, 12); c.restore();
-        } else { // incident depuis la face courbe (droite, en haut), émergent à gauche
-          const ai = -ir; c.strokeStyle = red; c.lineWidth = 3; c.beginPath(); c.moveTo(cx + Math.cos(ai) * L, cy + Math.sin(ai) * L); c.lineTo(cx, cy); c.stroke();
-          ray(ir, L, s.r == null ? 1 : 0.25 + 0.75 * Math.min(1, Rf * 3), red);         // réfléchi dans le bloc
-          if (s.r != null) ray(Math.PI - s.r * D2R, L, Math.max(0.12, 0.95 - Rf), red);  // réfracté dans l'air (en bas à gauche)
-          c.fillStyle = "#555"; c.save(); c.translate(cx + Math.cos(ai) * (L + 4), cy + Math.sin(ai) * (L + 4)); c.rotate(ai); c.fillRect(-4, -6, 22, 12); c.restore();
-          if (s.r == null) txt(c, "réflexion totale", cx - R * 0.5, cy + R * 0.5, css("--ko"), "center", "alphabetic", "700 13px 'Fira Sans'");
-        }
-        c.fillStyle = fg; c.beginPath(); c.arc(cx, cy, 3, 0, 7); c.fill();
-        txt(c, mode === "A" ? "air → plexiglas" : "plexiglas → air", 12, 18, fg, "left", "alphabetic", "600 13px 'Fira Sans'");
-      };
-      update();
-    }
-  });
-
-  /* ---------- outils communs aux lentilles ---------- */
-  // position de l'image (en cm, abscisse sur le banc) d'un objet en xo par une lentille en xl de focale f (lumière vers la droite)
+  /* ---------- outils communs aux TP 7 et 8 ---------- */
   const imageOf = (xo, xl, f) => { const OA = xo - xl, inv = 1 / f + 1 / OA; return Math.abs(inv) < 1e-9 ? Infinity : xl + 1 / inv; };
   function bench(c, w, by, X, mu) {
     c.fillStyle = css("--line"); c.fillRect(X(0), by + 34, X(150) - X(0), 10);
