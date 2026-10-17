@@ -28,7 +28,7 @@ window.TPCR = {
   ressort: {
     parts: {
       A: { min: 5, fill: [{ k: "F", h: "F = mg (N)" }, { k: "dl", h: "Δℓ = ℓ − ℓ₀ (cm)" }], plot: { x: (r, f) => f.dl, y: (r, f) => f.F, xl: "Δℓ (cm)", yl: "F (N)" } },
-      B: { min: 4, fill: [{ k: "T", h: "T₀ = t/n (s)" }, { k: "T2", h: "T₀² (s²)" }], plot: { x: (r, f) => r.m / 1000, y: (r, f) => f.T2, xl: "m (kg)", yl: "T₀² (s²)" } }
+      B: { min: 4, fill: [{ k: "T", h: "T₀ = t/n (s)", ref: r => r.t / r.n, warn: "Attention : T₀ est la durée d'UNE oscillation, T₀ = t / n (et non t)." }, { k: "T2", h: "T₀² (s²)", ref: r => (r.t / r.n) ** 2, warn: "T₀² est le carré de la période T₀ = t / n." }], plot: { x: (r, f) => r.m / 1000, y: (r, f) => f.T2, xl: "m (kg)", yl: "T₀² (s²)", xmin: 0, ymin: 0, fit: true, eq: R => "T₀² = " + R.a.toFixed(3).replace(".", ",") + " m + " + R.b.toFixed(4).replace(".", ","), mark0: R => "b = " + R.b.toFixed(4).replace(".", ",") + " s² pour m = 0" } }
     },
     calc: [
       { k: "kstat", h: "Raideur k par la méthode statique (pente de F = f(Δℓ), Δℓ en m)", u: "N/m" },

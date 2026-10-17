@@ -176,8 +176,8 @@
     questions: ["Partie A : la loi de Hooke est-elle vérifiée ? Donne la valeur de k.", "Partie B : la période dépend-elle de l'amplitude ? Justifie le nom « oscillateur harmonique ».", "Donne k obtenu par la méthode dynamique et compare-le à la valeur statique (écart relatif).", "Que représente l'ordonnée à l'origine du graphe T₀² = f(m) ? Estime la masse du ressort.", "Quelle méthode te paraît la plus précise ? Pourquoi ?"],
     init(T) {
       const ch = chrono("rsc"); const panel = $("#" + T.id + " .panel"); panel.innerHTML = panel.innerHTML.replace("__CHRONO__", ch.html); ch.bind();
-      let P = store.get("ressort_par", null);
-      const newSpring = () => { P = { k: 20 + Math.random() * 25, mr: 0.015 + Math.random() * 0.02, l0: 18 + Math.random() * 4 }; P.l0read = Math.round((P.l0 + gauss() * 0.04) * 10) / 10; store.set("ressort_par", P); };
+      let P = store.get("ressort_par", null); if (P && P.v !== 2) P = null;   // anciens ressorts (masse trop faible) remplacés
+      const newSpring = () => { P = { v: 2, k: 20 + Math.random() * 25, mr: 0.060 + Math.random() * 0.060, l0: 18 + Math.random() * 4 }; P.l0read = Math.round((P.l0 + gauss() * 0.04) * 10) / 10; store.set("ressort_par", P); };
       if (!P) newSpring();
       let m = 0.1, X = 0.02, x = 0, v = 0, run = false, prev = 0, wob = 0;
       const eqPos = () => P.l0 + (m * G / P.k) * 100;   // cm
