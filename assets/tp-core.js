@@ -91,14 +91,15 @@
       $("#" + id + "-rz").onclick = () => { S.on = false; S.armed = false; S.t = 0; S.n = 0; S.done = false; show(); };
       show();
     }
-    // appelé à chaque image ; extreme=true quand l'oscillateur passe par une position extrême (début de période) ;
-    // frac = temps écoulé depuis ce passage jusqu'à la fin de l'image (le capteur date le passage exactement, sans retard d'affichage)
-    S.step = (dt, extreme, frac) => {
+    // appelé à chaque image ; pass=true quand l'oscillateur passe par sa position d'équilibre (fourche optique placée à l'équilibre,
+    // franchie deux fois par période) ; frac = temps écoulé depuis ce passage jusqu'à la fin de l'image (passage daté exactement)
+    S.step = (dt, pass, frac) => {
       frac = Math.min(dt, Math.max(0, frac || 0));
-      if (S.armed && extreme) { S.armed = false; S.on = true; S.t = frac; S.n = 0; }
+      if (S.armed && pass) { S.armed = false; S.on = true; S.t = frac; S.n = 0; S.h = 0; }
       else if (S.on) {
         if (!S.auto && S.t0 != null) S.t = (performance.now() - S.t0) / 1000; else S.t += dt;
-        if (extreme) { S.n++; if (S.auto && S.n >= S.target) { S.on = false; S.done = true; S.t = Math.max(0, S.t - frac) + gauss() * 0.002; } }
+        if (pass && S.auto) { S.h = (S.h || 0) + 1; if (S.h % 2 === 0) { S.n++; if (S.n >= S.target) { S.on = false; S.done = true; S.t = Math.max(0, S.t - frac) + gauss() * 0.002; } } }
+        else if (pass) { S.h = (S.h || 0) + 1; if (S.h % 2 === 0) S.n++; }
       }
       if (S.show) S.show();
     };
@@ -443,5 +444,5 @@
       const T = TPS.find(t => t.id === cur); if (T && T.tick && dt > 0) T.tick(dt); requestAnimationFrame(loop); };
     requestAnimationFrame(loop);
   }
-  window.TPCORE = { build: 35, register, start, $, css, esc, fr, gauss, store, fit, txt, linreg, chrono, isCur: id => cur === id };
+  window.TPCORE = { build: 36, register, start, $, css, esc, fr, gauss, store, fit, txt, linreg, chrono, isCur: id => cur === id };
 })();
