@@ -882,3 +882,637 @@ window.QUIZ={
 ]
 }
 };
+
+/* ===================== OPTIQUE ===================== */
+Object.assign(window.QUIZ, {
+"opt1": {
+"course": "Optique",
+"title": "Chapitre 1 — Lois fondamentales de l'optique géométrique",
+"qs": [
+{
+"q": "Dans un verre d'indice $n=1{,}5$, la lumière se propage à la vitesse :",
+"c": [
+"$4{,}5\\times10^8$ m/s",
+"$2{,}0\\times10^8$ m/s",
+"$3{,}0\\times10^8$ m/s",
+"$1{,}5\\times10^8$ m/s"
+],
+"a": 1,
+"e": "$v=\\dfrac cn=\\dfrac{3{,}0\\times10^8}{1{,}5}=2{,}0\\times10^8$ m/s : la lumière est plus lente dans un milieu plus réfringent.",
+"s": "Indice de réfraction"
+},
+{
+"q": "Une radiation de longueur d'onde $\\lambda_0=600$ nm dans le vide entre dans l'eau ($n=1{,}33$). Sa longueur d'onde dans l'eau vaut :",
+"c": [
+"$798$ nm",
+"$600$ nm",
+"$451$ nm",
+"$300$ nm"
+],
+"a": 2,
+"e": "La fréquence ne change pas ; la vitesse est divisée par $n$, donc $\\lambda=\\dfrac{\\lambda_0}{n}=\\dfrac{600}{1{,}33}\\approx451$ nm.",
+"s": "Indice de réfraction"
+},
+{
+"q": "Quand la lumière passe de l'air dans l'eau, ce qui ne change pas est :",
+"c": [
+"la vitesse",
+"la longueur d'onde",
+"la fréquence",
+"la direction de propagation (quelle que soit l'incidence)"
+],
+"a": 2,
+"e": "La fréquence est imposée par la source ; vitesse et longueur d'onde sont divisées par l'indice.",
+"s": "Indice de réfraction"
+},
+{
+"q": "Un rayon passe de l'air dans un verre d'indice $1{,}5$ sous l'incidence $i_1=30^\\circ$. L'angle de réfraction vaut environ :",
+"c": [
+"$45^\\circ$",
+"$19{,}5^\\circ$",
+"$30^\\circ$",
+"$20^\\circ$ exactement"
+],
+"a": 1,
+"e": "$\\sin i_2=\\dfrac{\\sin30^\\circ}{1{,}5}=0{,}333$, d'où $i_2\\approx19{,}5^\\circ$ : le rayon se rapproche de la normale.",
+"s": "Lois de Snell-Descartes"
+},
+{
+"q": "L'angle critique (réflexion totale) pour le dioptre verre ($n=1{,}5$) – air vaut environ :",
+"c": [
+"$41{,}8^\\circ$",
+"$48{,}6^\\circ$",
+"$30^\\circ$",
+"$90^\\circ$"
+],
+"a": 0,
+"e": "$\\sin\\lambda=\\dfrac{n_2}{n_1}=\\dfrac1{1{,}5}$, d'où $\\lambda\\approx41{,}8^\\circ$.",
+"s": "Réflexion totale"
+},
+{
+"q": "La réflexion totale se produit lorsque :",
+"c": [
+"$n_1<n_2$ et $i_1>\\lambda$",
+"$n_1>n_2$ et $i_1>\\lambda$",
+"$n_1>n_2$ et $i_1<\\lambda$",
+"$i_1=0$"
+],
+"a": 1,
+"e": "Il faut passer vers un milieu moins réfringent ($n_1>n_2$) sous une incidence supérieure à l'angle critique $\\lambda$.",
+"s": "Réflexion totale"
+},
+{
+"q": "Le chemin optique d'un rayon qui traverse $2$ cm de verre ($n=1{,}5$) vaut :",
+"c": [
+"$2$ cm",
+"$1{,}33$ cm",
+"$3$ cm",
+"$0{,}75$ cm"
+],
+"a": 2,
+"e": "$L=n\\,d=1{,}5\\times2=3$ cm : c'est la distance que la lumière parcourrait dans le vide pendant la même durée.",
+"s": "Chemin optique et Fermat"
+},
+{
+"q": "D'après le principe de Fermat, le trajet suivi par la lumière entre deux points rend le chemin optique :",
+"c": [
+"maximal",
+"stationnaire (en général minimal)",
+"égal à la distance géométrique",
+"nul"
+],
+"a": 1,
+"e": "Le chemin optique est stationnaire : une petite variation du trajet ne le modifie pas au premier ordre (il est le plus souvent minimal).",
+"s": "Chemin optique et Fermat"
+},
+{
+"q": "Dans un prisme de verre, la radiation la plus déviée est :",
+"c": [
+"le rouge",
+"le vert",
+"le violet",
+"elles sont toutes déviées de la même façon"
+],
+"a": 2,
+"e": "L'indice du verre est plus grand pour le violet ($n$ décroît avec $\\lambda$) : le violet est le plus dévié.",
+"s": "Dispersion"
+},
+{
+"q": "Une fibre optique a un cœur d'indice $1{,}48$ et une gaine d'indice $1{,}46$. Son ouverture numérique $\\sqrt{n_c^2-n_g^2}$ vaut environ :",
+"c": [
+"$0{,}02$",
+"$0{,}24$",
+"$1{,}0$",
+"$0{,}5$"
+],
+"a": 1,
+"e": "$ON=\\sqrt{1{,}48^2-1{,}46^2}=\\sqrt{0{,}0588}\\approx0{,}24$ : l'angle d'acceptance vaut $\\arcsin0{,}24\\approx14^\\circ$.",
+"s": "Fibre optique"
+}
+]
+},
+"opt2": {
+"course": "Optique",
+"title": "Chapitre 2 — Formation des images et systèmes plans",
+"qs": [
+{
+"q": "Une image est réelle lorsque :",
+"c": [
+"les rayons émergents divergent",
+"les rayons émergents convergent réellement en $A'$ : on peut la recueillir sur un écran",
+"elle est droite",
+"elle est plus grande que l'objet"
+],
+"a": 1,
+"e": "Image réelle : les rayons émergents passent réellement par $A'$. Image virtuelle : seuls leurs prolongements y passent.",
+"s": "Objet et image"
+},
+{
+"q": "Le seul système rigoureusement stigmatique pour tous les points de l'espace est :",
+"c": [
+"la lentille mince",
+"le dioptre plan",
+"le miroir plan",
+"le miroir sphérique"
+],
+"a": 2,
+"e": "L'image d'un point par un miroir plan est son symétrique : tous les rayons réfléchis semblent venir exactement de ce point.",
+"s": "Stigmatisme"
+},
+{
+"q": "Les conditions de Gauss imposent des rayons :",
+"c": [
+"parallèles à l'axe uniquement",
+"peu inclinés et proches de l'axe (paraxiaux)",
+"très inclinés",
+"passant tous par le foyer"
+],
+"a": 1,
+"e": "Rayons paraxiaux : stigmatisme et aplanétisme approchés, et approximation $\\sin\\theta\\approx\\tan\\theta\\approx\\theta$.",
+"s": "Conditions de Gauss"
+},
+{
+"q": "Une personne se tient à $2$ m d'un miroir plan. La distance entre la personne et son image vaut :",
+"c": [
+"$2$ m",
+"$1$ m",
+"$4$ m",
+"$0$ m"
+],
+"a": 2,
+"e": "$\\overline{HA'}=-\\overline{HA}$ : l'image est à $2$ m derrière le miroir, donc à $4$ m de la personne.",
+"s": "Miroir plan"
+},
+{
+"q": "Le grandissement transversal d'un miroir plan vaut :",
+"c": [
+"$-1$",
+"$+1$",
+"$0$",
+"$+2$"
+],
+"a": 1,
+"e": "L'image est symétrique de l'objet : même taille, même sens, $\\gamma=+1$ (mais inversion gauche-droite).",
+"s": "Miroir plan"
+},
+{
+"q": "Un caillou est à $1{,}20$ m au fond d'une eau calme ($n=1{,}33$). Vu presque à la verticale, il paraît à la profondeur :",
+"c": [
+"$1{,}60$ m",
+"$1{,}20$ m",
+"$0{,}90$ m",
+"$0{,}60$ m"
+],
+"a": 2,
+"e": "Dioptre plan dans les conditions de Gauss : $h'=\\dfrac hn=\\dfrac{1{,}20}{1{,}33}\\approx0{,}90$ m.",
+"s": "Dioptre plan"
+},
+{
+"q": "Une lentille de distance focale image $f'=25$ cm a pour vergence :",
+"c": [
+"$0{,}25$ δ",
+"$25$ δ",
+"$4$ δ",
+"$-4$ δ"
+],
+"a": 2,
+"e": "$V=\\dfrac1{f'}=\\dfrac1{0{,}25\\ \\text{m}}=4$ δ (dioptries).",
+"s": "Foyers et vergence"
+},
+{
+"q": "Pour se voir en entier dans un miroir plan vertical, une personne de $1{,}80$ m a besoin d'un miroir d'au moins :",
+"c": [
+"$1{,}80$ m",
+"$0{,}90$ m",
+"$0{,}60$ m",
+"cela dépend de sa distance au miroir"
+],
+"a": 1,
+"e": "Les points de réflexion utiles sont à mi-hauteur entre l'œil et chaque extrémité du corps : la moitié de la taille, quelle que soit la distance.",
+"s": "Miroir plan"
+},
+{
+"q": "La relation de conjugaison du dioptre plan dans les conditions de Gauss s'écrit :",
+"c": [
+"$n_1\\,\\overline{HA'}=n_2\\,\\overline{HA}$",
+"$\\dfrac{\\overline{HA'}}{n_2}=\\dfrac{\\overline{HA}}{n_1}$",
+"$\\overline{HA'}=-\\overline{HA}$",
+"$\\overline{HA'}=\\overline{HA}$"
+],
+"a": 1,
+"e": "$\\dfrac{\\overline{HA'}}{n_2}=\\dfrac{\\overline{HA}}{n_1}$, $n_1$ étant l'indice du milieu de l'objet.",
+"s": "Dioptre plan"
+},
+{
+"q": "Une image virtuelle :",
+"c": [
+"ne peut pas être vue",
+"peut être vue à l'œil mais pas recueillie sur un écran",
+"se forme toujours sur l'écran",
+"est toujours renversée"
+],
+"a": 1,
+"e": "L'œil reçoit des rayons qui semblent venir de $A'$ et la voit ; aucun rayon ne passe réellement par $A'$, donc pas d'image sur un écran.",
+"s": "Objet et image"
+}
+]
+},
+"opt3": {
+"course": "Optique",
+"title": "Chapitre 3 — Prisme et lame à faces parallèles",
+"qs": [
+{
+"q": "Dans un prisme d'angle $A$, les angles de réfraction intérieurs vérifient :",
+"c": [
+"$A=r-r'$",
+"$A=r+r'$",
+"$A=r\\,r'$",
+"$A=2r$ toujours"
+],
+"a": 1,
+"e": "Dans le quadrilatère formé par l'arête et les normales, on obtient $r+r'=A$.",
+"s": "Formules du prisme"
+},
+{
+"q": "La déviation d'un rayon par un prisme vaut :",
+"c": [
+"$D=i+i'+A$",
+"$D=i-i'$",
+"$D=i+i'-A$",
+"$D=(n-1)i$"
+],
+"a": 2,
+"e": "$D=(i-r)+(i'-r')=i+i'-(r+r')=i+i'-A$.",
+"s": "Formules du prisme"
+},
+{
+"q": "Au minimum de déviation :",
+"c": [
+"$i=0$",
+"la marche du rayon est symétrique : $i=i'$ et $r=r'=A/2$",
+"$i'=90^\\circ$",
+"$r=0$"
+],
+"a": 1,
+"e": "La déviation est minimale pour une marche symétrique : $i=i'=i_m$, $r=r'=\\dfrac A2$, $D_m=2i_m-A$.",
+"s": "Minimum de déviation"
+},
+{
+"q": "Un prisme d'angle $A=60^\\circ$ présente une déviation minimale $D_m=37{,}2^\\circ$. Son indice vaut :",
+"c": [
+"$1{,}33$",
+"$1{,}50$",
+"$1{,}62$",
+"$1{,}20$"
+],
+"a": 1,
+"e": "$n=\\dfrac{\\sin\\frac{A+D_m}2}{\\sin\\frac A2}=\\dfrac{\\sin48{,}6^\\circ}{\\sin30^\\circ}=\\dfrac{0{,}750}{0{,}500}=1{,}50$.",
+"s": "Minimum de déviation"
+},
+{
+"q": "Un prisme mince d'angle $A=4^\\circ$ et d'indice $1{,}5$ dévie la lumière de :",
+"c": [
+"$6^\\circ$",
+"$4^\\circ$",
+"$2^\\circ$",
+"$1{,}5^\\circ$"
+],
+"a": 2,
+"e": "Pour un prisme mince : $D\\approx(n-1)A=0{,}5\\times4^\\circ=2^\\circ$, quelle que soit l'incidence (faible).",
+"s": "Prisme mince"
+},
+{
+"q": "Aucun rayon ne peut traverser un prisme si :",
+"c": [
+"$A>2\\lambda$ ($\\lambda$ : angle critique)",
+"$A<\\lambda$",
+"$n<1$",
+"$A=60^\\circ$"
+],
+"a": 0,
+"e": "Il faut $r'=A-r\\le\\lambda$ avec $r\\le\\lambda$ : c'est impossible si $A>2\\lambda$.",
+"s": "Conditions d'émergence"
+},
+{
+"q": "Dans l'air, un prisme dévie toujours la lumière :",
+"c": [
+"vers son arête",
+"vers sa base",
+"parallèlement à sa base",
+"cela dépend de la couleur"
+],
+"a": 1,
+"e": "À l'entrée le rayon se rapproche de la normale, à la sortie il s'en écarte : les deux rotations se font vers la base.",
+"s": "Formules du prisme"
+},
+{
+"q": "Un rayon qui traverse une lame à faces parallèles ressort :",
+"c": [
+"dévié de l'angle $A$",
+"parallèle au rayon incident, simplement décalé",
+"perpendiculaire à la lame",
+"confondu avec le rayon incident"
+],
+"a": 1,
+"e": "Les deux faces sont parallèles : $i'=i$. Le rayon est seulement déplacé latéralement de $d=e\\,\\dfrac{\\sin(i-r)}{\\cos r}$.",
+"s": "Lame à faces parallèles"
+},
+{
+"q": "Un bloc de verre ($n=1{,}5$) d'épaisseur $3$ cm rapproche l'image d'un objet (conditions de Gauss) de :",
+"c": [
+"$3$ cm",
+"$2$ cm",
+"$1$ cm",
+"$4{,}5$ cm"
+],
+"a": 2,
+"e": "$\\overline{AA'}=e\\left(1-\\dfrac1n\\right)=3\\times\\left(1-\\dfrac1{1{,}5}\\right)=1$ cm.",
+"s": "Lame à faces parallèles"
+},
+{
+"q": "Un prisme décompose la lumière blanche parce que :",
+"c": [
+"il réfléchit les couleurs différemment",
+"l'indice du verre dépend de la longueur d'onde",
+"il absorbe certaines couleurs",
+"la lumière blanche est polarisée"
+],
+"a": 1,
+"e": "$n$ dépend de $\\lambda$ (loi de Cauchy) : chaque radiation est déviée d'un angle différent.",
+"s": "Dispersion"
+}
+]
+},
+"opt4": {
+"course": "Optique",
+"title": "Chapitre 4 — Miroirs et dioptres sphériques",
+"qs": [
+{
+"q": "Pour un miroir concave de rayon $|R|=40$ cm, la distance focale $\\overline{SF}$ vaut :",
+"c": [
+"$-40$ cm",
+"$-20$ cm",
+"$+20$ cm",
+"$-80$ cm"
+],
+"a": 1,
+"e": "$\\overline{SF}=\\dfrac{\\overline{SC}}2=\\dfrac{-40}2=-20$ cm : le foyer est réel, au milieu de $[SC]$.",
+"s": "Miroir sphérique"
+},
+{
+"q": "La relation de conjugaison du miroir sphérique (origine au sommet) s'écrit :",
+"c": [
+"$\\dfrac1{\\overline{SA'}}-\\dfrac1{\\overline{SA}}=\\dfrac2{\\overline{SC}}$",
+"$\\dfrac1{\\overline{SA'}}+\\dfrac1{\\overline{SA}}=\\dfrac2{\\overline{SC}}$",
+"$\\overline{SA'}=-\\overline{SA}$",
+"$\\dfrac1{\\overline{SA'}}+\\dfrac1{\\overline{SA}}=\\dfrac1{\\overline{SC}}$"
+],
+"a": 1,
+"e": "$\\dfrac1{\\overline{SA'}}+\\dfrac1{\\overline{SA}}=\\dfrac2{\\overline{SC}}=\\dfrac1{\\overline{SF}}$.",
+"s": "Miroir sphérique"
+},
+{
+"q": "Un miroir convexe donne d'un objet réel une image :",
+"c": [
+"réelle et renversée",
+"virtuelle, droite et réduite",
+"virtuelle, droite et agrandie",
+"réelle et agrandie"
+],
+"a": 1,
+"e": "Le miroir convexe est divergent : l'image d'un objet réel est toujours virtuelle, droite et réduite (rétroviseurs).",
+"s": "Miroir sphérique"
+},
+{
+"q": "Miroir concave ($\\overline{SC}=-40$ cm), objet en $\\overline{SA}=-60$ cm. L'image est en :",
+"c": [
+"$\\overline{SA'}=-30$ cm",
+"$\\overline{SA'}=+30$ cm",
+"$\\overline{SA'}=-120$ cm",
+"$\\overline{SA'}=-24$ cm"
+],
+"a": 0,
+"e": "$\\dfrac1{\\overline{SA'}}=\\dfrac2{-40}-\\dfrac1{-60}=-\\dfrac1{30}$, donc $\\overline{SA'}=-30$ cm : image réelle, devant le miroir.",
+"s": "Miroir sphérique"
+},
+{
+"q": "Le grandissement d'un miroir sphérique vaut :",
+"c": [
+"$\\gamma=\\dfrac{\\overline{SA'}}{\\overline{SA}}$",
+"$\\gamma=-\\dfrac{\\overline{SA'}}{\\overline{SA}}$",
+"$\\gamma=\\dfrac{\\overline{SA}}{\\overline{SA'}}$",
+"$\\gamma=+1$"
+],
+"a": 1,
+"e": "Le rayon qui frappe le sommet se réfléchit symétriquement par rapport à l'axe, d'où $\\gamma=-\\dfrac{\\overline{SA'}}{\\overline{SA}}$.",
+"s": "Grandissement"
+},
+{
+"q": "La relation de conjugaison du dioptre sphérique s'écrit :",
+"c": [
+"$\\dfrac{n_2}{\\overline{SA'}}-\\dfrac{n_1}{\\overline{SA}}=\\dfrac{n_2-n_1}{\\overline{SC}}$",
+"$\\dfrac{n_1}{\\overline{SA'}}-\\dfrac{n_2}{\\overline{SA}}=\\dfrac{n_2-n_1}{\\overline{SC}}$",
+"$\\dfrac1{\\overline{SA'}}+\\dfrac1{\\overline{SA}}=\\dfrac2{\\overline{SC}}$",
+"$\\dfrac{n_2}{\\overline{SA'}}=\\dfrac{n_1}{\\overline{SA}}$"
+],
+"a": 0,
+"e": "Relation de Descartes du dioptre sphérique ; pour $\\overline{SC}\\to\\infty$ on retrouve le dioptre plan.",
+"s": "Dioptre sphérique"
+},
+{
+"q": "Un dioptre air → verre ($n=1{,}5$) a pour rayon $\\overline{SC}=+5$ cm. Sa vergence vaut :",
+"c": [
+"$+5$ δ",
+"$+10$ δ",
+"$-10$ δ",
+"$+30$ δ"
+],
+"a": 1,
+"e": "$V=\\dfrac{n_2-n_1}{\\overline{SC}}=\\dfrac{0{,}5}{0{,}05}=10$ δ : dioptre convergent.",
+"s": "Dioptre sphérique"
+},
+{
+"q": "Pour un miroir sphérique, un rayon incident passant par le centre $C$ :",
+"c": [
+"se réfléchit parallèlement à l'axe",
+"revient sur lui-même",
+"passe par le foyer",
+"n'est pas réfléchi"
+],
+"a": 1,
+"e": "Il arrive selon un rayon de la sphère, donc selon la normale : il est réfléchi sur lui-même.",
+"s": "Construction des images"
+},
+{
+"q": "La relation de Newton du miroir sphérique s'écrit :",
+"c": [
+"$\\overline{FA}\\cdot\\overline{FA'}=\\overline{SF}^{\\,2}$",
+"$\\overline{FA}\\cdot\\overline{FA'}=-\\overline{SF}^{\\,2}$",
+"$\\overline{FA}+\\overline{FA'}=\\overline{SC}$",
+"$\\overline{FA}=\\overline{FA'}$"
+],
+"a": 0,
+"e": "Avec origine au foyer (confondu pour $F$ et $F'$) : $\\overline{FA}\\cdot\\overline{FA'}=f^2$.",
+"s": "Miroir sphérique"
+},
+{
+"q": "On utilise des miroirs convexes comme rétroviseurs parce qu'ils :",
+"c": [
+"grossissent les objets",
+"donnent un large champ de vision",
+"donnent des images réelles",
+"suppriment les reflets"
+],
+"a": 1,
+"e": "L'image est réduite : on voit une plus grande portion de la route (mais les objets paraissent plus loin qu'ils ne sont).",
+"s": "Miroir sphérique"
+}
+]
+},
+"opt5": {
+"course": "Optique",
+"title": "Chapitre 5 — Les lentilles minces",
+"qs": [
+{
+"q": "Une lentille à bords minces, dans l'air, est :",
+"c": [
+"divergente",
+"convergente",
+"afocale",
+"cela dépend de l'objet"
+],
+"a": 1,
+"e": "Bords minces (plus épaisse au centre) : convergente. Bords épais : divergente.",
+"s": "Formes des lentilles"
+},
+{
+"q": "La relation de conjugaison d'une lentille mince s'écrit :",
+"c": [
+"$\\dfrac1{\\overline{OA'}}+\\dfrac1{\\overline{OA}}=\\dfrac1{f'}$",
+"$\\dfrac1{\\overline{OA'}}-\\dfrac1{\\overline{OA}}=\\dfrac1{f'}$",
+"$\\overline{OA'}-\\overline{OA}=f'$",
+"$\\overline{OA}\\cdot\\overline{OA'}=f'^2$"
+],
+"a": 1,
+"e": "Relation de Descartes : $\\dfrac1{\\overline{OA'}}-\\dfrac1{\\overline{OA}}=\\dfrac1{f'}=V$.",
+"s": "Relations de conjugaison"
+},
+{
+"q": "Le grandissement d'une lentille mince vaut :",
+"c": [
+"$\\gamma=\\dfrac{\\overline{OA}}{\\overline{OA'}}$",
+"$\\gamma=\\dfrac{\\overline{OA'}}{\\overline{OA}}$",
+"$\\gamma=-\\dfrac{\\overline{OA'}}{\\overline{OA}}$",
+"$\\gamma=\\dfrac{f'}{\\overline{OA'}}$"
+],
+"a": 1,
+"e": "Le rayon passant par $O$ n'est pas dévié : triangles semblables, $\\gamma=\\dfrac{\\overline{OA'}}{\\overline{OA}}$.",
+"s": "Relations de conjugaison"
+},
+{
+"q": "Lentille convergente $f'=20$ cm, objet en $\\overline{OA}=-60$ cm. L'image est en :",
+"c": [
+"$\\overline{OA'}=+15$ cm",
+"$\\overline{OA'}=+30$ cm",
+"$\\overline{OA'}=-30$ cm",
+"$\\overline{OA'}=+60$ cm"
+],
+"a": 1,
+"e": "$\\dfrac1{\\overline{OA'}}=\\dfrac1{20}+\\dfrac1{-60}=\\dfrac1{30}$, d'où $\\overline{OA'}=30$ cm (image réelle, $\\gamma=-0{,}5$).",
+"s": "Relations de conjugaison"
+},
+{
+"q": "Une lentille convergente fonctionne en loupe lorsque l'objet est placé :",
+"c": [
+"au-delà de $2f'$",
+"entre $F$ et $O$",
+"exactement en $F$",
+"en $2F$"
+],
+"a": 1,
+"e": "Objet entre le foyer objet et la lentille : image virtuelle, droite et agrandie.",
+"s": "Construction des images"
+},
+{
+"q": "Deux lentilles accolées de vergences $+5$ δ et $-2$ δ équivalent à une lentille de vergence :",
+"c": [
+"$+7$ δ",
+"$+3$ δ",
+"$-10$ δ",
+"$+2{,}5$ δ"
+],
+"a": 1,
+"e": "Théorème des vergences : $V=V_1+V_2=5-2=+3$ δ, soit $f'\\approx33$ cm.",
+"s": "Associations"
+},
+{
+"q": "Une lentille biconvexe en verre ($n=1{,}5$) a $R_1=+20$ cm et $R_2=-20$ cm. Sa vergence vaut :",
+"c": [
+"$+2{,}5$ δ",
+"$+5$ δ",
+"$+10$ δ",
+"$0$ δ"
+],
+"a": 1,
+"e": "$V=(n-1)\\left(\\dfrac1{R_1}-\\dfrac1{R_2}\\right)=0{,}5\\times(5+5)=5$ δ.",
+"s": "Formule des opticiens"
+},
+{
+"q": "Un rayon passant par le centre optique d'une lentille mince :",
+"c": [
+"passe par $F'$",
+"n'est pas dévié",
+"ressort parallèle à l'axe",
+"est réfléchi"
+],
+"a": 1,
+"e": "Près du centre, la lentille se comporte comme une lame à faces parallèles d'épaisseur négligeable : pas de déviation.",
+"s": "Construction des images"
+},
+{
+"q": "Une lentille divergente donne d'un objet réel une image :",
+"c": [
+"réelle et renversée",
+"virtuelle, droite et réduite",
+"virtuelle et agrandie",
+"à l'infini"
+],
+"a": 1,
+"e": "Pour une lentille divergente et un objet réel, l'image est toujours virtuelle, droite et réduite, entre $F'$ et $O$.",
+"s": "Construction des images"
+},
+{
+"q": "On corrige l'aberration chromatique d'un objectif :",
+"c": [
+"avec un diaphragme",
+"en accolant une lentille convergente en crown et une lentille divergente en flint (doublet achromatique)",
+"en augmentant la focale",
+"en utilisant de la lumière blanche"
+],
+"a": 1,
+"e": "Les dispersions des deux verres se compensent alors que les vergences ne s'annulent pas.",
+"s": "Aberrations"
+}
+]
+}
+});

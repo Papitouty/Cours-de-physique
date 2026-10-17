@@ -271,7 +271,7 @@ const COURSES=[
    {title:"Série de TD n°2 — chapitre 3",sub:"Le dipôle électrostatique",
     text:"6 exercices : champ du dipôle par calcul direct, calcul exact et approximation dipolaire, champ en un point quelconque, directions remarquables du champ, lignes de champ et équipotentielles, force exercée par un champ non uniforme.",
     e:"TD_Electricite_2_enonces",ep:4,c:"TD_Electricite_2_corrige",cp:9}]},
- {id:"opt",tab:"Optique",eyebrow:"Optique",title:"Optique géométrique",noExo:true,
+ {id:"opt",tab:"Optique",eyebrow:"Optique",title:"Optique géométrique",
   intro:"Cinq chapitres : lois fondamentales ; formation des images, miroir et dioptre plans ; prisme et lame à faces parallèles ; miroirs et dioptres sphériques ; lentilles minces. Chaque chapitre a son support de cours avec démonstrations détaillées, son diaporama (en ligne et en PowerPoint) et sa série de TD avec corrigé.",
   chapters:[
    {n:1,title:"Lois fondamentales de l'optique géométrique",key:"Optique_Chapitre_1_Lois_fondamentales",pages:19,slides:39,pptx:true,
@@ -304,14 +304,14 @@ if(location.hash&&COURSES.some(c=>c.id===location.hash.slice(1)))current=locatio
 (function(){
   let ch=0,pg=0,sl=0,td=0;
   COURSES.forEach(c=>{c.chapters.forEach(x=>{ch++;pg+=x.pages;if(x.slides)sl+=x.slides;if(x.td&&!x.td.n)td++});(c.series||[]).forEach(()=>td++)});
-  $("#stats").innerHTML=`<span><b>${COURSES.length}</b>cours</span><span><b>${ch}</b>chapitres</span><span><b>${pg}</b>pages de cours</span><span><b>${sl}</b>diapositives</span><span><b>${td}</b>séries de TD corrigées</span><span><b>70</b>questions de quiz</span><span><b>6</b>simulations</span><span><b>32</b>exercices d'entraînement</span>`;
+  $("#stats").innerHTML=`<span><b>${COURSES.length}</b>cours</span><span><b>${ch}</b>chapitres</span><span><b>${pg}</b>pages de cours</span><span><b>${sl}</b>diapositives</span><span><b>${td}</b>séries de TD corrigées</span><span><b>120</b>questions de quiz</span><span><b>10</b>simulations</span><span><b>47</b>exercices d'entraînement</span>`;
 })();
 
 function pdfBtn(file,label,n,kind,primary){
   const k=kind==="cor"?'<span class="k k-cor">CORRIGÉ</span>':'<span class="k k-pdf">PDF</span>';
   return `<button type="button" class="btn${primary?" primary":""}" data-pdf="${file}" data-title="${esc(label)}">${k}<span class="lbl">${esc(label)}</span><span class="n">${n} p.</span></button>`;
 }
-const SIMS={meca2:[["frenet","Simulation : base de Frenet"]],meca4:[["energie","Simulation : énergie potentielle"]],elec1:[["champ","Simulation : lignes de champ"]],elec2:[["champ","Simulation : champ et potentiel"],["anneau","Simulation : anneau chargé"],["boule","Simulation : théorème de Gauss"]],elec3:[["champ","Simulation : lignes de champ du dipôle"],["dipole","Simulation : dipôle dans un champ uniforme"]]};
+const SIMS={meca2:[["frenet","Simulation : base de Frenet"]],meca4:[["energie","Simulation : énergie potentielle"]],elec1:[["champ","Simulation : lignes de champ"]],elec2:[["champ","Simulation : champ et potentiel"],["anneau","Simulation : anneau chargé"],["boule","Simulation : théorème de Gauss"]],elec3:[["champ","Simulation : lignes de champ du dipôle"],["dipole","Simulation : dipôle dans un champ uniforme"]],opt1:[["refrac","Simulation : réfraction et réflexion totale"]],opt3:[["prisme","Simulation : prisme et dispersion"]],opt4:[["miroir","Simulation : miroir sphérique"]],opt5:[["lentille","Simulation : lentille mince"]]};
 function pptBtn(key,n,t){
   return `<button type="button" class="btn" data-pdf="slides/${key}_diapo" data-title="${esc(t)}"><span class="k k-ppt">DIAPO</span><span class="lbl">Diaporama</span><span class="n">${n} diap.</span></button>`;
 }

@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Physique L1">
-<meta name="description" content="Simulations interactives pour les cours de Physique L1 du Dr P. T. Traoré (USNM) : champ électrostatique, théorème de Gauss, base de Frenet, énergie potentielle.">
+<meta name="description" content="Simulations interactives pour les cours de Physique L1 du Dr P. T. Traoré (USNM) : champ électrostatique, théorème de Gauss, base de Frenet, énergie potentielle, réfraction, prisme, lentilles et miroirs.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Fira+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
@@ -62,6 +62,8 @@ input[type=range]{width:100%;accent-color:var(--accent)}
     <div class="pill-row" id="tabsE"></div>
     <div class="grp-t">Mécanique</div>
     <div class="pill-row" id="tabsM"></div>
+    <div class="grp-t">Optique</div>
+    <div class="pill-row" id="tabsO"></div>
   </nav>
 
   <!-- ============ 1. Champ de charges ponctuelles ============ -->
@@ -231,6 +233,117 @@ input[type=range]{width:100%;accent-color:var(--accent)}
       </ul><p class="hint">Unités réduites. Cours, chapitre 4 : équilibre et stabilité.</p></div>
     </div>
   </section>
+
+  <!-- ============ OPTIQUE 1. Réfraction et réflexion totale ============ -->
+  <section class="sim" id="refrac" hidden>
+    <div class="stage">
+      <canvas id="cvRefrac" aria-label="Réfraction et réflexion à la surface de séparation de deux milieux"></canvas>
+      <div class="legend"><span><i style="background:var(--saff)"></i>rayon incident</span><span><i style="background:var(--accent)"></i>rayon réfracté</span><span><i style="background:var(--rouge)"></i>rayon réfléchi (épaisseur ∝ intensité)</span><span><i style="background:var(--muted)"></i>normale</span></div>
+    </div>
+    <div class="side">
+      <div class="panel">
+        <h3>Milieux</h3>
+        <div class="ctl"><label for="rN1">Indice n₁ (milieu du haut) <b id="rN1v"></b></label><input id="rN1" type="range" min="1" max="2.42" step="0.01" value="1.5"></div>
+        <div class="row" id="rP1"></div>
+        <div class="ctl"><label for="rN2">Indice n₂ (milieu du bas) <b id="rN2v"></b></label><input id="rN2" type="range" min="1" max="2.42" step="0.01" value="1"></div>
+        <div class="row" id="rP2"></div>
+        <div class="ctl"><label for="rI">Angle d'incidence i₁ <b id="rIv"></b></label><input id="rI" type="range" min="0" max="89" step="0.5" value="30"></div>
+      </div>
+      <div class="panel">
+        <h3>Mesures</h3>
+        <dl class="read"><dt>i₁</dt><dd id="rRi1"></dd><dt>i₂ (réfraction)</dt><dd id="rRi2"></dd><dt>Angle critique λ</dt><dd id="rRl"></dd><dt>Lumière réfléchie</dt><dd id="rRR"></dd><dd id="rRt" class="txt"></dd></dl>
+        <div class="formula" id="rF"></div>
+      </div>
+      <div class="panel note"><h3>À observer</h3><ul>
+        <li>Vers un milieu plus réfringent (n₂ &gt; n₁), le rayon se rapproche de la normale.</li>
+        <li>Vers un milieu moins réfringent, il s'en écarte ; au-delà de l'angle critique λ (sin λ = n₂/n₁), il n'y a plus de rayon réfracté : réflexion totale.</li>
+        <li>Près de λ, le rayon réfracté s'affaiblit et rase la surface.</li>
+      </ul><p class="hint">Optique, chapitre 1 : lois de Snell-Descartes, réflexion totale.</p></div>
+    </div>
+  </section>
+
+  <!-- ============ OPTIQUE 2. Prisme ============ -->
+  <section class="sim" id="prisme" hidden>
+    <div class="stage">
+      <canvas id="cvPrisme" aria-label="Marche d'un rayon dans un prisme et courbe de déviation"></canvas>
+      <div class="legend"><span><i style="background:var(--saff)"></i>rayon</span><span><i style="background:var(--rouge)"></i>déviation D</span><span><i style="background:var(--accent)"></i>courbe D(i)</span></div>
+    </div>
+    <div class="side">
+      <div class="panel">
+        <h3>Prisme et rayon</h3>
+        <div class="ctl"><label for="pA">Angle du prisme A <b id="pAv"></b></label><input id="pA" type="range" min="20" max="75" step="1" value="60"></div>
+        <div class="ctl"><label for="pN">Indice n (raie jaune) <b id="pNv"></b></label><input id="pN" type="range" min="1.40" max="1.80" step="0.01" value="1.5"></div>
+        <div class="ctl"><label for="pI">Incidence i <b id="pIv"></b></label><input id="pI" type="range" min="0" max="89" step="0.5" value="48.5"></div>
+        <label class="chk"><input type="checkbox" id="pW"> Lumière blanche (dispersion)</label>
+        <div class="row"><button type="button" class="btn sm" id="pMin">Aller au minimum de déviation</button></div>
+      </div>
+      <div class="panel">
+        <h3>Mesures</h3>
+        <dl class="read"><dt>r</dt><dd id="pRr"></dd><dt>r′ = A − r</dt><dd id="pRrp"></dd><dt>i′</dt><dd id="pRip"></dd><dt>D = i + i′ − A</dt><dd id="pRD"></dd><dt>D<sub>m</sub> (minimum)</dt><dd id="pRDm"></dd><dd id="pRt" class="txt"></dd></dl>
+        <div class="formula" id="pF"></div>
+      </div>
+      <div class="panel note"><h3>À observer</h3><ul>
+        <li>La déviation passe par un minimum D<sub>m</sub> quand la marche est symétrique (i = i′, r = r′ = A/2).</li>
+        <li>En dessous de l'incidence i₀, le rayon subit une réflexion totale sur la seconde face.</li>
+        <li>En lumière blanche, le violet (indice plus grand) est plus dévié que le rouge.</li>
+      </ul><p class="hint">Optique, chapitre 3 : formules du prisme, minimum de déviation, dispersion.</p></div>
+    </div>
+  </section>
+
+  <!-- ============ OPTIQUE 3. Lentille mince ============ -->
+  <section class="sim" id="lentille" hidden>
+    <div class="stage">
+      <canvas id="cvLentille" aria-label="Construction de l'image donnée par une lentille mince"></canvas>
+      <div class="legend"><span><i style="background:var(--accent)"></i>objet AB</span><span><i style="background:var(--rouge)"></i>image A′B′ (pointillés : virtuelle)</span><span><i style="background:var(--saff)"></i>rayon parallèle à l'axe</span><span><i style="background:var(--ok)"></i>rayon par O</span><span><i style="background:var(--bleu)"></i>rayon par F</span></div>
+    </div>
+    <div class="side">
+      <div class="panel">
+        <h3>Lentille et objet</h3>
+        <div class="row" id="lType"></div>
+        <div class="ctl"><label for="lF">Distance focale |f′| <b id="lFv"></b></label><input id="lF" type="range" min="5" max="30" step="0.5" value="15"></div>
+        <div class="ctl"><label for="lA">Position de l'objet OA <b id="lAv"></b></label><input id="lA" type="range" min="-70" max="-1" step="0.5" value="-40"></div>
+        <div class="ctl"><label for="lH">Hauteur de l'objet AB <b id="lHv"></b></label><input id="lH" type="range" min="1" max="8" step="0.5" value="4"></div>
+        <div class="row"><button type="button" class="btn sm" id="lDrag">Astuce : fais glisser l'objet sur la figure</button></div>
+      </div>
+      <div class="panel">
+        <h3>Image</h3>
+        <dl class="read"><dt>Vergence V</dt><dd id="lRV"></dd><dt>OA′</dt><dd id="lRA"></dd><dt>γ = OA′/OA</dt><dd id="lRg"></dd><dd id="lRt" class="txt"></dd></dl>
+        <div class="formula" id="lFo"></div>
+      </div>
+      <div class="panel note"><h3>À observer</h3><ul>
+        <li>Lentille convergente : objet au-delà de F → image réelle renversée ; entre F et O → image virtuelle, droite, agrandie (loupe).</li>
+        <li>Objet en F : l'image part à l'infini. Objet en 2F : image en 2F′, γ = −1.</li>
+        <li>Lentille divergente : un objet réel donne toujours une image virtuelle, droite, réduite.</li>
+      </ul><p class="hint">Optique, chapitre 5 : relation de Descartes, grandissement, construction.</p></div>
+    </div>
+  </section>
+
+  <!-- ============ OPTIQUE 4. Miroir sphérique ============ -->
+  <section class="sim" id="miroir" hidden>
+    <div class="stage">
+      <canvas id="cvMiroir" aria-label="Construction de l'image donnée par un miroir sphérique"></canvas>
+      <div class="legend"><span><i style="background:var(--accent)"></i>objet AB</span><span><i style="background:var(--rouge)"></i>image A′B′ (pointillés : virtuelle)</span><span><i style="background:var(--saff)"></i>rayon parallèle à l'axe</span><span><i style="background:var(--ok)"></i>rayon par C</span><span><i style="background:var(--bleu)"></i>rayon vers S</span></div>
+    </div>
+    <div class="side">
+      <div class="panel">
+        <h3>Miroir et objet</h3>
+        <div class="row" id="mType"></div>
+        <div class="ctl"><label for="mR">Rayon de courbure |R| <b id="mRv"></b></label><input id="mR" type="range" min="10" max="60" step="1" value="30"></div>
+        <div class="ctl"><label for="mA">Position de l'objet SA <b id="mAv"></b></label><input id="mA" type="range" min="-80" max="-1" step="0.5" value="-45"></div>
+        <div class="ctl"><label for="mH">Hauteur de l'objet AB <b id="mHv"></b></label><input id="mH" type="range" min="1" max="8" step="0.5" value="4"></div>
+      </div>
+      <div class="panel">
+        <h3>Image</h3>
+        <dl class="read"><dt>SF = SC/2</dt><dd id="mRF"></dd><dt>SA′</dt><dd id="mRA"></dd><dt>γ = −SA′/SA</dt><dd id="mRg"></dd><dd id="mRt" class="txt"></dd></dl>
+        <div class="formula" id="mFo"></div>
+      </div>
+      <div class="panel note"><h3>À observer</h3><ul>
+        <li>Miroir concave : objet avant C → image réelle, renversée, réduite, entre C et F ; objet entre F et S → image virtuelle agrandie (miroir de maquillage).</li>
+        <li>Miroir convexe : l'image d'un objet réel est toujours virtuelle, droite et réduite (rétroviseur).</li>
+        <li>Un rayon passant par C revient sur lui-même ; un rayon qui frappe S repart symétriquement.</li>
+      </ul><p class="hint">Optique, chapitre 4 : miroirs sphériques.</p></div>
+    </div>
+  </section>
 </div></main>
 <footer><div class="wrap">Université Souleymane Niang de Matam • Dr P. T. Traoré • <a href="reparer.html?retour=simulations.html">Affichage incomplet ? Mettre le site à jour</a></div></footer>
 
@@ -276,9 +389,9 @@ function curve(c,f,xr,X,Y,col,lw=2,dash=[],n=400,clip){c.save();if(clip){c.begin
   c.stroke();c.restore()}
 
 /* ============ onglets ============ */
-const SIMS=[["champ","Lignes de champ et équipotentielles","E"],["boule","Boule chargée : théorème de Gauss","E"],["anneau","Champ sur l'axe d'un anneau","E"],["dipole","Dipôle dans un champ uniforme","E"],["frenet","Base de Frenet","M"],["energie","Énergie potentielle et stabilité","M"]];
+const SIMS=[["champ","Lignes de champ et équipotentielles","E"],["boule","Boule chargée : théorème de Gauss","E"],["anneau","Champ sur l'axe d'un anneau","E"],["dipole","Dipôle dans un champ uniforme","E"],["frenet","Base de Frenet","M"],["energie","Énergie potentielle et stabilité","M"],["refrac","Réfraction et réflexion totale","O"],["prisme","Le prisme : déviation et dispersion","O"],["lentille","Lentille mince : construction d'image","O"],["miroir","Miroir sphérique : construction d'image","O"]];
 let cur=SIMS.some(s=>s[0]===location.hash.slice(1))?location.hash.slice(1):"champ";
-function tabs(){["E","M"].forEach(g=>$("#tabs"+g).innerHTML=SIMS.filter(s=>s[2]===g).map(s=>`<button type="button" class="pill" data-s="${s[0]}" aria-selected="${s[0]===cur}">${s[1]}</button>`).join(""))}
+function tabs(){["E","M","O"].forEach(g=>$("#tabs"+g).innerHTML=SIMS.filter(s=>s[2]===g).map(s=>`<button type="button" class="pill" data-s="${s[0]}" aria-selected="${s[0]===cur}">${s[1]}</button>`).join(""))}
 function go(id){cur=id;tabs();SIMS.forEach(s=>$("#"+s[0]).hidden=s[0]!==id);history.replaceState(null,"","#"+id);redraw()}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-s]");if(b)go(b.dataset.s)});
 const DRAW={};function redraw(){DRAW[cur]&&DRAW[cur]()}
@@ -567,6 +680,186 @@ if(matchMedia)matchMedia("(prefers-color-scheme: dark)").addEventListener?.("cha
   setup(true);requestAnimationFrame(loop);
   DRAW.energie=draw;
 })();
+
+
+/* ============ OPTIQUE : outils communs ============ */
+const D2R=Math.PI/180,R2D=180/Math.PI;
+function segBtns(id,items,cur,cb){const el=$("#"+id);el.innerHTML=items.map(([v,l])=>`<button type="button" class="pill" data-v="${v}" aria-pressed="${v===cur}">${l}</button>`).join("");
+  el.addEventListener("click",e=>{const b=e.target.closest("[data-v]");if(!b)return;el.querySelectorAll("[data-v]").forEach(x=>x.setAttribute("aria-pressed",x===b));cb(b.dataset.v)})}
+function line(c,x1,y1,x2,y2,col,lw=2,dash=[]){c.save();c.strokeStyle=col;c.lineWidth=lw;c.setLineDash(dash);c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();c.restore()}
+function midArrow(c,x1,y1,x2,y2,col,f=0.5,s=8){const x=x1+(x2-x1)*f,y=y1+(y2-y1)*f,a=Math.atan2(y2-y1,x2-x1);c.fillStyle=col;c.beginPath();c.moveTo(x+s*Math.cos(a),y+s*Math.sin(a));c.lineTo(x-s*.6*Math.cos(a)+s*.5*Math.sin(a),y-s*.6*Math.sin(a)-s*.5*Math.cos(a));c.lineTo(x-s*.6*Math.cos(a)-s*.5*Math.sin(a),y-s*.6*Math.sin(a)+s*.5*Math.cos(a));c.closePath();c.fill()}
+const SEP=v=>v.toFixed(2).replace(".",",");
+
+/* ============ OPTIQUE 1. RÉFRACTION ============ */
+(function(){
+  const cv=$("#cvRefrac");const PRE=[["1","air"],["1.33","eau"],["1.5","verre"],["2.42","diamant"]];
+  const setN=(id,v)=>{$("#"+id).value=v;draw()};
+  $("#rP1").innerHTML=PRE.map(([v,l])=>`<button type="button" class="btn sm" data-n1="${v}">${l}</button>`).join("");
+  $("#rP2").innerHTML=PRE.map(([v,l])=>`<button type="button" class="btn sm" data-n2="${v}">${l}</button>`).join("");
+  $("#rP1").addEventListener("click",e=>{const b=e.target.closest("[data-n1]");if(b)setN("rN1",b.dataset.n1)});
+  $("#rP2").addEventListener("click",e=>{const b=e.target.closest("[data-n2]");if(b)setN("rN2",b.dataset.n2)});
+  ["rN1","rN2","rI"].forEach(id=>$("#"+id).addEventListener("input",draw));
+  tex($("#rF"),"\\begin{array}{c}n_1\\sin i_1=n_2\\sin i_2\\\\[4pt]\\sin\\lambda=\\dfrac{n_2}{n_1}\\end{array}");
+  function draw(){
+    const n1=+$("#rN1").value,n2=+$("#rN2").value,i1=+$("#rI").value*D2R;
+    $("#rN1v").textContent=SEP(n1);$("#rN2v").textContent=SEP(n2);$("#rIv").textContent=num(i1*R2D,1)+"°";
+    const s2=n1*Math.sin(i1)/n2,tot=s2>1,i2=tot?NaN:Math.asin(s2);
+    let Rf=1;if(!tot){const a=n1*Math.cos(i1),b=n2*Math.cos(i2),cc=n1*Math.cos(i2),d=n2*Math.cos(i1);Rf=((a-b)/(a+b))**2/2+((cc-d)/(cc+d))**2/2}
+    const lam=n1>n2?Math.asin(n2/n1):NaN;
+    $("#rRi1").textContent=num(i1*R2D,1)+"°";$("#rRi2").textContent=tot?"—":num(i2*R2D,1)+"°";$("#rRl").textContent=isFinite(lam)?num(lam*R2D,1)+"°":"aucun (n₂ ≥ n₁)";
+    $("#rRR").textContent=Math.round(Rf*100)+" %";
+    $("#rRt").textContent=tot?"Réflexion totale : toute la lumière est réfléchie.":n2>n1?"Le rayon se rapproche de la normale (milieu plus réfringent).":n2<n1?"Le rayon s'écarte de la normale (milieu moins réfringent).":"Même indice : pas de déviation.";
+    const narrow=innerWidth<600,F=fit(cv,narrow?0.95:0.62),c=F.c,W=F.w,H=F.h;
+    const shade=n=>`rgba(31,122,140,${Math.min(0.35,(n-1)*0.25)})`;
+    c.fillStyle=css("--plot-bg");c.fillRect(0,0,W,H);c.fillStyle=shade(n1);c.fillRect(0,0,W,H/2);c.fillStyle=shade(n2);c.fillRect(0,H/2,W,H/2);
+    const O=[W/2,H/2],L=Math.min(W,H)*0.46;
+    line(c,0,H/2,W,H/2,css("--fg"),1.5);line(c,W/2,H/2-L,W/2,H/2+L,css("--muted"),1.2,[6,5]);
+    text(c,"n₁ = "+SEP(n1),12,22,css("--fg"),"left","alphabetic","600 14px 'Fira Sans',Arial");text(c,"n₂ = "+SEP(n2),12,H-12,css("--fg"),"left","alphabetic","600 14px 'Fira Sans',Arial");
+    const P=[O[0]-L*Math.sin(i1),O[1]-L*Math.cos(i1)];
+    line(c,P[0],P[1],O[0],O[1],css("--saff"),3);midArrow(c,P[0],P[1],O[0],O[1],css("--saff"));
+    const Q=[O[0]+L*Math.sin(i1),O[1]-L*Math.cos(i1)];c.globalAlpha=0.25+0.75*Rf;line(c,O[0],O[1],Q[0],Q[1],css("--rouge"),1+4*Rf);midArrow(c,O[0],O[1],Q[0],Q[1],css("--rouge"));c.globalAlpha=1;
+    if(!tot){const Rr=[O[0]+L*Math.sin(i2),O[1]+L*Math.cos(i2)];c.globalAlpha=0.3+0.7*(1-Rf);line(c,O[0],O[1],Rr[0],Rr[1],css("--accent"),1+4*(1-Rf));midArrow(c,O[0],O[1],Rr[0],Rr[1],css("--accent"));c.globalAlpha=1;
+      c.strokeStyle=css("--accent");c.lineWidth=1.2;c.beginPath();c.arc(O[0],O[1],46,Math.PI/2-i2,Math.PI/2,false);c.stroke();text(c,"i₂",O[0]+18*Math.sin(i2/2)+4,O[1]+62*Math.cos(i2/2),css("--accent"),"left","middle","600 13px 'Fira Sans',Arial")}
+    else text(c,"réflexion totale",O[0]+20,O[1]+30,css("--rouge"),"left","alphabetic","700 14px 'Fira Sans',Arial");
+    c.strokeStyle=css("--saff");c.lineWidth=1.2;c.beginPath();c.arc(O[0],O[1],40,-Math.PI/2-i1,-Math.PI/2,false);c.stroke();text(c,"i₁",O[0]-22*Math.sin(i1/2)-14,O[1]-56*Math.cos(i1/2),css("--saff"),"right","middle","600 13px 'Fira Sans',Arial");
+    if(isFinite(lam)){const Lp=[O[0]-L*Math.sin(lam),O[1]-L*Math.cos(lam)];line(c,Lp[0],Lp[1],O[0],O[1],css("--muted"),1,[2,4]);text(c,"λ",Lp[0]-4,Lp[1]+14,css("--muted"),"right")}
+  }
+  DRAW.refrac=draw;
+})();
+
+/* ============ OPTIQUE 2. PRISME ============ */
+(function(){
+  const cv=$("#cvPrisme");
+  ["pA","pN","pI","pW"].forEach(id=>$("#"+id).addEventListener("input",draw));$("#pW").addEventListener("change",draw);
+  tex($("#pF"),"\\begin{array}{c}\\sin i=n\\sin r\\qquad \\sin i'=n\\sin r'\\\\[4pt]A=r+r'\\qquad D=i+i'-A\\end{array}");
+  // marche du rayon : renvoie r, r', i', D (NaN si réflexion totale)
+  function path(A,n,i){const r=Math.asin(Math.sin(i)/n),rp=A-r,s=n*Math.sin(rp);if(rp<0||s>1)return{r,rp,ip:NaN,D:NaN};const ip=Math.asin(s);return{r,rp,ip,D:i+ip-A}}
+  $("#pMin").addEventListener("click",()=>{const A=+$("#pA").value*D2R,n=+$("#pN").value,s=n*Math.sin(A/2);if(s>=1){return}$("#pI").value=(Math.asin(s)*R2D).toFixed(1);draw()});
+  function draw(){
+    const A=+$("#pA").value*D2R,n=+$("#pN").value,i=+$("#pI").value*D2R,white=$("#pW").checked;
+    $("#pAv").textContent=Math.round(A*R2D)+"°";$("#pNv").textContent=SEP(n);$("#pIv").textContent=num(i*R2D,1)+"°";
+    const P=path(A,n,i),sm=n*Math.sin(A/2),im=sm<1?Math.asin(sm):NaN,Dm=2*im-A,lam=Math.asin(1/n),i0s=n*Math.sin(A-lam),i0=i0s<=-1?0:i0s>=1?NaN:Math.max(0,Math.asin(i0s));
+    $("#pRr").textContent=num(P.r*R2D,1)+"°";$("#pRrp").textContent=num(P.rp*R2D,1)+"°";$("#pRip").textContent=isFinite(P.ip)?num(P.ip*R2D,1)+"°":"—";$("#pRD").textContent=isFinite(P.D)?num(P.D*R2D,1)+"°":"—";$("#pRDm").textContent=isFinite(Dm)?num(Dm*R2D,1)+"° (i = "+num(im*R2D,1)+"°)":"—";
+    $("#pRt").textContent=A>2*lam?"A > 2λ : aucun rayon ne peut traverser ce prisme.":!isFinite(P.D)?"Réflexion totale sur la seconde face : augmente l'incidence (i ≥ i₀ = "+(isFinite(i0)?num(i0*R2D,1):"—")+"°).":Math.abs(P.D-Dm)<0.002?"Minimum de déviation : marche symétrique, i = i′.":"Le rayon est dévié vers la base.";
+    const narrow=innerWidth<700,F=fit(cv,narrow?1.25:0.58),c=F.c,W=F.w,H=F.h;c.fillStyle=css("--plot-bg");c.fillRect(0,0,W,H);
+    // zone du prisme
+    const bw=narrow?W:W*0.58,bh=narrow?H*0.56:H,cx=bw*0.5,sz=Math.min(bw,bh)*0.38,Sx=cx,Sy=bh*0.16;
+    const u1=[-Math.sin(A/2),Math.cos(A/2)],u2=[Math.sin(A/2),Math.cos(A/2)]; // directions des faces (y vers le bas)
+    const Lf=sz*2.0,B1=[Sx+u1[0]*Lf,Sy+u1[1]*Lf],B2=[Sx+u2[0]*Lf,Sy+u2[1]*Lf];
+    c.fillStyle="rgba(31,122,140,.13)";c.strokeStyle=css("--accent");c.lineWidth=2;c.beginPath();c.moveTo(Sx,Sy);c.lineTo(B1[0],B1[1]);c.lineTo(B2[0],B2[1]);c.closePath();c.fill();c.stroke();
+    text(c,"A = "+Math.round(A*R2D)+"°",Sx,Sy-8,css("--accent"),"center");
+    const I=[Sx+u1[0]*Lf*0.5,Sy+u1[1]*Lf*0.5];
+    // directions (repère écran, angle mesuré vers le bas positif) : normale entrante de la face 1 = angle A/2 sous l'horizontale
+    const dir=a=>[Math.cos(a),Math.sin(a)]; // a en radians, y vers le bas
+    const nin=A/2; // normale entrante (vers la droite et le bas)
+    const din=nin-i; // incident : tourne vers le haut
+    const rays=white?[[n-0.012,"#d33"],[n,"#e8b400"],[n+0.018,"#7b3fe4"]]:[[n,css("--saff")]];
+    const back=Math.max(bw,bh);
+    line(c,I[0]-dir(din)[0]*back,I[1]-dir(din)[1]*back,I[0],I[1],white?css("--fg"):css("--saff"),3);midArrow(c,I[0]-dir(din)[0]*80,I[1]-dir(din)[1]*80,I[0],I[1],white?css("--fg"):css("--saff"));
+    // normale à l'entrée
+    line(c,I[0]-dir(nin)[0]*45,I[1]-dir(nin)[1]*45,I[0]+dir(nin)[0]*45,I[1]+dir(nin)[1]*45,css("--muted"),1,[4,4]);
+    c.save();c.beginPath();c.rect(0,0,bw,bh);c.clip();
+    rays.forEach(([nn,col])=>{const Q=path(A,nn,i),dr=nin-Q.r;
+      // intersection avec la face 2 : S + t u2
+      const d=dir(dr),den=d[0]*u2[1]-d[1]*u2[0],t=((Sx-I[0])*u2[1]-(Sy-I[1])*u2[0])/den;let J=[I[0]+d[0]*t,I[1]+d[1]*t];
+      const tt=((J[0]-Sx)*u2[0]+(J[1]-Sy)*u2[1]);if(!(t>0)||tt<0||tt>Lf){return}
+      line(c,I[0],I[1],J[0],J[1],col,2.4);
+      const nout=-A/2; // normale sortante de la face 2 (vers la droite et le haut)
+      if(isFinite(Q.ip)){const de=nout+Q.ip;line(c,J[0],J[1],J[0]+dir(de)[0]*back,J[1]+dir(de)[1]*back,col,2.6);midArrow(c,J[0],J[1],J[0]+dir(de)[0]*90,J[1]+dir(de)[1]*90,col);
+        if(!white){line(c,J[0]-dir(nout)[0]*45,J[1]-dir(nout)[1]*45,J[0]+dir(nout)[0]*45,J[1]+dir(nout)[1]*45,css("--muted"),1,[4,4]);
+          line(c,I[0],I[1],I[0]+dir(din)[0]*back,I[1]+dir(din)[1]*back,css("--muted"),1,[3,4]);
+          text(c,"D = "+num(Q.D*R2D,1)+"°",J[0]+dir(de)[0]*120+8,J[1]+dir(de)[1]*120,css("--rouge"),"left","middle","700 14px 'Fira Sans',Arial")}}
+      else{const dref=Math.PI-(dr-2*(nout+Math.PI/2))+Math.PI;const rr=[Math.cos(2*(nout+Math.PI/2)-dr),Math.sin(2*(nout+Math.PI/2)-dr)];line(c,J[0],J[1],J[0]+rr[0]*sz*0.8,J[1]+rr[1]*sz*0.8,col,2,[5,4]);text(c,"réflexion totale",J[0]+10,J[1]-10,css("--rouge"),"left")}
+    });
+    c.restore();
+    // courbe D(i)
+    const gx=narrow?44:bw+44,gy=narrow?bh+16:28,gw=(narrow?W:W-bw)-64,gh=(narrow?H-bh:H)-70;
+    const ir=[0,90],yr=[0,90],{X,Y}=plotFrame(c,{x:gx,y:gy,w:gw,h:gh},ir,yr,{xt:[0,30,60,90],yt:[0,30,60,90],xl:"i (°)",yl:"D (°)"});
+    c.save();c.beginPath();c.rect(gx,gy,gw,gh);c.clip();c.strokeStyle=css("--accent");c.lineWidth=2.2;c.beginPath();let st=false;
+    for(let k=0;k<=360;k++){const ii=k/4*D2R,Q=path(A,n,ii);if(!isFinite(Q.D)){st=false;continue}const px=X(ii*R2D),py=Y(Q.D*R2D);st?c.lineTo(px,py):c.moveTo(px,py);st=true}c.stroke();
+    if(isFinite(Dm)){line(c,X(0),Y(Dm*R2D),X(im*R2D),Y(Dm*R2D),css("--muted"),1,[4,4]);text(c,"Dm",X(2),Y(Dm*R2D)-5,css("--muted"))}
+    if(isFinite(P.D)){c.fillStyle=css("--rouge");c.beginPath();c.arc(X(i*R2D),Y(P.D*R2D),5,0,7);c.fill()}
+    c.restore();text(c,"Déviation D en fonction de i",gx+gw/2,gy-8,css("--muted"),"center");
+  }
+  DRAW.prisme=draw;
+})();
+
+/* ============ OPTIQUE 3 et 4. LENTILLE MINCE / MIROIR SPHÉRIQUE ============ */
+function opticBench(o){
+  // o.kind : "lentille" | "miroir" ; tout en cm, axe orienté de gauche à droite ; système en x = 0
+  const cv=$(o.cv);let typ=o.types[0][0],drag=false,geo=null;
+  segBtns(o.typeId,o.types,typ,v=>{typ=v;draw()});
+  [o.fId,o.aId,o.hId].forEach(id=>$("#"+id).addEventListener("input",draw));
+  function draw(){
+    const f=+$("#"+o.fId).value,xa=+$("#"+o.aId).value,hb=+$("#"+o.hId).value;
+    $("#"+o.fId+"v").textContent=num(f,1)+" cm";$("#"+o.aId+"v").textContent=num(xa,1)+" cm";$("#"+o.hId+"v").textContent=num(hb,1)+" cm";
+    const S=o.solve(typ,f,xa); // {fp (foyer image, abscisse), fo (foyer objet), C, xi (abscisse image), g}
+    const xi=S.xi,g=S.g,yb=g*hb,real=o.real(xi);
+    o.read(typ,f,xa,S);
+    const narrow=innerWidth<600,F=fit(cv,narrow?0.85:0.55),c=F.c,W=F.w,H=F.h;c.fillStyle=css("--plot-bg");c.fillRect(0,0,W,H);
+    const xmin=-80,xmax=o.kind==="miroir"?50:80,sx=W/(xmax-xmin),ymaxW=Math.max(2,hb,isFinite(yb)?Math.min(Math.abs(yb),3*hb):hb)*1.35,sy=(H/2-20)/ymaxW,X=x=>(x-xmin)*sx,Y=y=>H/2-y*sy;   // échelle verticale dilatée (conditions de Gauss)
+    geo={X,Y,sx,sy,xmin};
+    // grille
+    c.strokeStyle=css("--grid");c.lineWidth=1;for(let x=-80;x<=xmax;x+=10){c.beginPath();c.moveTo(X(x),0);c.lineTo(X(x),H);c.stroke()}
+    line(c,0,H/2,W,H/2,css("--muted"),1.2,[8,5]);
+    const top=Y(ymaxW*0.95),bot=Y(-ymaxW*0.95);
+    o.drawSystem(c,typ,X(0),top,bot,H);
+    const pt=(x,l)=>{if(x<xmin||x>xmax)return;c.fillStyle=css("--fg");c.beginPath();c.arc(X(x),Y(0),3.5,0,7);c.fill();text(c,l,X(x),Y(0)+16,css("--fg"),"center","alphabetic","600 13px 'Fira Sans',Arial")};
+    S.pts.forEach(([x,l])=>pt(x,l));
+    // rayons
+    const B=[xa,hb],clipEnd=o.kind==="miroir"?xmin:xmax;
+    o.rays(typ,S,B,yb).forEach(r=>{
+      // r : {pts:[[x,y],...] segment réel ; ext:[[x,y],[x,y]] prolongement virtuel (pointillés) ; col}
+      c.save();c.beginPath();c.rect(0,0,W,H);c.clip();
+      c.strokeStyle=css(r.col);c.lineWidth=2;c.beginPath();r.pts.forEach((p,k)=>k?c.lineTo(X(p[0]),Y(p[1])):c.moveTo(X(p[0]),Y(p[1])));c.stroke();
+      if(r.pts.length>1){const a=r.pts[0],b=r.pts[1];midArrow(c,X(a[0]),Y(a[1]),X(b[0]),Y(b[1]),css(r.col),0.55,7)}
+      if(r.pts.length>2){const a=r.pts[r.pts.length-2],b=r.pts[r.pts.length-1];midArrow(c,X(a[0]),Y(a[1]),X(b[0]),Y(b[1]),css(r.col),0.35,7)}
+      if(r.ext){c.setLineDash([5,4]);c.lineWidth=1.3;c.beginPath();c.moveTo(X(r.ext[0][0]),Y(r.ext[0][1]));c.lineTo(X(r.ext[1][0]),Y(r.ext[1][1]));c.stroke();c.setLineDash([])}
+      c.restore();
+    });
+    // objet
+    arrow(c,X(xa),Y(0),X(xa),Y(hb),css("--accent"),3.5,11);text(c,"B",X(xa)-8,Y(hb)-4,css("--accent"),"right","alphabetic","700 13px 'Fira Sans',Arial");text(c,"A",X(xa),Y(0)+16,css("--accent"),"center");
+    // image
+    if(isFinite(xi)&&xi>xmin-1&&xi<xmax+1&&Math.abs(yb)<ymaxW*1.6){c.save();if(!real)c.setLineDash([6,4]);arrow(c,X(xi),Y(0),X(xi),Y(yb),css("--rouge"),3.5,11);c.restore();text(c,"B′",X(xi)+8,Y(yb)+(yb>0?-4:14),css("--rouge"),"left","alphabetic","700 13px 'Fira Sans',Arial");text(c,"A′",X(xi),Y(0)+(yb>0?16:-8),css("--rouge"),"center")}
+    else text(c,isFinite(xi)?"image hors du cadre":"image à l'infini",W-10,22,css("--rouge"),"right","alphabetic","700 13px 'Fira Sans',Arial");
+  }
+  cv.addEventListener("pointerdown",e=>{if(!geo)return;const r=cv.getBoundingClientRect(),x=e.clientX-r.left,xa=+$("#"+o.aId).value;if(Math.abs(x-geo.X(xa))<22){drag=true;cv.setPointerCapture(e.pointerId)}});
+  cv.addEventListener("pointermove",e=>{if(!drag)return;const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)/geo.sx+geo.xmin,el=$("#"+o.aId);el.value=Math.max(+el.min,Math.min(+el.max,Math.round(x*2)/2));draw()});
+  cv.addEventListener("pointerup",()=>drag=false);cv.addEventListener("pointercancel",()=>drag=false);
+  return draw;
+}
+DRAW.lentille=opticBench({kind:"lentille",cv:"#cvLentille",typeId:"lType",fId:"lF",aId:"lA",hId:"lH",types:[["conv","Convergente"],["div","Divergente"]],
+  solve:(t,f,xa)=>{const fp=t==="conv"?f:-f,xi=Math.abs(1/fp+1/xa)<1e-9?Infinity:1/(1/fp+1/xa);return{fp,xi,g:xi/xa,pts:[[fp,"F′"],[-fp,"F"],[0,"O"],[2*fp,"2F′"],[-2*fp,"2F"]]}},
+  real:xi=>xi>0,
+  read:(t,f,xa,S)=>{$("#lRV").textContent=num(100/S.fp,2)+" δ";$("#lRA").textContent=isFinite(S.xi)?num(S.xi,1)+" cm":"∞";$("#lRg").textContent=isFinite(S.g)?num(S.g,2):"∞";
+    $("#lRt").textContent=!isFinite(S.xi)?"Objet au foyer objet : l'image est rejetée à l'infini.":`Image ${S.xi>0?"réelle":"virtuelle"}, ${S.g>0?"droite":"renversée"}, ${Math.abs(S.g)>1?"agrandie":"réduite"}${S.xi<0&&t==="conv"?" : c'est une loupe.":"."}`},
+  drawSystem:(c,t,x,top,bot)=>{const col=css("--fg");line(c,x,top,x,bot,col,2.6);const s=10,d=t==="conv"?1:-1;
+    c.strokeStyle=col;c.lineWidth=2.6;c.beginPath();c.moveTo(x-s,top+d*s);c.lineTo(x,top);c.lineTo(x+s,top+d*s);c.moveTo(x-s,bot-d*s);c.lineTo(x,bot);c.lineTo(x+s,bot-d*s);c.stroke()},
+  rays:(t,S,B,yb)=>{const fp=S.fp,[xa,h]=B,R=[],far=200,xi=S.xi;
+    // 1) parallèle à l'axe puis par F′
+    const k1=-h/fp;R.push({col:"--saff",pts:[[xa,h],[0,h],[far,h+k1*far]],ext:(fp<0||xi<0)&&isFinite(xi)?[[0,h],[Math.min(xi,fp),h+k1*Math.min(xi,fp)]]:null});
+    // 2) par O
+    const k2=h/xa;R.push({col:"--ok",pts:[[xa,h],[far,k2*far]],ext:xi<0&&isFinite(xi)?[[xa,h],[xi,k2*xi]]:null});
+    // 3) par F (ou dirigé vers F) puis parallèle
+    const fo=-fp;if(Math.abs(xa-fo)>0.5){const k3=(0-h)/(fo-xa),y0=h+k3*(0-xa);R.push({col:"--bleu",pts:[[xa,h],[0,y0],[far,y0]],ext:xi<0&&isFinite(xi)?[[0,y0],[xi,y0]]:(fp<0?[[0,y0],[fo,0]]:null)})}
+    return R}});
+tex($("#lFo"),"\\dfrac1{\\overline{OA'}}-\\dfrac1{\\overline{OA}}=\\dfrac1{f'}\\qquad\\gamma=\\dfrac{\\overline{OA'}}{\\overline{OA}}");
+DRAW.miroir=opticBench({kind:"miroir",cv:"#cvMiroir",typeId:"mType",fId:"mR",aId:"mA",hId:"mH",types:[["cc","Concave"],["cx","Convexe"]],
+  solve:(t,Rr,xa)=>{const SC=t==="cc"?-Rr:Rr,SF=SC/2,inv=2/SC-1/xa,xi=Math.abs(inv)<1e-9?Infinity:1/inv;return{SC,SF,xi,g:-xi/xa,pts:[[SF,"F"],[SC,"C"],[0,"S"]]}},
+  real:xi=>xi<0,
+  read:(t,Rr,xa,S)=>{$("#mRF").textContent=num(S.SF,1)+" cm";$("#mRA").textContent=isFinite(S.xi)?num(S.xi,1)+" cm":"∞";$("#mRg").textContent=isFinite(S.g)?num(S.g,2):"∞";
+    $("#mRt").textContent=!isFinite(S.xi)?"Objet au foyer : l'image est rejetée à l'infini.":`Image ${S.xi<0?"réelle (devant le miroir)":"virtuelle (derrière le miroir)"}, ${S.g>0?"droite":"renversée"}, ${Math.abs(S.g)>1?"agrandie":"réduite"}.`},
+  drawSystem:(c,t,x,top,bot,H)=>{const col=css("--fg"),d=t==="cc"?-1:1;c.strokeStyle=col;c.lineWidth=3;c.beginPath();c.moveTo(x+d*12,top-6);c.quadraticCurveTo(x-d*6,H/2,x+d*12,bot+6);c.stroke();
+    c.strokeStyle=css("--muted");c.lineWidth=1;for(let y=top;y<bot;y+=12){c.beginPath();c.moveTo(x+(d>0?14:4),y);c.lineTo(x+(d>0?22:12),y+8);c.stroke()}},
+  rays:(t,S,B,yb)=>{const SF=S.SF,SC=S.SC,[xa,h]=B,R=[],far=-200,xi=S.xi,virt=xi>0&&isFinite(xi);
+    // 1) parallèle à l'axe → réfléchi par F (ou semblant venir de F)
+    const p1=(0-h)/(SF-0);R.push({col:"--saff",pts:[[xa,h],[0,h],[far,h+p1*far]],ext:SF>0||virt?[[0,h],[Math.max(SF,isFinite(xi)?xi:SF),h+p1*Math.max(SF,isFinite(xi)?xi:SF)]]:null});
+    // 2) dirigé vers C → revient sur lui-même
+    if(Math.abs(xa-SC)>0.5){const p2=(0-h)/(SC-xa),yS=h+p2*(0-xa);R.push({col:"--ok",pts:[[xa,h],[0,yS],[far,yS+p2*far]],ext:SC>0||virt?[[0,yS],[Math.max(SC,isFinite(xi)?xi:SC),yS+p2*Math.max(SC,isFinite(xi)?xi:SC)]]:null})}
+    // 3) vers S → réfléchi symétriquement
+    const p3=(0-h)/(0-xa);R.push({col:"--bleu",pts:[[xa,h],[0,0],[far,-p3*far]],ext:virt?[[0,0],[xi,-p3*xi]]:null});
+    return R}});
+tex($("#mFo"),"\\dfrac1{\\overline{SA'}}+\\dfrac1{\\overline{SA}}=\\dfrac2{\\overline{SC}}\\qquad\\gamma=-\\dfrac{\\overline{SA'}}{\\overline{SA}}");
 
 addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(SIMS.some(s=>s[0]===h)&&h!==cur)go(h)});
 tabs();go(cur);

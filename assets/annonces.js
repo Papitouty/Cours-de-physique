@@ -16,6 +16,10 @@
    ===================================================================== */
 window.ANNONCES = [
   { date: "2026-10-17", important: true,
+    titre: "Optique : quiz, exercices d'entraînement et simulations",
+    texte: "Pour chacun des 5 chapitres d'optique : un quiz de 10 questions corrigées et 3 exercices d'entraînement à valeurs aléatoires avec correction détaillée. Quatre nouvelles simulations : réfraction et réflexion totale, prisme et dispersion, lentille mince, miroir sphérique.",
+    lien: "simulations.html#refrac" },
+  { date: "2026-10-17", important: true,
     titre: "TP n°6 : Mesures électriques (multimètre)",
     texte: "Le TP n°6 devient « Mesures électriques : utilisation du multimètre » : voltmètre, ampèremètre et ohmmètre, choix du calibre, branchement et incertitudes. Le fascicule de TP a été mis à jour.",
     lien: "tp.html#mesures" },
