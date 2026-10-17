@@ -44,6 +44,13 @@ a{color:var(--accent)}
 :focus-visible{outline:2px solid var(--saff);outline-offset:2px}
 .wrap{max-width:1080px;margin:0 auto;padding-inline:20px}
 
+/* ---------- message défilant ---------- */
+.ticker{background:var(--saff);color:#1B2A41;overflow:hidden;white-space:nowrap;font-family:var(--f-head);font-size:.95rem;padding:7px 0;position:relative}
+.tk-track{display:inline-flex;animation:tk 38s linear infinite;will-change:transform}
+.ticker:hover .tk-track,.ticker:focus-within .tk-track{animation-play-state:paused}
+.tk-item{padding-right:5rem}.tk-item b{font-weight:800}.tk-dot{margin-right:.6rem}
+@keyframes tk{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.ticker{white-space:normal;padding:8px 16px;text-align:center}.tk-track{animation:none;display:block}.tk-item+.tk-item{display:none}.tk-item{padding-right:0}}
 /* ---------- bandeau ---------- */
 .band{background:var(--band);color:var(--band-fg);position:relative;overflow:hidden}
 .band canvas{position:absolute;right:0;top:0;height:100%;width:min(520px,60%);opacity:.32;pointer-events:none}
@@ -166,6 +173,9 @@ footer .wrap{padding-block:18px}
     <div class="stats" id="stats"></div>
   </div>
 </header>
+<div class="ticker" role="note" aria-label="Message du professeur : Il faut toujours lire les cours, essayer les exercices, les quiz et les entraînements avant de regarder la correction. La réussite est au bout de l'effort, dans la discipline.">
+  <div class="tk-track" aria-hidden="true"><span class="tk-item"><span class="tk-dot" aria-hidden="true">★</span>Il faut toujours <b>lire les cours</b>, essayer <b>les exercices, les quiz et les entraînements</b> avant de regarder la correction. La réussite est au bout de l'effort, dans la <b>DISCIPLINE</b>.</span><span class="tk-item"><span class="tk-dot" aria-hidden="true">★</span>Il faut toujours <b>lire les cours</b>, essayer <b>les exercices, les quiz et les entraînements</b> avant de regarder la correction. La réussite est au bout de l'effort, dans la <b>DISCIPLINE</b>.</span></div>
+</div>
 
 <nav class="bar" aria-label="Choix du cours">
   <div class="wrap">
